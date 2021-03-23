@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="./tailwind.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@next"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <h1>Füne</h1>
+        <h2>Transaction</h2>
+        <form >
+            <label>From: </label>
+            <select v-model="tx.from">
+                <option disabled value="">Please select one</option>
+                <option v-for="account in accounts" :value="account.name">{{ account.name }}</option>
+            </select>
+            <label>To: </label>
+            <select v-model="tx.to">
+                <option disabled value="">Please select one</option>
+                <option v-for="account in accounts" :value="account.name">{{ account.name }}</option>
+            </select>
+            <label>Value: </label>
+            <input v-model="tx.value" type="number" />
+            <button type="button" @click="executeTx()">Pay</button>
+        </form>
+
+
+
+        <h2>Accounts</h2>
+        <ul>
+            <li v-for="account in accounts">
+                <a href="#">{{ account.name }}</a>: {{ currencyDecimal(account.balance) }} Ü
+            </li>
+        </ul>
+    </div>
+
+</body>
+
+<script>
+    const app = {
+        data() {
+            return {
+                accounts: [],
+                tx: {from: '', to: '', value: 0}
+            }
+        },
+        methods: {
+            currencyDecimal(value) {
+                return (value/100).toFixed(2)
+            },
+            executeTx() {
+                axios
+                    .post('/tx', {from: this.tx.from, to: this.tx.to, value: parseInt(this.tx.value) * 100})
+                    .then(response => {
+                        // TODO
+                    })
+            }
+        },
+        mounted() {
+            axios
+                .get('/accounts')
+                .then(response => {
+                    this.accounts = response.data
+                })
+            setInterval(() => {
+                axios
+                    .get('/accounts')
+                    .then(response => {
+                        this.accounts = response.data
+                    })
+            }, 5000)
+        }
+    }
+
+
+    Vue.createApp(app).mount('#app')
+
+</script>
+
+
+</html>
