@@ -1,2 +1,2 @@
-# fune.openode.io
+# Fune
 My website thanks to www.openode.io
