@@ -135,7 +135,7 @@ app.delete('/ideas/:id', (req, res) => {
 
 
 
-app.listen(8080, () => {
+app.listen(80, () => {
     console.log("Let the Füne begin !!!")
 })
 
