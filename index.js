@@ -19,7 +19,7 @@ var ideas = {
 var currency = {
     date: new Date().toISOString(),
     c: 0.1,
-    stepTime: 1,
+    stepTime: 60,
     elapsedTime: 0,
     revaluationTime: 30, 
     playing: true, 
@@ -53,7 +53,7 @@ app.get('/currency', (req, res) => {
  */
 
 app.get('/accounts/:id', (req, res) => {
-    const id = parseInt(req.params.id)
+    const id = req.params.id
     var account = accounts[id]
     res.status(account ? 200 : 404).json(account)
 })
@@ -68,7 +68,7 @@ app.post('/accounts', (req, res) => {
 })
 
 app.patch('/accounts/:id', (req, res) => {
-    const id = parseInt(req.params.id)
+    const id = req.params.id
     var account = accounts[id]
     if (account)
         account = Object.assign(account, req.body)
@@ -76,7 +76,7 @@ app.patch('/accounts/:id', (req, res) => {
 })
 
 app.delete('/accounts/:id', (req, res) => {
-    const id = parseInt(req.params.id)
+    const id = req.params.id
     var account = accounts[id]
     if (account)
         delete accounts[id]
@@ -87,8 +87,8 @@ app.post('/tx', (req, res) => {
     var tx = Object.assign({from: '', to: '', value: 0, date: new Date().toISOString()}, req.body)
     var accountFrom = accounts[tx.from]
     var accountTo = accounts[tx.to]
-    if (!(accountFrom && accountTo && tx.value > 0 && accountFrom.balance - tx.value > 0)) {
-        res.status(account ? 204 : 404).send()
+    if (!(accountFrom && accountTo && tx.value > 0 && accountFrom.balance - tx.value >= 0)) {
+        res.status(400).send()
     } else {
         accountTo.balance += tx.value
         accountFrom.balance -= tx.value
@@ -102,7 +102,7 @@ app.post('/tx', (req, res) => {
  */
 
 app.get('/ideas/:id', (req, res) => {
-    const id = parseInt(req.params.id)
+    const id = req.params.id
     var idea = ideas[id]
     res.status(idea ? 200 : 404).json(idea)
 })
@@ -117,7 +117,7 @@ app.post('/ideas', (req, res) => {
 })
 
 app.patch('/ideas/:id', (req, res) => {
-    const id = parseInt(req.params.id)
+    const id = req.params.id
     var idea = ideas[id]
     if (idea)
         idea = Object.assign(idea, req.body)
@@ -125,7 +125,7 @@ app.patch('/ideas/:id', (req, res) => {
 })
 
 app.delete('/ideas/:id', (req, res) => {
-    const id = parseInt(req.params.id)
+    const id = req.params.id
     var idea = ideas[id]
     if (idea)
         delete ideas[id]

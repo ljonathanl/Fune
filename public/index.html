@@ -33,9 +33,13 @@
 
 
         <h2>Accounts</h2>
+        <label>Name: </label>
+        <input v-model="newAccount.name" type="text" />
+        <button type="button" @click="createAccount()">Create account</button>
         <ul>
             <li v-for="account in accounts">
-                <a href="#">{{ account.name }}</a>: {{ currencyDecimal(account.balance) }} Ü
+                <a href="#">{{ account.name }}</a>: {{ currencyDecimal(account.balance) }} Ü 
+                <button type="button" @click="deleteAccount(account.name)">Delete</button>
             </li>
         </ul>
     </div>
@@ -46,6 +50,7 @@
     const app = {
         data() {
             return {
+                newAccount: {name: '', creator: true},
                 accounts: [],
                 tx: {from: '', to: '', value: 0}
             }
@@ -58,23 +63,34 @@
                 axios
                     .post('/tx', {from: this.tx.from, to: this.tx.to, value: parseInt(this.tx.value) * 100})
                     .then(response => {
-                        // TODO
+                        this.listAccounts()
                     })
-            }
-        },
-        mounted() {
-            axios
-                .get('/accounts')
-                .then(response => {
-                    this.accounts = response.data
-                })
-            setInterval(() => {
+            },
+            listAccounts() {
                 axios
                     .get('/accounts')
                     .then(response => {
                         this.accounts = response.data
                     })
-            }, 5000)
+            },
+            createAccount() {
+                axios
+                    .post('/accounts', this.newAccount)
+                    .then(response => {
+                        this.listAccounts()
+                    })
+            },
+            deleteAccount(name) {
+                axios
+                    .delete('/accounts/' + name)
+                    .then(response => {
+                        this.listAccounts()
+                    })
+            }
+        },
+        mounted() {
+            this.listAccounts()
+            setInterval(this.listAccounts, 60000)
         }
     }
 
