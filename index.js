@@ -7,9 +7,10 @@ app.use(express.static('public'))
 app.use(morgan('tiny'))
 
 var accounts = {
-    alice: {name: 'alice', balance: 0, creator: false, date: new Date().toISOString()},
-    bob: {name: 'bob', balance: 0, creator: false, date: new Date().toISOString()},
-    claude: {name: 'claude', balance: 0, creator: false, date: new Date().toISOString()},
+    alice: {name: 'alice', balance: 0, creator: true, date: new Date().toISOString()},
+    bob: {name: 'bob', balance: 0, creator: true, date: new Date().toISOString()},
+    claude: {name: 'claude', balance: 0, creator: true, date: new Date().toISOString()},
+    daniel: {name: 'daniel', balance: 0, creator: false, date: new Date().toISOString()},
 }
 
 var ideas = {

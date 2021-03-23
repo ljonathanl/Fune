@@ -1,47 +1,95 @@
 <!doctype html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8" />
+    <title>Füne</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="./tailwind.css" rel="stylesheet">
+    <link href="./bootstrap.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="favicon.png" />
     <script src="https://unpkg.com/vue@next"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
-    <div id="app">
-        <h1>Füne</h1>
-        <h2>Transaction</h2>
-        <form >
-            <label>From: </label>
-            <select v-model="tx.from">
-                <option disabled value="">Please select one</option>
-                <option v-for="account in accounts" :value="account.name">{{ account.name }}</option>
-            </select>
-            <label>To: </label>
-            <select v-model="tx.to">
-                <option disabled value="">Please select one</option>
-                <option v-for="account in accounts" :value="account.name">{{ account.name }}</option>
-            </select>
-            <label>Value: </label>
-            <input v-model="tx.value" type="number" />
-            <button type="button" @click="executeTx()">Pay</button>
-        </form>
+    <div id="app" class="container">
+        <h1><img src="./favicon.png" class="align-baseline"><span class="align-baseline">Füne</span></h1>
+        <div class="mb-3 rounded border border-4 p-3">
+            <h4>Transaction</h4>
+            <form class="row g-4 align-items-center">
+                <div class="col-auto">
+                    <div class="input-group">
+                        <label class="input-group-text" for="txFrom">From </label>
+                        <select v-model="tx.from" id="txFrom" class="form-select">
+                            <option disabled value="">Please select one</option>
+                            <option v-for="account in accounts" :value="account.name">{{ account.name }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <div class="input-group">
+                        <label class="input-group-text" for="txTo">To </label>
+                        <select v-model="tx.to" id="txTo" class="form-select">
+                            <option disabled value="">Please select one</option>
+                            <option v-for="account in accounts" :value="account.name">{{ account.name }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <div class="input-group">
+                        <span class="input-group-text">Ü</span>
+                        <input v-model="tx.value" type="number" class="form-control">
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <button type="button" class="btn btn-primary" @click="executeTx()">Pay</button>
+                </div>
+            </form>
+        </div>
 
 
+        <div class="mb-3 rounded border border-4 p-3">
+            <h4>New Account</h4>
+            <form class="row g-3 align-items-center">
+                <div class="col-auto">
+                    <div class="input-group">
+                        <label for="accountName" class="input-group-text">Name</label>
+                        <input v-model="newAccount.name" type="text" class="form-control" id="accountName" />
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <div class="form-check form-check-inline">
+                        <input v-model="newAccount.creator" type="checkbox" class="form-check-input" id="accountCreator">
+                        <label class="form-check-label" for="accountCreator">Creator</label>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <button type="button" class="btn btn-primary" @click="createAccount()">Create</button>
+                </div>
+            </form>
+        </div>
 
-        <h2>Accounts</h2>
-        <label>Name: </label>
-        <input v-model="newAccount.name" type="text" />
-        <button type="button" @click="createAccount()">Create account</button>
-        <ul>
-            <li v-for="account in accounts">
-                <a href="#">{{ account.name }}</a>: {{ currencyDecimal(account.balance) }} Ü 
-                <button type="button" @click="deleteAccount(account.name)">Delete</button>
-            </li>
-        </ul>
+        <table class="table">
+            <thead class="table-light">
+                <tr>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Balance</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="account in accounts">
+                    <td>{{ account.name }}</td>
+                    <td>
+                        <span v-if="account.creator" class="badge bg-primary text-light">Creator</span>
+                        <span v-else class="badge bg-secondary text-light">Wallet</span>
+                    </td>
+                    <td>{{ currencyDecimal(account.balance) }} Ü</td>
+                    <td><a href="#" @click="deleteAccount(account.name)">Delete</a></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
 </body>
@@ -81,11 +129,12 @@
                     })
             },
             deleteAccount(name) {
-                axios
-                    .delete('/accounts/' + name)
-                    .then(response => {
-                        this.listAccounts()
-                    })
+                if (confirm("Are you sure to delete " + name + "?"))
+                    axios
+                        .delete('/accounts/' + name)
+                        .then(response => {
+                            this.listAccounts()
+                        })
             }
         },
         mounted() {
