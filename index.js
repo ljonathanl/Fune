@@ -3,7 +3,7 @@ const morgan = require('morgan')
 
 const app = express()
 app.use(express.json())
-app.use('/public', express.static('public'))
+app.use(express.static('public'))
 app.use(morgan('tiny'))
 
 var accounts = {
