@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "Füne project",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "start": "node ./index.js"
+  },
   "author": "Jonathan",
   "license": "GPL",
   "dependencies": {
