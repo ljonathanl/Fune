@@ -167,7 +167,8 @@ async function play() {
         Object.values(accounts).forEach( account => {
             if (currency.elapsedTime % currency.revaluationTime == 0)
                 account.balance = Math.ceil(account.balance * (1 - currency.c));
-            account.balance += 100;
+            if (account.creator)
+                account.balance += 100;
         });
         await storage.setItem('accounts', accounts)
         await storage.setItem('currency', currency)
