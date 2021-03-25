@@ -113,7 +113,7 @@
         data() {
             return {
                 hasAccount: false,
-                account: {name: '', creator: true},
+                account: {name: '', creator: true, value: 0},
                 accounts: [],
                 accountsMap: {},
                 otherAccounts: [],
@@ -202,8 +202,9 @@
             },
             deleteAccount() {
                 if (confirm("are ü sure?")) {
+                    localStorage.setItem('name', null)
                     this.hasAccount = false;
-                    this.account = {name: '', creator: true}
+                    this.account = {name: '', creator: true, value: 0}
                 }
             }
         },
