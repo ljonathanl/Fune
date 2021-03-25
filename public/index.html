@@ -60,7 +60,7 @@
                 </div>
             </form>
             <ul class="list-group m-auto">
-                <li v-for="transaction in transactions" class="list-group-item">
+                <li v-for="transaction in transactions" class="list-group-item list-group-item-light">
                     <div class="d-flex w-100 justify-content-between">
                         <h5 v-if="transaction.from == account.name">
                             <span style="width: 80px;" class="badge bg-secondary text-light text-right">{{ currencyDecimal(transaction.value) }} Ü</span>
