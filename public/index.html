@@ -46,8 +46,8 @@
             <p class="display-5 text-center" v-else>welcöme !</p>
             <form class="mb-4 mt-4 row justify-content-center" v-if="account.balance > 0">
                 <div class="col-auto input-group w-auto">
-                    <input v-model="tx.value" type="number" :max="Math.round(account.balance/100)" min="0" class="form-control text-right" style="max-width: 120px;">
-                    <span class="input-group-text mr-3">Ü</span>
+                    <input v-model="tx.value" type="number" :max="Math.round(account.balance/100)" step="1" min="0" class="form-control text-right" style="max-width: 120px;">
+                    <small class="input-group-text mr-3">Ü</small>
                     <label class="input-group-text" for="txTo">tö</label>
                     <select v-model="tx.to" id="txTo" class="form-select">
                         <option disabled value="">someöne</option>
@@ -62,7 +62,7 @@
                 <li v-for="transaction in transactions" class="list-group-item" style="background-color: #a1adb9;">
                     <div class="d-flex w-100 justify-content-between">
                         <h5 v-if="transaction.from == account.name">
-                            <span style="width: 80px;" class="badge bg-secondary text-right">{{ currencyDecimal(transaction.value) }} Ü</span>
+                            <span style="width: 80px;" class="badge bg-secondary text-right">{{ currencyDecimal(transaction.value) }}<small> Ü</small></span>
                             <span style="width: 80px;" class="d-inline-block text-center"> to </span>
                             <strong>
                                 <a href="#" @click="tx.to = transaction.to" :class="{ 'text-primary': isCreator(transaction.to), 'text-secondary': !isCreator(transaction.to) }">
@@ -71,7 +71,7 @@
                             </strong>
                         </h5>
                         <h5 v-else>
-                            <span style="width: 80px;" class="badge bg-primary text-right">{{ currencyDecimal(transaction.value) }} Ü</span>
+                            <span style="width: 80px;" class="badge bg-primary text-right">{{ currencyDecimal(transaction.value) }}<small> Ü</small></span>
                             <span style="width: 80px;" class="d-inline-block text-center"> from </span>
                             <strong>
                                 <a href="#" @click="tx.to = transaction.from" :class="{ 'text-primary': isCreator(transaction.from), 'text-secondary': !isCreator(transaction.from) }">
@@ -100,7 +100,7 @@
                             <span v-if="account.creator" class="badge bg-primary">Creator</span>
                             <span v-else class="badge bg-secondary">Wallet</span>
                         </td>
-                        <td class="text-right">{{ currencyDecimal(account.balance) }} Ü</td>
+                        <td class="text-right">{{ currencyDecimal(account.balance) }}<small> Ü</small></td>
                         <td class="text-right"></td>
                     </tr>
                 </tbody>
