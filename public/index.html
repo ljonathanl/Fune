@@ -3,125 +3,107 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Füne</title>
+    <title>neŭrone</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="./bootstrap.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="favicon.png" />
     <script src="https://unpkg.com/vue@next"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        [v-cloak] > * { display:none }
+        [v-cloak]::before { content: "loading…" }
+    </style>
 </head>
 
 <body>
-    <div id="app" class="container">
-        <h1><img src="./favicon.png" class="align-baseline"><span class="align-baseline">Füne</span></h1>
-
-        <div class="mb-3 rounded border border-4 p-3">
-            <h4>Currency</h4>
-            <form>
-                <div class="input-group mb-3">
-                    <label class="input-group-text" for="currencyCelerity">Celerity</label>
-                    <input id="currencyCelerity" v-model="currency.c" type="text" class="form-control text-right" disabled>
-                </div>
-                <div class="input-group mb-3">
-                    <label class="input-group-text" for="currencyStepTime">Day duration</label>
-                    <input id="currencyStepTime" v-model="currency.stepTime" type="text" class="form-control text-right" disabled>
-                    <span class="input-group-text">seconds</span>
-                </div>
-                <div class="input-group mb-3">
-                    <label class="input-group-text" for="currencyRevaluationTime">Revaluation period</label>
-                    <input id="currencyRevaluationTime" v-model="currency.revaluationTime" type="text" class="form-control text-right" disabled>
-                    <span class="input-group-text">days</span>
-                </div>
-                <div class="input-group mb-3">
-                    <label class="input-group-text" for="currencyElapsedTime">Elapsed time</label>
-                    <input id="currencyElapsedTime" v-model="currency.elapsedTime" type="text" class="form-control text-right" disabled>
-                    <span class="input-group-text">days</span>
-                </div>
-            </form>    
-        </div>    
-
-
-        <div class="mb-3 rounded border border-4 p-3">
-            <h4>Transaction</h4>
-            <form class="row g-4 align-items-center">
-                <div class="col-auto">
-                    <div class="input-group">
-                        <label class="input-group-text" for="txFrom">From </label>
-                        <select v-model="tx.from" id="txFrom" class="form-select">
-                            <option disabled value="">Select one</option>
-                            <option v-for="account in accounts" :value="account.name">{{ account.name }}</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-auto">
-                    <div class="input-group">
-                        <label class="input-group-text" for="txTo">To </label>
-                        <select v-model="tx.to" id="txTo" class="form-select">
-                            <option disabled value="">Select one</option>
-                            <option v-for="account in accounts" :value="account.name">{{ account.name }}</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-auto">
-                    <div class="input-group">
-                        <input v-model="tx.value" type="number" class="form-control text-right">
-                        <span class="input-group-text">Ü</span>
-                    </div>
-                </div>
-                <div class="col-auto">
-                    <button type="button" class="btn btn-primary" @click="executeTx()">Pay</button>
+    <div id="app" v-cloak class="container-sm" style="max-width: 600px;">
+        <div class="mt-3 mb-3" v-if="!hasAccount">
+            <h2 class="text-center display-2">hëllö !</h2>
+            <p class="display-4 text-center">enter ür name</p>
+            <form class="mb-3 p-3">
+                <div class="input-group">
+                    <input v-model="account.name" type="text" class="form-control text-left">
+                    <button type="button" class="btn btn-primary ml-3" @click="createAccount()">ök !</button>
                 </div>
             </form>
         </div>
 
-
-        <div class="mb-3 rounded border border-4 p-3">
-            <h4>New Account</h4>
-            <form class="row g-3 align-items-center">
-                <div class="col-auto">
-                    <div class="input-group">
-                        <label for="accountName" class="input-group-text">Name</label>
-                        <input v-model="newAccount.name" type="text" class="form-control" id="accountName" />
-                    </div>
-                </div>
-                <div class="col-auto">
-                    <div class="input-group">
-                        <div class="input-group-text">
-                            <input v-model="newAccount.creator" type="checkbox" class="mt-0" id="accountCreator">
-                        </div>
-                        <label class="input-group-text" for="accountCreator">
-                            <span v-if="newAccount.creator" class="badge bg-primary text-light" style="width: 80px;">Creator</span>
-                            <span v-else class="badge bg-secondary text-light" style="width: 80px;">Wallet</span>
-                        </label>
-                    </div>
-                </div>
-                <div class="col-auto">
-                    <button type="button" class="btn btn-primary" @click="createAccount()">Create</button>
+        
+        <div class="mt-3 mb-3" v-if="hasAccount">
+            <h2 class="text-center display-3 mb-6">
+                <span>{{ account.name }}</span>
+                <small style="position: absolute;top: 10px;right: 20px;">
+                    <a href="#" class="text-dark" @click="deleteAccount()">x</a>
+                </small>
+            </h2>
+            <div class="display-1 text-center">{{ currencyDecimal(account.balance) }} Ü</div>
+            <p class="display-5 text-center" v-if="!account.creator">wallet</p>
+            <p class="display-5 text-center" v-else-if="currency.elapsedTime - account.creationDay > 1"><strong>{{ currency.elapsedTime - account.creationDay }}</strong> days of creation, thx !</p>
+            <p class="display-5 text-center" v-else>elcöme !</p>
+            <form class="mb-4 mt-4 row justify-content-center" v-if="account.balance > 0">
+                <div class="col-auto input-group w-auto">
+                    <span class="input-group-text" for="txTo">gïve</span>
+                    <input v-model="tx.value" type="number" :max="Math.round(account.balance/100)" min="0" class="form-control text-right" style="max-width: 120px;">
+                    <span class="input-group-text mr-3">Ü</span>
+                    <label class="input-group-text" for="txTo">tö</label>
+                    <select v-model="tx.to" id="txTo" class="form-select">
+                        <option disabled value="">someöne</option>
+                        <option v-for="account in otherAccounts" :value="account.name" :class="{ 'text-primary': account.creator, 'text-secondary': !account.creator }">
+                            <strong>{{ account.name }}</strong>
+                        </option>
+                    </select>
+                    <button type="button" class="btn btn-primary ml-3" @click="executeTx()">ök !</button>
                 </div>
             </form>
+            <ul class="list-group w-75 m-auto">
+                <li v-for="transaction in transactions" class="list-group-item">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 v-if="transaction.from == account.name">
+                            <span style="width: 80px;" class="badge bg-secondary text-light text-right">{{ currencyDecimal(transaction.value) }} Ü</span>
+                            <span style="width: 120px;" class="d-inline-block text-center"> to </span>
+                            <strong>
+                                <a href="#" :class="{ 'text-primary': isCreator(transaction.to), 'text-secondary': !isCreator(transaction.to) }">
+                                    {{ transaction.to}}
+                                </a>
+                            </strong>
+                        </h5>
+                        <h5 v-else>
+                            <span style="width: 80px;" class="badge bg-primary text-light text-right">{{ currencyDecimal(transaction.value) }} Ü</span>
+                            <span style="width: 120px;" class="d-inline-block text-center"> from </span>
+                            <strong>
+                                <a href="#" :class="{ 'text-primary': isCreator(transaction.from), 'text-secondary': !isCreator(transaction.from) }">
+                                    {{ transaction.from}}
+                                </a>
+                            </strong>
+                        </h5>
+                        <small> {{ formatDay(transaction.day) }}</small>
+                    </div>
+                </li>
+            </ul>
+            <table class="table mt-3">
+                <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        <th class="text-center">Role</th>
+                        <th class="text-right">Balance</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="account in otherAccounts">
+                        <td>{{ account.name }}</td>
+                        <td class="text-center">
+                            <span v-if="account.creator" class="badge bg-primary text-light">Creator</span>
+                            <span v-else class="badge bg-secondary text-light">Wallet</span>
+                        </td>
+                        <td class="text-right">{{ currencyDecimal(account.balance) }} Ü</td>
+                        <td class="text-right"></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
-        <table class="table">
-            <thead class="table-light">
-                <tr>
-                    <th>Name</th>
-                    <th class="text-center">Role</th>
-                    <th class="text-right">Balance</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="account in accounts">
-                    <td>{{ account.name }}</td>
-                    <td class="text-center">
-                        <span v-if="account.creator" class="badge bg-primary text-light">Creator</span>
-                        <span v-else class="badge bg-secondary text-light">Wallet</span>
-                    </td>
-                    <td class="text-right">{{ currencyDecimal(account.balance) }} Ü</td>
-                    <td class="text-right"><a href="#" @click="deleteAccount(account.name)">Delete</a></td>
-                </tr>
-            </tbody>
-        </table>
+        
     </div>
 
 </body>
@@ -130,9 +112,13 @@
     const app = {
         data() {
             return {
-                newAccount: {name: '', creator: true},
+                hasAccount: false,
+                account: {name: '', creator: true},
                 accounts: [],
+                accountsMap: {},
+                otherAccounts: [],
                 tx: {from: '', to: '', value: 0},
+                transactions: [],
                 currency: {
                     date: new Date().toISOString(),
                     c: 0,
@@ -149,10 +135,22 @@
             },
             executeTx() {
                 axios
-                    .post('/tx', {from: this.tx.from, to: this.tx.to, value: parseInt(this.tx.value) * 100})
+                    .post('/tx', {from: this.account.name, to: this.tx.to, value: parseInt(this.tx.value) * 100})
                     .then(response => {
                         this.listAccounts()
+                        this.listTransactions()
                     })
+            },
+            formatDay(day) {
+                if (day >= this.currency.elapsedTime) {
+                    return " today"
+                } else if (day == this.currency.elapsedTime - 1) {
+                    return " yesterday"
+                }
+                return  " " + (this.currency.elapsedTime - day) + " days ago" 
+            },
+            isCreator(name) {
+                return this.accountsMap[name].creator
             },
             getCurrency() {
                 axios
@@ -161,36 +159,62 @@
                         this.currency = response.data
                     })
             },
+            listTransactions() {
+                axios
+                    .get('/accounts/' + this.account.name + '/tx')
+                    .then(response => {
+                        this.transactions = response.data.reverse()
+                    })
+            },
             listAccounts() {
                 axios
                     .get('/accounts')
                     .then(response => {
                         this.accounts = response.data
+                        this.otherAccounts = []
+                        this.accountsMap = {}
+                        for (let i = 0; i < this.accounts.length; i++) {
+                            const account = this.accounts[i]
+                            if (account.name == this.account.name) {
+                                this.account = account
+                            } else {
+                                this.otherAccounts.push(account)
+                            }
+                            this.accountsMap[account.name] = account;
+                        }
                     })
             },
             createAccount() {
                 axios
-                    .post('/accounts', this.newAccount)
+                    .post('/accounts', this.account)
                     .then(response => {
-                        this.listAccounts()
+                        localStorage.setItem('name', this.account.name)
+                        this.hasAccount = true
+                        this.refresh()
+                        setInterval(this.refresh, 60000)
                     })
-            },
-            deleteAccount(name) {
-                if (confirm("Are you sure to delete " + name + "?"))
-                    axios
-                        .delete('/accounts/' + name)
-                        .then(response => {
-                            this.listAccounts()
-                        })
             },
             refresh() {
                 this.listAccounts()
                 this.getCurrency()
+                if (this.hasAccount)
+                    this.listTransactions()
+            },
+            deleteAccount() {
+                if (confirm("are ü sure?")) {
+                    this.hasAccount = false;
+                    this.account = {name: '', creator: true}
+                }
             }
         },
         mounted() {
-            this.refresh();
-            setInterval(this.refresh, 60000)
+            var name = localStorage.getItem('name')
+            if (name) {
+                this.account.name = name
+                this.hasAccount = true
+                this.refresh()
+                setInterval(this.refresh, 60000)
+            }
         }
     }
 
