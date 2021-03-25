@@ -60,10 +60,10 @@
                 </div>
             </form>
             <ul class="list-group m-auto">
-                <li v-for="transaction in transactions" class="list-group-item list-group-item-light">
+                <li v-for="transaction in transactions" class="list-group-item" style="background-color: #a1adb9;">
                     <div class="d-flex w-100 justify-content-between">
                         <h5 v-if="transaction.from == account.name">
-                            <span style="width: 80px;" class="badge bg-secondary text-light text-right">{{ currencyDecimal(transaction.value) }} Ü</span>
+                            <span style="width: 80px;" class="badge bg-secondary text-right">{{ currencyDecimal(transaction.value) }} Ü</span>
                             <span style="width: 80px;" class="d-inline-block text-center"> to </span>
                             <strong>
                                 <a href="#" :class="{ 'text-primary': isCreator(transaction.to), 'text-secondary': !isCreator(transaction.to) }">
@@ -72,7 +72,7 @@
                             </strong>
                         </h5>
                         <h5 v-else>
-                            <span style="width: 80px;" class="badge bg-primary text-light text-right">{{ currencyDecimal(transaction.value) }} Ü</span>
+                            <span style="width: 80px;" class="badge bg-primary text-right">{{ currencyDecimal(transaction.value) }} Ü</span>
                             <span style="width: 80px;" class="d-inline-block text-center"> from </span>
                             <strong>
                                 <a href="#" :class="{ 'text-primary': isCreator(transaction.from), 'text-secondary': !isCreator(transaction.from) }">
