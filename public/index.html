@@ -46,14 +46,13 @@
             <p class="display-5 text-center" v-else>welcöme !</p>
             <form class="mb-4 mt-4 row justify-content-center" v-if="account.balance > 0">
                 <div class="col-auto input-group w-auto">
-                    <span class="input-group-text" for="txTo">gïve</span>
                     <input v-model="tx.value" type="number" :max="Math.round(account.balance/100)" min="0" class="form-control text-right" style="max-width: 120px;">
                     <span class="input-group-text mr-3">Ü</span>
                     <label class="input-group-text" for="txTo">tö</label>
                     <select v-model="tx.to" id="txTo" class="form-select">
                         <option disabled value="">someöne</option>
                         <option v-for="account in otherAccounts" :value="account.name" :class="{ 'text-primary': account.creator, 'text-secondary': !account.creator }">
-                            <strong>{{ account.name }}</strong>
+                            <strong>{{ (account.creator ? '@' : '#') + account.name }}</strong>
                         </option>
                     </select>
                     <button type="button" class="btn btn-primary ml-3" @click="executeTx()">ök !</button>
@@ -66,8 +65,8 @@
                             <span style="width: 80px;" class="badge bg-secondary text-right">{{ currencyDecimal(transaction.value) }} Ü</span>
                             <span style="width: 80px;" class="d-inline-block text-center"> to </span>
                             <strong>
-                                <a href="#" :class="{ 'text-primary': isCreator(transaction.to), 'text-secondary': !isCreator(transaction.to) }">
-                                    {{ transaction.to}}
+                                <a href="#" @click="tx.to = transaction.to" :class="{ 'text-primary': isCreator(transaction.to), 'text-secondary': !isCreator(transaction.to) }">
+                                    {{ (isCreator(transaction.to) ? '@' : '#') + transaction.to }}
                                 </a>
                             </strong>
                         </h5>
@@ -75,8 +74,8 @@
                             <span style="width: 80px;" class="badge bg-primary text-right">{{ currencyDecimal(transaction.value) }} Ü</span>
                             <span style="width: 80px;" class="d-inline-block text-center"> from </span>
                             <strong>
-                                <a href="#" :class="{ 'text-primary': isCreator(transaction.from), 'text-secondary': !isCreator(transaction.from) }">
-                                    {{ transaction.from}}
+                                <a href="#" @click="tx.to = transaction.from" :class="{ 'text-primary': isCreator(transaction.from), 'text-secondary': !isCreator(transaction.from) }">
+                                    {{ (isCreator(transaction.from) ? '@' : '#') + transaction.from }}
                                 </a>
                             </strong>
                         </h5>
@@ -95,7 +94,8 @@
                 </thead>
                 <tbody>
                     <tr v-for="account in otherAccounts">
-                        <td>{{ account.name }}</td>
+                        <td>
+                            <a href="#" @click="tx.to = account.name">{{ account.name }}</a></td>
                         <td class="text-center">
                             <span v-if="account.creator" class="badge bg-primary">Creator</span>
                             <span v-else class="badge bg-secondary">Wallet</span>
@@ -113,6 +113,7 @@
 </body>
 
 <script>
+    let intervalId = 0;
     const app = {
         data() {
             return {
@@ -121,7 +122,7 @@
                 accounts: [],
                 accountsMap: {},
                 otherAccounts: [],
-                tx: {from: '', to: '', value: 0},
+                tx: {from: '', to: '', value: 1},
                 transactions: [],
                 currency: {
                     date: new Date().toISOString(),
@@ -192,14 +193,16 @@
                     })
             },
             createAccount() {
-                axios
-                    .post('/accounts', this.account)
-                    .then(response => {
-                        localStorage.setItem('name', this.account.name)
-                        this.hasAccount = true
-                        this.refresh()
-                        setInterval(this.refresh, 60000)
-                    })
+                let account = this.accountsMap[this.account.name];
+                if (account) {
+                    this.setAccount()
+                } else {
+                    axios
+                        .post('/accounts', this.account)
+                        .then(response => {
+                            this.setAccount()
+                        })
+                }
             },
             refresh() {
                 this.listAccounts()
@@ -209,19 +212,25 @@
             },
             deleteAccount() {
                 if (confirm("are ü sure?")) {
-                    localStorage.setItem('name', null)
+                    localStorage.removeItem('name')
                     this.hasAccount = false;
                     this.account = {name: '', creator: true, value: 0}
                 }
+            },
+            setAccount() {
+                localStorage.setItem('name', this.account.name)
+                this.hasAccount = true
+                this.refresh()
+                clearInterval(intervalId)
+                intervalId = setInterval(this.refresh, 60000)
             }
         },
         mounted() {
+            this.listAccounts()
             var name = localStorage.getItem('name')
             if (name) {
                 this.account.name = name
-                this.hasAccount = true
-                this.refresh()
-                setInterval(this.refresh, 60000)
+                this.setAccount()
             }
         }
     }
