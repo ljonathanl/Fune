@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <title>neŭrone</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="./bootstrap.min.css" rel="stylesheet">
+    <link href="./bootstrap.superhero.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="favicon.png" />
     <script src="https://unpkg.com/vue@next"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -32,11 +32,15 @@
         <div class="mt-3 mb-3" v-if="hasAccount">
             <h2 class="text-center display-3 mb-6">
                 <span>{{ account.name }}</span>
-                <small style="position: absolute;top: 10px;right: 20px;font-size: 40%;">
+                <small class="position-absolute top-0 end-0" style="font-size: 40%;">
                     <a href="#" class="text-dark" @click="deleteAccount()">x</a>
                 </small>
             </h2>
-            <div class="display-1 text-center">{{ currencyDecimal(account.balance) }} Ü</div>
+            <div class="display-2 text-center">
+                <span>{{ Math.round(account.balance/100) }}</span>
+                <small class="align-baseline" style="font-size: 50%;">.{{ digit(account.balance) }}</small> 
+                <small> Ü</small>
+            </div>
             <p class="display-5 text-center" v-if="!account.creator">wallet</p>
             <p class="display-5 text-center" v-else-if="currency.elapsedTime - account.creationDay > 1"><strong>{{ currency.elapsedTime - account.creationDay }}</strong> days of creation, thx !</p>
             <p class="display-5 text-center" v-else>welcöme !</p>
@@ -81,7 +85,7 @@
                 </li>
             </ul>
             <table class="table mt-3">
-                <thead class="table-light">
+                <thead>
                     <tr>
                         <th>Name</th>
                         <th class="text-center">Role</th>
@@ -93,8 +97,8 @@
                     <tr v-for="account in otherAccounts">
                         <td>{{ account.name }}</td>
                         <td class="text-center">
-                            <span v-if="account.creator" class="badge bg-primary text-light">Creator</span>
-                            <span v-else class="badge bg-secondary text-light">Wallet</span>
+                            <span v-if="account.creator" class="badge bg-primary">Creator</span>
+                            <span v-else class="badge bg-secondary">Wallet</span>
                         </td>
                         <td class="text-right">{{ currencyDecimal(account.balance) }} Ü</td>
                         <td class="text-right"></td>
@@ -130,6 +134,9 @@
             }
         },
         methods: {
+            digit(value) {
+                return (value % 100).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false})
+            },
             currencyDecimal(value) {
                 return (value/100).toFixed(2)
             },
