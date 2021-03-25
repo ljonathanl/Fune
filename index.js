@@ -35,7 +35,7 @@ app.get('/accounts', (req, res) => {
 })
 
 app.post('/accounts', async (req, res) => {
-    var account = accounts[req.body.name] = Object.assign({name: '', balance: 0, creator: false, date: new Date().toISOString()}, req.body)
+    var account = accounts[req.body.name] = Object.assign({name: '', balance: 0, creator: false, date: new Date().toISOString(), creationDay: currency.elapsedTime}, req.body)
     await storage.setItem('accounts', accounts)
     res.status(201).json(account)
 })
@@ -60,8 +60,19 @@ app.delete('/accounts/:id', async (req, res) => {
     res.status(account ? 204 : 404).send();
 })
 
+app.get('/accounts/:id/tx', (req, res) => {
+    const id = req.params.id
+    var account = accounts[id]
+    if (!account) {
+        res.status(404).send()
+    } else {
+        var tx = transactions.filter(transaction => transaction.from == id || transaction.to == id)
+        res.status(200).json(tx)
+    }
+})
+
 app.post('/tx', async (req, res) => {
-    var tx = Object.assign({from: '', to: '', value: 0, date: new Date().toISOString()}, req.body)
+    var tx = Object.assign({from: '', to: '', value: 0, date: new Date().toISOString(), day: currency.elapsedTime}, req.body)
     var accountFrom = accounts[tx.from]
     var accountTo = accounts[tx.to]
     if (!(accountFrom && accountTo && tx.value > 0 && accountFrom.balance - tx.value >= 0)) {
@@ -113,6 +124,29 @@ app.delete('/ideas/:id', (req, res) => {
 
 
 
+/* 
+ * DB
+ */
+
+app.get('/db', (req, res) => {
+    const db = {
+        currency,
+        accounts,
+        transactions
+    }
+    res.status(200).json(db)
+})
+
+
+app.put('/db', async (req, res) => {
+    currency = req.body.currency
+    accounts = req.body.accounts
+    transactions = req.body.transactions
+    await storage.setItem('currency', currency)
+    await storage.setItem('accounts', accounts)
+    await storage.setItem('transactions', transactions)
+    res.status(204).send()
+})
 
 app.listen(80, () => {
     console.log("Let the Füne begin !!!")
@@ -139,17 +173,15 @@ async function start() {
 
     if (!accounts)
         accounts = {
-            alice: {name: 'alice', balance: 0, creator: true, date: new Date().toISOString()},
-            bob: {name: 'bob', balance: 0, creator: true, date: new Date().toISOString()},
-            claude: {name: 'claude', balance: 0, creator: true, date: new Date().toISOString()},
-            daniel: {name: 'daniel', balance: 0, creator: false, date: new Date().toISOString()},
+            alice: {name: 'alice', balance: 0, creator: true, date: new Date().toISOString(), creationDay: 0},
+            bob: {name: 'bob', balance: 0, creator: true, date: new Date().toISOString(), creationDay: 0},
+            claude: {name: 'claude', balance: 0, creator: true, date: new Date().toISOString(), creationDay: 0},
+            daniel: {name: 'daniel', balance: 0, creator: false, date: new Date().toISOString(), creationDay: 0},
         }
 
     ideas = {
         idea1: {name: 'idea1', account: 'alice', text: 'first idea', date: new Date().toISOString()},
     }
-
-
 
     transactions = await storage.getItem('transactions')
 
