@@ -12,17 +12,18 @@
 </head>
 
 <body>
-    <div id="app" class="container">
+    <div id="app" class="container-sm">
         <h1 class="display-1 text-center mb-5"><img src="./favicon.png" class="align-baseline"><span class="align-baseline"> f<small>Ü</small>ne</span></h1>
 
         <p class="lead text-center mb-3"><strong>f<small>Ü</small>ne</strong> is a web app to test and play with a simple <a href="https://libre-currency.org/">Libre Currency</a> called <strong>f<small>Ü</small>ne</strong> (pronounced /fən/ like fun)</p>
 
         <p class="lead text-center mb-5">
-            a creator account create a new one <small>Ü</small> (the Ünit of the f<small>Ü</small>ne currency) by day<br>
-            <small>old created <strong>Ünits</strong> melt <strong>celerity</strong> % per <strong>revaluation period</strong></small><br>
+            a creator account create a new one <small>Ü</small> (the <small>Ü</small>nit of the f<small>Ü</small>ne currency) by day<br>
+            <small>old created <strong><small>Ü</small>nits</strong> melt <strong>celerity</strong> % per <strong>revaluation period</strong></small><br>
             <small class="fs-3">that's all fölks !</small><br>
         </p>
-        <div class="mb-3 rounded border border-4 p-3">
+
+        <div class="mb-3 p-3 m-auto" style="width: 300px;">
             <h4>Currency</h4>
             <form>
                 <div class="input-group mb-3">
@@ -46,70 +47,30 @@
                     <span class="input-group-text">days</span>
                 </div>
             </form>    
-        </div>    
+        </div>
 
-
-        <div class="mb-3 rounded border border-4 p-3">
+        <div class="mb-3 p-3 m-auto" style="width: 500px;">
             <h4>Transaction</h4>
-            <form class="row g-4 align-items-center">
-                <div class="col-auto">
-                    <div class="input-group">
-                        <label class="input-group-text" for="txFrom">From </label>
-                        <select v-model="tx.from" id="txFrom" class="form-select">
-                            <option disabled value="">Select one</option>
-                            <option v-for="account in accounts" :value="account.name">{{ account.name }}</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-auto">
-                    <div class="input-group">
-                        <label class="input-group-text" for="txTo">To </label>
-                        <select v-model="tx.to" id="txTo" class="form-select">
-                            <option disabled value="">Select one</option>
-                            <option v-for="account in accounts" :value="account.name">{{ account.name }}</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-auto">
-                    <div class="input-group">
-                        <input v-model="tx.value" type="number" class="form-control text-right">
-                        <span class="input-group-text"><small>Ü</small></span>
-                    </div>
-                </div>
-                <div class="col-auto">
-                    <button type="button" class="btn btn-primary" @click="executeTx()">Pay</button>
+            <form>
+                <div class="input-group">
+                    <input v-model="tx.value" type="number" class="form-control text-right" style="width: 80px;">
+                    <span class="input-group-text"><small>Ü</small></span>
+                    <label class="input-group-text" for="txFrom"> fröm </label>
+                    <select v-model="tx.from" id="txFrom" class="form-select">
+                        <option disabled value="">select one</option>
+                        <option v-for="account in accounts" :value="account.name">{{ account.name }}</option>
+                    </select>
+                    <label class="input-group-text" for="txTo">tö </label>
+                    <select v-model="tx.to" id="txTo" class="form-select">
+                        <option disabled value="">select one</option>
+                        <option v-for="account in accounts" :value="account.name">{{ account.name }}</option>
+                    </select>
+                    <button type="button" class="btn btn-primary" @click="executeTx()">ök!</button>
                 </div>
             </form>
         </div>
 
-
-        <div class="mb-3 rounded border border-4 p-3">
-            <h4>New Account</h4>
-            <form class="row g-3 align-items-center">
-                <div class="col-auto">
-                    <div class="input-group">
-                        <label for="accountName" class="input-group-text">Name</label>
-                        <input v-model="newAccount.name" type="text" class="form-control" id="accountName" />
-                    </div>
-                </div>
-                <div class="col-auto">
-                    <div class="input-group">
-                        <div class="input-group-text">
-                            <input v-model="newAccount.creator" type="checkbox" class="mt-0" id="accountCreator">
-                        </div>
-                        <label class="input-group-text" for="accountCreator">
-                            <span v-if="newAccount.creator" class="badge bg-primary" style="width: 80px;">Creator</span>
-                            <span v-else class="badge bg-secondary" style="width: 80px;">Wallet</span>
-                        </label>
-                    </div>
-                </div>
-                <div class="col-auto">
-                    <button type="button" class="btn btn-primary" @click="createAccount()">Create</button>
-                </div>
-            </form>
-        </div>
-
-        <table class="table">
+        <table class="table mt-3">
             <thead>
                 <tr>
                     <th @click="sortBy('name')">Name</th>
@@ -119,14 +80,31 @@
                 </tr>
             </thead>
             <tbody>
+                <tr>
+                    <td>
+                        <input placeholder="näme" v-model="newAccount.name" type="text" class="form-control" id="accountName" />
+                    </td>
+                    <td class="text-center align-baseline">
+                        <input v-model="newAccount.creator" type="checkbox" class="d-none" id="accountCreator">
+                        <label for="accountCreator">
+                            <span v-if="newAccount.creator" class="btn btn-outline-primary" style="width: 80px;">crëator</span>
+                            <span v-else class="btn btn-outline-secondary" style="width: 80px;">wället</span>
+                        </label>
+                    </td>
+                    <td></td>
+                    <td class="text-right">
+                        <button type="button" class="btn btn-primary" @click="createAccount()">nëw!</button>
+                    </td>
+                </tr>
                 <tr v-for="account in sortedAccounts">
                     <td><a :href="'./#' + account.name">{{ account.name }}</a></td>
                     <td class="text-center">
-                        <span v-if="account.creator" class="badge bg-primary">Creator</span>
-                        <span v-else class="badge bg-secondary">Wallet</span>
+                        <span v-if="account.creator" class="badge bg-primary mr-3">crëator</span>
+                        <span v-else class="badge bg-secondary mr-3">wället</span>
+                        <a href="#" @click.stop.prevent="changeAccount(account.name, !account.creator)">change</a>
                     </td>
                     <td class="text-right">{{ currencyDecimal(account.balance) }} <small>Ü</small></td>
-                    <td class="text-right"><a href="#" @click="deleteAccount(account.name)">Delete</a></td>
+                    <td class="text-right"><a href="#" @click.stop.prevent="deleteAccount(account.name)">delete</a></td>
                 </tr>
             </tbody>
         </table>
@@ -181,6 +159,13 @@
             createAccount() {
                 axios
                     .post('/accounts', this.newAccount)
+                    .then(response => {
+                        this.listAccounts()
+                    })
+            },
+            changeAccount(name, isCreator) {
+                axios
+                    .patch('/accounts/' + name, {creator: isCreator})
                     .then(response => {
                         this.listAccounts()
                     })
