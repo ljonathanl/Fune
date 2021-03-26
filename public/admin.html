@@ -3,9 +3,9 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Füne</title>
+    <title>fÜne</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="./bootstrap.min.css" rel="stylesheet">
+    <link href="./bootstrap.superhero.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="favicon.png" />
     <script src="https://unpkg.com/vue@next"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -13,14 +13,22 @@
 
 <body>
     <div id="app" class="container">
-        <h1><img src="./favicon.png" class="align-baseline"><span class="align-baseline">Füne</span></h1>
+        <h1 class="display-1 text-center mb-5"><img src="./favicon.png" class="align-baseline"><span class="align-baseline"> f<small>Ü</small>ne</span></h1>
 
+        <p class="lead text-center mb-3"><strong>f<small>Ü</small>ne</strong> is a web app to test and play with a simple <a href="https://libre-currency.org/">Libre Currency</a> called <strong>f<small>Ü</small>ne</strong> (pronounced /fən/ like fun)</p>
+
+        <p class="lead text-center mb-5">
+            a creator account create a new one <small>Ü</small> (the Ünit of the f<small>Ü</small>ne currency) by day<br>
+            <small>old created <strong>Ünits</strong> melt <strong>celerity</strong> % per <strong>revaluation period</strong></small><br>
+            <small class="fs-3">that's all fölks !</small><br>
+        </p>
         <div class="mb-3 rounded border border-4 p-3">
             <h4>Currency</h4>
             <form>
                 <div class="input-group mb-3">
                     <label class="input-group-text" for="currencyCelerity">Celerity</label>
                     <input id="currencyCelerity" v-model="currency.c" type="text" class="form-control text-right" disabled>
+                    <span class="input-group-text">%</span>
                 </div>
                 <div class="input-group mb-3">
                     <label class="input-group-text" for="currencyStepTime">Day duration</label>
@@ -65,7 +73,7 @@
                 <div class="col-auto">
                     <div class="input-group">
                         <input v-model="tx.value" type="number" class="form-control text-right">
-                        <span class="input-group-text">Ü</span>
+                        <span class="input-group-text"><small>Ü</small></span>
                     </div>
                 </div>
                 <div class="col-auto">
@@ -90,8 +98,8 @@
                             <input v-model="newAccount.creator" type="checkbox" class="mt-0" id="accountCreator">
                         </div>
                         <label class="input-group-text" for="accountCreator">
-                            <span v-if="newAccount.creator" class="badge bg-primary text-light" style="width: 80px;">Creator</span>
-                            <span v-else class="badge bg-secondary text-light" style="width: 80px;">Wallet</span>
+                            <span v-if="newAccount.creator" class="badge bg-primary" style="width: 80px;">Creator</span>
+                            <span v-else class="badge bg-secondary" style="width: 80px;">Wallet</span>
                         </label>
                     </div>
                 </div>
@@ -102,22 +110,22 @@
         </div>
 
         <table class="table">
-            <thead class="table-light">
+            <thead>
                 <tr>
-                    <th>Name</th>
-                    <th class="text-center">Role</th>
-                    <th class="text-right">Balance</th>
+                    <th @click="sortBy('name')">Name</th>
+                    <th @click="sortBy('creator')" class="text-center">Role</th>
+                    <th @click="sortBy('balance')" class="text-right">Balance</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="account in accounts">
-                    <td>{{ account.name }}</td>
+                <tr v-for="account in sortedAccounts">
+                    <td><a :href="'./#' + account.name">{{ account.name }}</a></td>
                     <td class="text-center">
-                        <span v-if="account.creator" class="badge bg-primary text-light">Creator</span>
-                        <span v-else class="badge bg-secondary text-light">Wallet</span>
+                        <span v-if="account.creator" class="badge bg-primary">Creator</span>
+                        <span v-else class="badge bg-secondary">Wallet</span>
                     </td>
-                    <td class="text-right">{{ currencyDecimal(account.balance) }} Ü</td>
+                    <td class="text-right">{{ currencyDecimal(account.balance) }} <small>Ü</small></td>
                     <td class="text-right"><a href="#" @click="deleteAccount(account.name)">Delete</a></td>
                 </tr>
             </tbody>
@@ -130,6 +138,8 @@
     const app = {
         data() {
             return {
+                sortKey: "name",
+                sortOrder: 1,
                 newAccount: {name: '', creator: true},
                 accounts: [],
                 tx: {from: '', to: '', value: 0},
@@ -186,6 +196,21 @@
             refresh() {
                 this.listAccounts()
                 this.getCurrency()
+            },
+            sortBy(key) {
+                if (key == this.sortKey) {
+                    this.sortOrder = - this.sortOrder;
+                }
+                this.sortKey = key
+            },
+        },
+        computed: {
+            sortedAccounts() {
+                return this.accounts.sort((a, b) => {
+                    a = a[this.sortKey]
+                    b = b[this.sortKey]
+                    return (a === b ? 0 : a > b ? 1 : -1) * this.sortOrder
+                })
             }
         },
         mounted() {

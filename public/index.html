@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>neŭrone</title>
+    <title>fÜne</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="./bootstrap.superhero.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="favicon.png" />
@@ -43,7 +43,8 @@
             </div>
             <p class="display-5 text-center" v-if="!account.creator">wallet</p>
             <p class="display-5 text-center" v-else-if="currency.elapsedTime - account.creationDay > 1"><strong>{{ currency.elapsedTime - account.creationDay }}</strong> days of creation, thx !</p>
-            <p class="display-5 text-center" v-else>welcöme !</p>
+            <p class="display-5 text-center" v-else-if="currency.elapsedTime == account.creationDay">welcöme !</p>
+            <p class="display-5 text-center" v-else>u've created ur first Ü, nice job !</p>
             <form class="mb-4 mt-4 row justify-content-center" v-if="account.balance > 0">
                 <div class="col-auto input-group w-auto">
                     <input v-model="tx.value" type="number" :max="Math.round(account.balance/100)" step="1" min="0" class="form-control text-right" style="max-width: 120px;">
@@ -86,14 +87,13 @@
             <table class="table mt-3">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th class="text-center">Role</th>
-                        <th class="text-right">Balance</th>
-                        <th></th>
+                        <th @click="sortBy('name')">Name</th>
+                        <th @click="sortBy('creator')" class="text-center">Role</th>
+                        <th @click="sortBy('balance')" class="text-right">Balance</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="account in otherAccounts">
+                    <tr v-for="account in sortedOtherAccounts">
                         <td>
                             <a href="#" @click="tx.to = account.name">{{ account.name }}</a></td>
                         <td class="text-center">
@@ -101,11 +101,10 @@
                             <span v-else class="badge bg-secondary">Wallet</span>
                         </td>
                         <td class="text-right">{{ currencyDecimal(account.balance) }}<small> Ü</small></td>
-                        <td class="text-right"></td>
                     </tr>
                 </tbody>
             </table>
-        </div>
+        </div> 
 
         
     </div>
@@ -117,6 +116,8 @@
     const app = {
         data() {
             return {
+                sortKey: "name",
+                sortOrder: 1,
                 hasAccount: false,
                 account: {name: '', creator: true, value: 0},
                 accounts: [],
@@ -135,6 +136,12 @@
             }
         },
         methods: {
+            sortBy(key) {
+                if (key == this.sortKey) {
+                    this.sortOrder = - this.sortOrder;
+                }
+                this.sortKey = key
+            },
             digit(value) {
                 return (value % 100).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false})
             },
@@ -143,7 +150,7 @@
             },
             executeTx() {
                 axios
-                    .post('/tx', {from: this.account.name, to: this.tx.to, value: parseInt(this.tx.value) * 100})
+                    .post('/tx', {from: this.account.name, to: this.tx.to, value: Math.floor(parseFloat(this.tx.value)) * 100})
                     .then(response => {
                         this.listAccounts()
                         this.listTransactions()
@@ -179,16 +186,24 @@
                     .get('/accounts')
                     .then(response => {
                         this.accounts = response.data
-                        this.otherAccounts = []
-                        this.accountsMap = {}
+                        var currentAccount
+                        var otherAccounts = []
+                        var accountsMap = {}
                         for (let i = 0; i < this.accounts.length; i++) {
                             const account = this.accounts[i]
                             if (account.name == this.account.name) {
-                                this.account = account
+                                currentAccount = account
                             } else {
-                                this.otherAccounts.push(account)
+                                otherAccounts.push(account)
                             }
-                            this.accountsMap[account.name] = account;
+                            accountsMap[account.name] = account;
+                        }
+                        this.otherAccounts = otherAccounts
+                        this.accountsMap = accountsMap
+                        if (currentAccount == null) {
+                            this.createAccount()
+                        } else {
+                            this.account = currentAccount
                         }
                     })
             },
@@ -225,12 +240,28 @@
                 intervalId = setInterval(this.refresh, 60000)
             }
         },
+        computed: {
+            sortedOtherAccounts() {
+                return this.otherAccounts.sort((a, b) => {
+                    a = a[this.sortKey]
+                    b = b[this.sortKey]
+                    return (a === b ? 0 : a > b ? 1 : -1) * this.sortOrder
+                })
+            }
+        },
         mounted() {
-            this.listAccounts()
-            var name = localStorage.getItem('name')
-            if (name) {
-                this.account.name = name
-                this.setAccount()
+            if(window.location.hash) {
+                var hash = window.location.hash.substring(1)
+                if (hash.length > 0) {
+                    this.account.name = hash
+                    this.setAccount()
+                }
+            } else {
+                var name = localStorage.getItem('name')
+                if (name) {
+                    this.account.name = name
+                    this.setAccount()
+                }
             }
         }
     }
