@@ -20,6 +20,12 @@ app.get('/currency', (req, res) => {
     res.status(200).json(currency)
 })
 
+app.patch('/currency', async (req, res) => {
+    currency = Object.assign(currency, req.body)
+    await storage.setItem('currency', currency)
+    res.status(200).json(currency)
+})
+
 /* 
  * ACCOUNT
  */

@@ -23,28 +23,35 @@
             <small class="fs-3">that's all fölks !</small><br>
         </p>
 
-        <div class="mb-3 p-3 m-auto" style="width: 300px;">
+        <div class="mb-3 p-3 m-auto" style="width: 320px;">
             <h4>Currency</h4>
             <form>
                 <div class="input-group mb-3">
                     <label class="input-group-text" for="currencyCelerity">Celerity</label>
-                    <input id="currencyCelerity" v-model="currency.c" type="text" class="form-control text-right" disabled>
+                    <input id="currencyCelerity" v-model="editCurrency.c" type="number" class="form-control text-right"
+                        :class="{'bg-primary': editCurrency.c != currency.c}">
                     <span class="input-group-text">%</span>
                 </div>
                 <div class="input-group mb-3">
                     <label class="input-group-text" for="currencyStepTime">Day duration</label>
-                    <input id="currencyStepTime" v-model="currency.stepTime" type="text" class="form-control text-right" disabled>
+                    <input id="currencyStepTime" v-model="editCurrency.stepTime" type="number" class="form-control text-right"
+                        :class="{'bg-primary': editCurrency.stepTime != currency.stepTime}">
                     <span class="input-group-text">seconds</span>
                 </div>
                 <div class="input-group mb-3">
                     <label class="input-group-text" for="currencyRevaluationTime">Revaluation period</label>
-                    <input id="currencyRevaluationTime" v-model="currency.revaluationTime" type="text" class="form-control text-right" disabled>
+                    <input id="currencyRevaluationTime" v-model="editCurrency.revaluationTime" type="number" class="form-control text-right" 
+                        :class="{'bg-primary': editCurrency.revaluationTime != currency.revaluationTime}">
                     <span class="input-group-text">days</span>
                 </div>
                 <div class="input-group mb-3">
                     <label class="input-group-text" for="currencyElapsedTime">Elapsed time</label>
                     <input id="currencyElapsedTime" v-model="currency.elapsedTime" type="text" class="form-control text-right" disabled>
                     <span class="input-group-text">days</span>
+                </div>
+                <div class="d-grid gap-2 d-md-flex" v-if="currencyChange">
+                    <button type="button" class="btn btn-secondary mr-auto" @click="Object.assign(editCurrency, currency)">ündo!</button>
+                    <button type="button" class="btn btn-primary" @click="updateCurrency()">üpdate!</button>
                 </div>
             </form>    
         </div>
@@ -57,12 +64,12 @@
                     <span class="input-group-text"><small>Ü</small></span>
                     <label class="input-group-text" for="txFrom"> fröm </label>
                     <select v-model="tx.from" id="txFrom" class="form-select">
-                        <option disabled value="">select one</option>
+                        <option disabled value="">select öne</option>
                         <option v-for="account in accounts" :value="account.name">{{ account.name }}</option>
                     </select>
                     <label class="input-group-text" for="txTo">tö </label>
                     <select v-model="tx.to" id="txTo" class="form-select">
-                        <option disabled value="">select one</option>
+                        <option disabled value="">select öne</option>
                         <option v-for="account in accounts" :value="account.name">{{ account.name }}</option>
                     </select>
                     <button type="button" class="btn btn-primary" @click="executeTx()">ök!</button>
@@ -70,44 +77,47 @@
             </form>
         </div>
 
-        <table class="table mt-3">
-            <thead>
-                <tr>
-                    <th @click="sortBy('name')">Name</th>
-                    <th @click="sortBy('creator')" class="text-center">Role</th>
-                    <th @click="sortBy('balance')" class="text-right">Balance</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <input placeholder="näme" v-model="newAccount.name" type="text" class="form-control" id="accountName" />
-                    </td>
-                    <td class="text-center align-baseline">
-                        <input v-model="newAccount.creator" type="checkbox" class="d-none" id="accountCreator">
-                        <label for="accountCreator">
-                            <span v-if="newAccount.creator" class="btn btn-outline-primary" style="width: 80px;">crëator</span>
-                            <span v-else class="btn btn-outline-secondary" style="width: 80px;">wället</span>
-                        </label>
-                    </td>
-                    <td></td>
-                    <td class="text-right">
-                        <button type="button" class="btn btn-primary" @click="createAccount()">nëw!</button>
-                    </td>
-                </tr>
-                <tr v-for="account in sortedAccounts">
-                    <td><a :href="'./#' + account.name">{{ account.name }}</a></td>
-                    <td class="text-center">
-                        <span v-if="account.creator" class="badge bg-primary mr-3">crëator</span>
-                        <span v-else class="badge bg-secondary mr-3">wället</span>
-                        <a href="#" @click.stop.prevent="changeAccount(account.name, !account.creator)">change</a>
-                    </td>
-                    <td class="text-right">{{ currencyDecimal(account.balance) }} <small>Ü</small></td>
-                    <td class="text-right"><a href="#" @click.stop.prevent="deleteAccount(account.name)">delete</a></td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="mb-3 p-3 m-auto">
+            <h4>Accounts</h4>
+            <table class="table mt-3">
+                <thead>
+                    <tr>
+                        <th @click="sortBy('name')">Name</th>
+                        <th @click="sortBy('creator')" class="text-center">Role</th>
+                        <th @click="sortBy('balance')" class="text-right">Balance</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <input placeholder="näme" v-model="newAccount.name" type="text" class="form-control" id="accountName" />
+                        </td>
+                        <td class="text-center align-baseline">
+                            <input v-model="newAccount.creator" type="checkbox" class="d-none" id="accountCreator">
+                            <label for="accountCreator">
+                                <span v-if="newAccount.creator" class="btn btn-outline-primary" style="width: 80px;">crëator</span>
+                                <span v-else class="btn btn-outline-secondary" style="width: 80px;">wället</span>
+                            </label>
+                        </td>
+                        <td></td>
+                        <td class="text-right">
+                            <button type="button" class="btn btn-primary" @click="createAccount()">nëw!</button>
+                        </td>
+                    </tr>
+                    <tr v-for="account in sortedAccounts">
+                        <td><a :href="'./#' + account.name">{{ account.name }}</a></td>
+                        <td class="text-center">
+                            <span v-if="account.creator" class="badge bg-primary mr-3">crëator</span>
+                            <span v-else class="badge bg-secondary mr-3">wället</span>
+                            <a href="#" @click.stop.prevent="changeAccount(account.name, !account.creator)">change</a>
+                        </td>
+                        <td class="text-right">{{ currencyDecimal(account.balance) }} <small>Ü</small></td>
+                        <td class="text-right"><a href="#" @click.stop.prevent="deleteAccount(account.name)">delete</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
 </body>
@@ -121,6 +131,12 @@
                 newAccount: {name: '', creator: true},
                 accounts: [],
                 tx: {from: '', to: '', value: 0},
+                editCurrency: {
+                    c: 0,
+                    stepTime: 0,
+                    revaluationTime: 0,
+
+                },
                 currency: {
                     date: new Date().toISOString(),
                     c: 0,
@@ -147,6 +163,17 @@
                     .get('/currency')
                     .then(response => {
                         this.currency = response.data
+                        if (this.editCurrency.c == 0) {
+                            Object.assign(this.editCurrency, this.currency)
+                        }
+                    })
+            },
+            updateCurrency() {
+                axios
+                    .patch('/currency', this.editCurrency)
+                    .then(response => {
+                        this.currency = response.data
+                        Object.assign(this.editCurrency, this.currency)
                     })
             },
             listAccounts() {
@@ -196,6 +223,11 @@
                     b = b[this.sortKey]
                     return (a === b ? 0 : a > b ? 1 : -1) * this.sortOrder
                 })
+            },
+            currencyChange() {
+                return this.currency.c != this.editCurrency.c
+                    || this.currency.revaluationTime != this.editCurrency.revaluationTime
+                    || this.currency.stepTime != this.editCurrency.stepTime;
             }
         },
         mounted() {
