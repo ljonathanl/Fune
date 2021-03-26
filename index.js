@@ -161,7 +161,7 @@ async function start() {
     if (!currency)
         currency = {
             date: new Date().toISOString(),
-            c: 0.1,
+            c: 10,
             stepTime: 60,
             elapsedTime: 0,
             revaluationTime: 30, 
@@ -198,7 +198,7 @@ async function play() {
         currency.elapsedTime++;
         Object.values(accounts).forEach( account => {
             if (currency.elapsedTime % currency.revaluationTime == 0)
-                account.balance = Math.ceil(account.balance * (1 - currency.c));
+                account.balance = Math.ceil(account.balance * (100 - currency.c) / 100);
             if (account.creator)
                 account.balance += 100;
         });
