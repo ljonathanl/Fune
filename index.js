@@ -1,3 +1,4 @@
+var pjson = require('./package.json');
 const express = require('express')
 const morgan = require('morgan')
 const storage = require('node-persist');
@@ -7,11 +8,26 @@ app.use(express.json())
 app.use(express.static('public'))
 app.use(morgan('tiny'))
 
+
+let fune = {
+    name: 'fÜne',
+    logo: 'fї',
+    version: pjson.version
+}
+
 let currency = {}
 let accounts = {}
 let transactions = []
 let ideas = {}
 
+
+/*
+ * ABOUT
+ */
+
+app.get('/fune', (req, res) => {
+    res.status(200).json(fune)
+})
 
 
 /* 
