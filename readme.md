@@ -5,7 +5,7 @@
 
 **fÜne** is a web app to test and play with a simple [Libre Currency](https://libre-currency.org) called **fÜne** (pronounced /fən/ like fun) 
 
-a creator account create a new one Ü (the Ünit of the fÜne currency) by day
+a crëator account create a new one Ü (the Ünit of the fÜne currency) by day
 
 old created **Ünits** melt **celerity** % per **revaluation period**
 
@@ -23,7 +23,7 @@ Open shell in project folder and type
 > node ./index.js
 ```
 
-A web server will start at localhost:80, go to http://localhost to create your first account or go to http://localhost/admin.html to manage the currency and accounts
+A web server will start at localhost:80, go to http://localhost to create your first crëator account or go to http://localhost/admin.html to manage the currency and accounts
 
 
 ## Acknowledgements
