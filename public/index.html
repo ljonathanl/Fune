@@ -23,8 +23,8 @@
             <p class="display-4 text-center">enter ür name</p>
             <form class="mb-3 p-3">
                 <div class="input-group">
-                    <input v-model="account.name" type="text" class="form-control text-left">
-                    <button type="button" class="btn btn-primary ml-3" @click="createAccount()">ök !</button>
+                    <input v-model="account.name" type="text" class="form-control text-left" maxlength="10">
+                    <button :disabled="3 > account.name.length" type="button" class="btn btn-primary ml-3" @click="createAccount()">ök !</button>
                 </div>
             </form>
         </div>
