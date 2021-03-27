@@ -125,7 +125,12 @@
                 </tbody>
             </table>
         </div>
+        <div class="text-right">
+            <span>{{ fune.name }} v{{ fune.version }}</span>
+        </div>
     </div>
+
+    
 
 </body>
 
@@ -133,6 +138,7 @@
     const app = {
         data() {
             return {
+                fune: { name: 'fÜne', logo: 'fї', version: '0'},
                 sortKey: "name",
                 sortOrder: 1,
                 newAccount: {name: '', creator: true},
@@ -229,6 +235,13 @@
                 }
                 this.sortKey = key
             },
+            about() {
+                axios
+                    .get('/fune')
+                    .then(response => {
+                        this.fune = response.data
+                    })
+            },
         },
         computed: {
             sortedAccounts() {
@@ -245,7 +258,8 @@
             }
         },
         mounted() {
-            this.refresh();
+            this.about()
+            this.refresh()
             setInterval(this.refresh, 60000)
         }
     }

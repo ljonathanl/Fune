@@ -109,7 +109,9 @@
                 </tbody>
             </table>
         </div> 
-
+        <div class="text-right">
+            <span>{{ fune.name }} v{{ fune.version }}</span>
+        </div>
         
     </div>
 
@@ -120,6 +122,7 @@
     const app = {
         data() {
             return {
+                fune: { name: 'fÜne', logo: 'fї', version: '0'},
                 sortKey: "name",
                 sortOrder: 1,
                 hasAccount: false,
@@ -245,7 +248,14 @@
                 this.refresh()
                 clearInterval(intervalId)
                 intervalId = setInterval(this.refresh, 60000)
-            }
+            },
+            about() {
+                axios
+                    .get('/fune')
+                    .then(response => {
+                        this.fune = response.data
+                    })
+            },
         },
         computed: {
             sortedOtherAccounts() {
@@ -257,6 +267,7 @@
             }
         },
         mounted() {
+            this.about()
             if(window.location.hash) {
                 var hash = window.location.hash.substring(1)
                 if (hash.length > 0) {
