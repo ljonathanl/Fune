@@ -163,6 +163,9 @@
                 return  " " + (this.currency.elapsedTime - day) + " days ago" 
             },
             isCreator(name) {
+                var account = this.accountsMap[name];
+                if (!account)
+                    return false
                 return this.accountsMap[name].creator
             },
             getCurrency() {
