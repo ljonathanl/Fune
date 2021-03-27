@@ -12,6 +12,8 @@ let accounts = {}
 let transactions = []
 let ideas = {}
 
+
+
 /* 
  * CURRENCY
  */
@@ -80,6 +82,8 @@ app.get('/accounts/:id/tx', (req, res) => {
 app.post('/tx', async (req, res) => {
     var tx = Object.assign({from: '', to: '', value: 0, date: new Date().toISOString(), day: currency.elapsedTime}, req.body)
     var accountFrom = accounts[tx.from]
+    if (!accountFrom && tx.from == 'fÜne')
+        accountFrom = { balance: tx.value }
     var accountTo = accounts[tx.to]
     if (!(accountFrom && accountTo && tx.value > 0 && accountFrom.balance - tx.value >= 0)) {
         res.status(400).send()
