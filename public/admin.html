@@ -96,7 +96,7 @@
                 <tbody>
                     <tr>
                         <td>
-                            <input placeholder="näme" v-model="newAccount.name" type="text" class="form-control" id="accountName" />
+                            <input placeholder="näme" v-model="newAccount.name" type="text" class="form-control" id="accountName" maxlength="10"/>
                         </td>
                         <td class="text-center align-baseline">
                             <input v-model="newAccount.creator" type="checkbox" class="d-none" id="accountCreator">
@@ -107,7 +107,7 @@
                         </td>
                         <td></td>
                         <td class="text-right">
-                            <button type="button" class="btn btn-primary" @click="createAccount()">nëw!</button>
+                            <button type="button" :disabled="3 > newAccount.name.length" class="btn btn-primary" @click="createAccount()">nëw!</button>
                         </td>
                     </tr>
                     <tr v-for="account in sortedAccounts">
