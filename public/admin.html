@@ -60,7 +60,7 @@
             <h4 class="text-center">transaction</h4>
             <form>
                 <div class="input-group">
-                    <input v-model="tx.value" type="number" class="form-control text-right" style="width: 80px;">
+                    <input v-model="tx.value" type="number" step="any" class="form-control text-right" style="width: 80px;">
                     <span class="input-group-text"><small>Ü</small></span>
                     <label class="input-group-text" for="txFrom"> fröm </label>
                     <select v-model="tx.from" id="txFrom" class="form-select">
@@ -82,9 +82,9 @@
             <table class="table mt-3">
                 <thead>
                     <tr>
-                        <th @click="sortBy('name')">Name</th>
-                        <th @click="sortBy('creator')" class="text-center">Role</th>
-                        <th @click="sortBy('balance')" class="text-right">Balance</th>
+                        <th @click="sortBy('name')">name</th>
+                        <th @click="sortBy('creator')" class="text-center">role</th>
+                        <th @click="sortBy('balance')" class="text-right">balance</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -156,7 +156,7 @@
             },
             executeTx() {
                 axios
-                    .post('/tx', {from: this.tx.from, to: this.tx.to, value: parseInt(this.tx.value) * 100})
+                    .post('/tx', {from: this.tx.from, to: this.tx.to, value: Math.floor(this.tx.value * 100)})
                     .then(response => {
                         this.listAccounts()
                     })

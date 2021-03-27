@@ -47,7 +47,7 @@
             <p class="display-5 text-center" v-else>u've created ur first Ü, nice job !</p>
             <form class="mb-4 mt-4 row justify-content-center" v-if="account.balance > 0">
                 <div class="col-auto input-group w-auto">
-                    <input v-model="tx.value" type="number" :max="Math.round(account.balance/100)" step="1" min="0" class="form-control text-right" style="max-width: 120px;">
+                    <input v-model="tx.value" type="number" :max="Math.round(account.balance/100)" step="any" min="0" class="form-control text-right" style="max-width: 120px;">
                     <small class="input-group-text mr-3">Ü</small>
                     <label class="input-group-text" for="txTo">tö</label>
                     <select v-model="tx.to" id="txTo" class="form-select">
@@ -66,7 +66,10 @@
                             <span style="width: 80px;" class="badge bg-secondary text-right">{{ currencyDecimal(transaction.value) }}<small> Ü</small></span>
                             <span style="width: 80px;" class="d-inline-block text-center"> to </span>
                             <strong>
-                                <a href="#" @click="tx.to = transaction.to" :class="{ 'text-primary': isCreator(transaction.to), 'text-secondary': !isCreator(transaction.to) }">
+                                <span v-if="!accountsMap[transaction.to]">
+                                    {{ transaction.to }}
+                                </span>
+                                <a v-else href="#" @click="tx.to = transaction.to" :class="{ 'text-primary': isCreator(transaction.to), 'text-secondary': !isCreator(transaction.to) }">
                                     {{ (isCreator(transaction.to) ? '@' : '#') + transaction.to }}
                                 </a>
                             </strong>
@@ -75,7 +78,10 @@
                             <span style="width: 80px;" class="badge bg-primary text-right">{{ currencyDecimal(transaction.value) }}<small> Ü</small></span>
                             <span style="width: 80px;" class="d-inline-block text-center"> from </span>
                             <strong>
-                                <a href="#" @click="tx.to = transaction.from" :class="{ 'text-primary': isCreator(transaction.from), 'text-secondary': !isCreator(transaction.from) }">
+                                <span v-if="!accountsMap[transaction.from]">
+                                    {{ transaction.from }}
+                                </span>
+                                <a v-else href="#" @click="tx.to = transaction.from" :class="{ 'text-primary': isCreator(transaction.from), 'text-secondary': !isCreator(transaction.from) }">
                                     {{ (isCreator(transaction.from) ? '@' : '#') + transaction.from }}
                                 </a>
                             </strong>
@@ -148,7 +154,7 @@
             },
             executeTx() {
                 axios
-                    .post('/tx', {from: this.account.name, to: this.tx.to, value: Math.floor(parseFloat(this.tx.value)) * 100})
+                    .post('/tx', {from: this.account.name, to: this.tx.to, value: Math.floor(this.tx.value * 100)})
                     .then(response => {
                         this.listAccounts()
                         this.listTransactions()
