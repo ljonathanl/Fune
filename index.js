@@ -159,7 +159,7 @@ app.put('/db', async (req, res) => {
 })
 
 app.listen(80, () => {
-    console.log("Let the Füne begin !!!")
+    console.log("let the fÜne begin !!!")
 })
 
 

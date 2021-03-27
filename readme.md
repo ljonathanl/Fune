@@ -11,6 +11,20 @@ old created **Ünits** melt **celerity** % per **revaluation period**
 
 that's all fölks !
 
+## Installation
+
+The project depends on [nodejs](https://nodejs.org/en/), please install it before 
+
+Open shell in project folder and type
+
+```bash
+> npm install
+
+> node ./index.js
+```
+
+A web server will start at localhost:80, go to http://localhost to create your first account or go to http://localhost/admin.html to manage the currency and accounts
+
 
 ## Acknowledgements
-Many thanks to [OpeNode](www.openode.io) for hosting this project at https://fune.openode.io
+Many thanks to [OpeNode](www.openode.io) for hosting this project at [fune.openode.io](https://fune.openode.io)
