@@ -13,6 +13,8 @@ that's all fölks !
 
 ## Installation
 
+Clone this repository
+
 The project depends on [nodejs](https://nodejs.org/en/), please install it before 
 
 Open shell in project folder and type
