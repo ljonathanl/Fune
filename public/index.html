@@ -183,7 +183,7 @@
             },
             listTransactions() {
                 axios
-                    .get('/accounts/' + this.account.name + '/tx')
+                    .get('/accounts/' + this.account.name + '/tx?limit=10')
                     .then(response => {
                         this.transactions = response.data.reverse()
                     })

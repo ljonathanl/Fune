@@ -75,6 +75,10 @@ app.get('/accounts/:id/tx', (req, res) => {
         res.status(404).send()
     } else {
         var tx = transactions.filter(transaction => transaction.from == id || transaction.to == id)
+        if (req.query.limit) {
+            const limit = parseInt(req.query.limit)
+            tx = tx.slice(-req.query.limit)
+        }
         res.status(200).json(tx)
     }
 })
