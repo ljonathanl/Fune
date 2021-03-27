@@ -13,7 +13,7 @@
 
 <body>
     <div id="app" class="container-sm">
-        <h1 class="display-1 text-center mb-5"><img src="./favicon.png" class="align-baseline"><span class="align-baseline"> f<small>Ü</small>ne</span></h1>
+        <h1 class="display-1 text-center mb-5"><span class="align-baseline">f<small>Ü</small>ne</span></h1>
 
         <p class="lead text-center mb-3"><strong>f<small>Ü</small>ne</strong> is a web app to test and play with a simple <a href="https://libre-currency.org/">Libre Currency</a> called <strong>f<small>Ü</small>ne</strong> (pronounced /fən/ like fun)</p>
 
@@ -27,25 +27,25 @@
             <h4 class="text-center">currency</h4>
             <form>
                 <div class="input-group mb-3">
-                    <label class="input-group-text" for="currencyCelerity">Celerity</label>
+                    <label class="input-group-text" for="currencyCelerity">celerity</label>
                     <input id="currencyCelerity" v-model="editCurrency.c" type="number" class="form-control text-right"
                         :class="{'bg-primary': editCurrency.c != currency.c}">
                     <span class="input-group-text">%</span>
                 </div>
                 <div class="input-group mb-3">
-                    <label class="input-group-text" for="currencyStepTime">Day duration</label>
+                    <label class="input-group-text" for="currencyStepTime">day duration</label>
                     <input id="currencyStepTime" v-model="editCurrency.stepTime" type="number" class="form-control text-right"
                         :class="{'bg-primary': editCurrency.stepTime != currency.stepTime}">
                     <span class="input-group-text">seconds</span>
                 </div>
                 <div class="input-group mb-3">
-                    <label class="input-group-text" for="currencyRevaluationTime">Revaluation period</label>
+                    <label class="input-group-text" for="currencyRevaluationTime">revaluation period</label>
                     <input id="currencyRevaluationTime" v-model="editCurrency.revaluationTime" type="number" class="form-control text-right" 
                         :class="{'bg-primary': editCurrency.revaluationTime != currency.revaluationTime}">
                     <span class="input-group-text">days</span>
                 </div>
                 <div class="input-group mb-3">
-                    <label class="input-group-text" for="currencyElapsedTime">Elapsed time</label>
+                    <label class="input-group-text" for="currencyElapsedTime">elapsed time</label>
                     <input id="currencyElapsedTime" v-model="currency.elapsedTime" type="text" class="form-control text-right" disabled>
                     <span class="input-group-text">days</span>
                 </div>
