@@ -8,11 +8,19 @@ app.use(express.json())
 app.use(express.static('public'))
 app.use(morgan('tiny'))
 
+const txLimit = 1000
+
+const roles = {
+    creator: 'creator',
+    wallet: 'wallet',
+    bank: 'bank'
+}
+
 
 let fune = {
     name: 'fÜne',
     logo: 'fї',
-    version: pjson.version
+    version: pjson.version,
 }
 
 let currency = {}
@@ -20,6 +28,28 @@ let accounts = {}
 let transactions = []
 let ideas = {}
 
+const doTx = async (simpleTx) => {
+    let tx = Object.assign({from: '', to: '', message: '', value: 0, date: new Date().toISOString(), day: currency.elapsedTime}, simpleTx)
+    var accountFrom = accounts[tx.from]
+    var accountTo = accounts[tx.to]
+    if (tx.value <= 0 
+        || !accountFrom
+        || !accountTo
+        || accountFrom.role != roles.bank && (accountFrom.balance - tx.value < 0))
+        return null
+    if (accountTo.role != roles.bank)
+        accountTo.balance += tx.value
+    if (accountFrom.role != roles.bank)
+        accountFrom.balance -= tx.value
+    tx.balanceFrom = accountFrom.balance
+    tx.balanceTo = accountTo.balance
+    transactions.push(tx)
+    if (transactions.length > txLimit) 
+        transactions = transactions.slice(transactions.length - txLimit)
+    await storage.setItem('accounts', accounts)
+    await storage.setItem('transactions', transactions)
+    return tx
+}
 
 /*
  * ABOUT
@@ -60,7 +90,7 @@ app.get('/accounts', (req, res) => {
 
 app.post('/accounts', async (req, res) => {
     if (req.body.name) {
-        var account = accounts[req.body.name] = Object.assign({name: '', balance: 0, creator: false, date: new Date().toISOString(), creationDay: currency.elapsedTime}, req.body)
+        var account = accounts[req.body.name] = Object.assign({name: '', balance: 0, role: 'wallet', date: new Date().toISOString(), creationDay: currency.elapsedTime}, req.body)
         await storage.setItem('accounts', accounts)
         res.status(201).json(account)
     } else {
@@ -71,21 +101,24 @@ app.post('/accounts', async (req, res) => {
 app.patch('/accounts/:id', async (req, res) => {
     const id = req.params.id
     var account = accounts[id]
-    if (account) {
+    let patched = false
+    if (account && account.role != 'bank') {
         account = Object.assign(account, req.body)
         await storage.setItem('accounts', accounts)    
     }
-    res.status(account ? 200 : 404).json(account)
+    res.status(patched ? 200 : 404).json(account)
 })
 
 app.delete('/accounts/:id', async (req, res) => {
     const id = req.params.id
     var account = accounts[id]
-    if (account) {
+    let deleted = false
+    if (account && account.role != 'bank') {
         delete accounts[id]
         await storage.setItem('accounts', accounts)
+        deleted = true
     }
-    res.status(account ? 204 : 404).send();
+    res.status(deleted ? 204 : 404).send();
 })
 
 app.get('/accounts/:id/tx', (req, res) => {
@@ -104,21 +137,11 @@ app.get('/accounts/:id/tx', (req, res) => {
 })
 
 app.post('/tx', async (req, res) => {
-    var tx = Object.assign({from: '', to: '', value: 0, date: new Date().toISOString(), day: currency.elapsedTime}, req.body)
-    var accountFrom = accounts[tx.from]
-    if (!accountFrom && tx.from == 'fÜne')
-        accountFrom = { balance: tx.value }
-    var accountTo = accounts[tx.to]
-    if (!(accountFrom && accountTo && tx.value > 0 && accountFrom.balance - tx.value >= 0)) {
+    let tx = doTx(req.body)
+    if (!tx)
         res.status(400).send()
-    } else {
-        accountTo.balance += tx.value
-        accountFrom.balance -= tx.value
-        transactions.push(tx)
-        res.status(201).json(tx)
-        await storage.setItem('accounts', accounts)
-        await storage.setItem('transactions', transactions)
-    }
+    else 
+        res.status(201).json(tx) 
 })
 
 /* 
@@ -207,11 +230,14 @@ async function start() {
 
     if (!accounts)
         accounts = {
-            alice: {name: 'alice', balance: 0, creator: true, date: new Date().toISOString(), creationDay: 0},
-            bob: {name: 'bob', balance: 0, creator: true, date: new Date().toISOString(), creationDay: 0},
-            claude: {name: 'claude', balance: 0, creator: true, date: new Date().toISOString(), creationDay: 0},
-            daniel: {name: 'daniel', balance: 0, creator: false, date: new Date().toISOString(), creationDay: 0},
+            alice: {name: 'alice', balance: 0, role: roles.creator, date: new Date().toISOString(), creationDay: 0},
+            bob: {name: 'bob', balance: 0, role: roles.creator, date: new Date().toISOString(), creationDay: 0},
+            claude: {name: 'claude', balance: 0, role: roles.creator, date: new Date().toISOString(), creationDay: 0},
+            daniel: {name: 'daniel', balance: 0, role: roles.wallet, date: new Date().toISOString(), creationDay: 0},
         }
+
+    if (!accounts[fune.name])
+        accounts[fune.name] = {name: fune.name, balance: 0, role: roles.bank, date: new Date().toISOString(), creationDay: 0}
 
     ideas = {
         idea1: {name: 'idea1', account: 'alice', text: 'first idea', date: new Date().toISOString()},
@@ -230,11 +256,12 @@ async function start() {
 async function play() {
     if (currency.playing) {
         currency.elapsedTime++;
+        const funeAccount = accounts[fune.name]
         Object.values(accounts).forEach( account => {
-            if (currency.elapsedTime % currency.revaluationTime == 0)
-                account.balance = Math.ceil(account.balance * (100 - currency.c) / 100);
-            if (account.creator)
-                account.balance += 100;
+            if (currency.elapsedTime % currency.revaluationTime == 0) 
+                doTx({from: account.name, to: funeAccount.name, message: '!revaluation', value: Math.ceil(account.balance * (currency.c / 100))})
+            if (account.role == roles.creator)
+                doTx({from: funeAccount.name, to: account.name, message: '!Ucreation', value: 100})
         });
         await storage.setItem('accounts', accounts)
         await storage.setItem('currency', currency)

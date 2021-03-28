@@ -48,7 +48,7 @@
                 <small class="align-baseline" style="font-size: 50%;">.{{ digit(account.balance) }}</small> 
                 <small> Ü</small>
             </div>
-            <p class="display-5 text-center" v-if="!account.creator">
+            <p class="display-5 text-center" v-if="!isCreator(account.name)">
                 <t :c="ln" ln="en">wallet</t>
                 <t :c="ln" ln="fr">compte simple</t>
             </p>
@@ -76,46 +76,49 @@
                     <select v-model="tx.to" id="txTo" class="form-select">
                         <option v-if="ln == 'en'" disabled value="">someöne</option>
                         <option v-if="ln == 'fr'" disabled value="">qüi</option>
-                        <option v-for="account in otherAccounts" :value="account.name" :class="{ 'text-primary': account.creator, 'text-secondary': !account.creator }">
-                            <strong>{{ (account.creator ? '@' : '#') + account.name }}</strong>
+                        <option v-for="account in otherAccounts" :value="account.name" :class="{ 'text-primary': isCreator(account.name), 'text-secondary': !isCreator(account.name) }">
+                            <strong>{{ (isCreator(account.name) ? '@' : '#') + account.name }}</strong>
                         </option>
                     </select>
                     <button type="button" class="btn btn-primary ml-3" @click="executeTx()">ök!</button>
                 </div>
             </form>
-            <ul class="list-group m-auto">
+            <ul class="list-group m-auto" style="max-width: 440px;">
                 <li v-for="transaction in transactions" class="list-group-item" style="background-color: #0c1e2f;">
                     <div class="d-flex w-100 justify-content-between">
-                        <h5 v-if="transaction.from == account.name">
-                            <span style="width: 80px;" class="badge bg-secondary text-right">{{ currencyDecimal(transaction.value) }}<small> Ü</small></span>
-                            <span style="width: 80px;" class="d-inline-block text-center">
-                                <t :c="ln" ln="en"> to </t>
-                                <t :c="ln" ln="fr"> à </t> 
-                            </span>
-                            <strong>
-                                <span v-if="!accountsMap[transaction.to]">
-                                    {{ transaction.to }}
+                        <div>
+                            <h5 v-if="transaction.from == account.name">
+                                <span style="width: 80px;" class="badge bg-secondary text-right">{{ currencyDecimal(transaction.value) }}<small> Ü</small></span>
+                                <span style="width: 50px;" class="d-inline-block text-center">
+                                    <t :c="ln" ln="en"> to </t>
+                                    <t :c="ln" ln="fr"> à </t> 
                                 </span>
-                                <a v-else href="#" @click="tx.to = transaction.to" :class="{ 'text-primary': isCreator(transaction.to), 'text-secondary': !isCreator(transaction.to) }">
-                                    {{ (isCreator(transaction.to) ? '@' : '#') + transaction.to }}
-                                </a>
-                            </strong>
-                        </h5>
-                        <h5 v-else>
-                            <span style="width: 80px;" class="badge bg-primary text-right">{{ currencyDecimal(transaction.value) }}<small> Ü</small></span>
-                            <span style="width: 80px;" class="d-inline-block text-center">
-                                <t :c="ln" ln="en"> from </t>
-                                <t :c="ln" ln="fr"> de </t>
-                            </span>
-                            <strong>
-                                <span v-if="!accountsMap[transaction.from]">
-                                    {{ transaction.from }}
+                                <strong>
+                                    <span v-if="!accountsMap[transaction.to]">
+                                        {{ transaction.to }}
+                                    </span>
+                                    <a v-else href="#" @click="tx.to = transaction.to" :class="{ 'text-primary': isCreator(transaction.to), 'text-secondary': !isCreator(transaction.to) }">
+                                        {{ (isCreator(transaction.to) ? '@' : '#') + transaction.to }}
+                                    </a>
+                                </strong>
+                            </h5>
+                            <h5 v-else>
+                                <span style="width: 80px;" class="badge bg-primary text-right">{{ currencyDecimal(transaction.value) }}<small> Ü</small></span>
+                                <span style="width: 50px;" class="d-inline-block text-center">
+                                    <t :c="ln" ln="en"> from </t>
+                                    <t :c="ln" ln="fr"> de </t>
                                 </span>
-                                <a v-else href="#" @click="tx.to = transaction.from" :class="{ 'text-primary': isCreator(transaction.from), 'text-secondary': !isCreator(transaction.from) }">
-                                    {{ (isCreator(transaction.from) ? '@' : '#') + transaction.from }}
-                                </a>
-                            </strong>
-                        </h5>
+                                <strong>
+                                    <span v-if="!accountsMap[transaction.from]">
+                                        {{ transaction.from }}
+                                    </span>
+                                    <a v-else href="#" @click="tx.to = transaction.from" :class="{ 'text-primary': isCreator(transaction.from), 'text-secondary': !isCreator(transaction.from) }">
+                                        {{ (isCreator(transaction.from) ? '@' : '#') + transaction.from }}
+                                    </a>
+                                </strong>
+                            </h5>
+                            {{ translateTxMessage(transaction.message) }}
+                        </div>
                         <small> {{ formatDay(transaction.day) }}</small>
                     </div>
                 </li>
@@ -136,8 +139,8 @@
                 <tbody>
                     <tr v-for="account in sortedOtherAccounts">
                         <td>
-                            <a href="#" class="btn btn-link" @click="tx.to = account.name" :class="{ 'text-primary': account.creator, 'text-secondary': !account.creator }">
-                                {{ (account.creator ? '@' : '#') + account.name }}
+                            <a href="#" class="btn btn-link" @click="tx.to = account.name" :class="{ 'text-primary': isCreator(account.name), 'text-secondary': !isCreator(account.name) }">
+                                {{ (isCreator(account.name) ? '@' : '#') + account.name }}
                             </a>
                         </td>
                         <td class="text-right">{{ currencyDecimal(account.balance) }}<small> Ü</small></td>
@@ -168,11 +171,11 @@
                 sortKey: "name",
                 sortOrder: 1,
                 hasAccount: false,
-                account: {name: '', creator: true, value: 0},
+                account: {name: '', role: 'creator', value: 0},
                 accounts: [],
                 accountsMap: {},
                 otherAccounts: [],
-                tx: {from: '', to: '', value: 1},
+                tx: {from: '', to: '', message: '', value: 1},
                 transactions: [],
                 currency: {
                     date: new Date().toISOString(),
@@ -205,6 +208,21 @@
                         this.listTransactions()
                     })
             },
+            translateTxMessage(message) {
+                if (message == '!Ucreation') {
+                    if (this.ln == 'fr')
+                        return '> crëation d\'une Ü !'
+                    return '> u crëate 1 Ü!' 
+                }
+
+                if (message == '!revaluation') {
+                    if (this.ln == 'fr')
+                        return '> tous les Ü fondent !'
+                    return '> all the Ü melt!' 
+                }
+
+                return message ? '> ' + message : ''
+            },
             formatDay(day) {
                 if (this.ln == 'fr') {
                     if (day >= this.currency.elapsedTime) {
@@ -226,7 +244,7 @@
                 var account = this.accountsMap[name];
                 if (!account)
                     return false
-                return this.accountsMap[name].creator
+                return this.accountsMap[name].role == 'creator'
             },
             getCurrency() {
                 axios
@@ -290,7 +308,7 @@
                 if (confirm(this.ln == 'fr' ? 'tu es sür.e ?' : 'are ü sure?')) {
                     localStorage.removeItem('name')
                     this.hasAccount = false;
-                    this.account = {name: '', creator: true, value: 0}
+                    this.account = {name: '', role: 'creator', value: 0}
                 }
             },
             setAccount() {
