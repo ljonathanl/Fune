@@ -1,6 +1,6 @@
 {
   "name": "fune",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Füne project",
   "main": "index.js",
   "scripts": {

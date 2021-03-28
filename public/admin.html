@@ -115,7 +115,6 @@
                         <t :c="ln" ln="fr"> de </t> 
                     </label>
                     <select v-model="tx.from" id="txFrom" class="form-select">
-                        <option value="fÜne">fÜne</option>
                         <option v-for="account in accounts" :value="account.name">{{ account.name }}</option>
                     </select>
                     <label class="input-group-text" for="txTo">
@@ -144,7 +143,7 @@
                             <t :c="ln" ln="en">name</t>
                             <t :c="ln" ln="fr">nom</t> 
                         </th>
-                        <th @click="sortBy('creator')" class="text-center">
+                        <th @click="sortBy('role')" class="text-center">
                             <t :c="ln" ln="en">role</t>
                             <t :c="ln" ln="fr">rôle</t>
                         </th>
@@ -161,17 +160,14 @@
                             <input :placeholder="ln == 'fr' ? 'nöm' : 'näme'" v-model="newAccount.name" type="text" class="form-control" id="accountName" maxlength="10"/>
                         </td>
                         <td class="text-center">
-                            <input v-model="newAccount.creator" type="checkbox" class="d-none" id="accountCreator">
-                            <label for="accountCreator">
-                                <span v-if="newAccount.creator" class="btn btn-outline-primary">
-                                    <t :c="ln" ln="en">crëator</t>
-                                    <t :c="ln" ln="fr">crëateur</t>
-                                </span>
-                                <span v-else class="btn btn-outline-secondary">
-                                    <t :c="ln" ln="en">wället</t>
-                                    <t :c="ln" ln="fr">sïmple</t>
-                                </span>
-                            </label>
+                            <span v-if="newAccount.role == 'creator'" class="btn btn-outline-primary" @click="newAccount.role = 'wallet'">
+                                <t :c="ln" ln="en">crëator</t>
+                                <t :c="ln" ln="fr">crëateur</t>
+                            </span>
+                            <span v-else class="btn btn-outline-secondary" @click="newAccount.role = 'creator'">
+                                <t :c="ln" ln="en">wället</t>
+                                <t :c="ln" ln="fr">sïmple</t>
+                            </span>
                         </td>
                         <td></td>
                         <td class="text-right">
@@ -184,28 +180,32 @@
                     <tr v-for="account in sortedAccounts">
                         <td><a :href="'./#' + account.name">{{ account.name }}</a></td>
                         <td class="text-right">
-                            <span v-if="account.creator" class="badge bg-primary mr-3">
-                                <t :c="ln" ln="en">crëator</t>
-                                <t :c="ln" ln="fr">crëateur</t>
-                            </span>
-                            <span v-else class="badge bg-secondary mr-3">
-                                <t :c="ln" ln="en">wället</t>
-                                <t :c="ln" ln="fr"> sïmple </t>
-                            </span>
-                            <a href="#" @click.stop.prevent="changeAccount(account.name, !account.creator)">
-                                <t :c="ln" ln="en">change</t>
-                                <t :c="ln" ln="fr">modifier</t>
-                            </a>
+                            <template v-if="account.name != fune.name">
+                                <span v-if="account.role == 'creator'" class="badge bg-primary mr-3">
+                                    <t :c="ln" ln="en">crëator</t>
+                                    <t :c="ln" ln="fr">crëateur</t>
+                                </span>
+                                <span v-else class="badge bg-secondary mr-3">
+                                    <t :c="ln" ln="en">wället</t>
+                                    <t :c="ln" ln="fr"> sïmple </t>
+                                </span>
+                                <a href="#" @click.stop.prevent="switchAccountRole(account.name)">
+                                    <t :c="ln" ln="en">change</t>
+                                    <t :c="ln" ln="fr">modifier</t>
+                                </a>
+                            </template>
                         </td>
                         <td class="text-right">
-                            <strong>{{ currencyDecimal(account.balance) }}<small class="mr-3"> Ü </small></strong>
-                            <a href="#" @click.stop.prevent="resetBalance(account.name)">
-                                <t :c="ln" ln="en">reset</t>
-                                <t :c="ln" ln="fr">raz</t>
-                            </a>
+                            <template v-if="account.name != fune.name">
+                                <strong>{{ currencyDecimal(account.balance) }}<small class="mr-3"> Ü </small></strong>
+                                <a href="#" @click.stop.prevent="resetBalance(account.name)">
+                                    <t :c="ln" ln="en">reset</t>
+                                    <t :c="ln" ln="fr">raz</t>
+                                </a>
+                            </template>
                         </td>
                         <td class="text-right">
-                            <a href="#" @click.stop.prevent="deleteAccount(account.name)">
+                            <a v-if="account.name != fune.name" href="#" @click.stop.prevent="deleteAccount(account.name)">
                                 <t :c="ln" ln="en">delete</t>
                                 <t :c="ln" ln="fr">supprimer</t>
                             </a>
@@ -235,7 +235,7 @@
                 fune: { name: 'fÜne', logo: 'fї', version: '0'},
                 sortKey: "name",
                 sortOrder: 1,
-                newAccount: {name: '', creator: true},
+                newAccount: {name: '', role: 'creator'},
                 accounts: [],
                 tx: {from: 'fÜne', to: '', value: 1},
                 editCurrency: {
@@ -297,9 +297,10 @@
                         this.listAccounts()
                     })
             },
-            changeAccount(name, isCreator) {
+            switchAccountRole(account) {
+                let role = account.role == 'creator' ? 'simple' : 'creator'
                 axios
-                    .patch('/accounts/' + name, {creator: isCreator})
+                    .patch('/accounts/' + account.name, {role: role})
                     .then(response => {
                         this.listAccounts()
                     })
