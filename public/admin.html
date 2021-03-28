@@ -312,7 +312,7 @@
                     })
             },
             deleteAccount(name) {
-                if (confirm("Are you sure to delete " + name + "?"))
+                if (confirm(this.ln == 'fr' ? "êtes vous sûr de supprimer " + name + " ?" : "Are you sure to delete " + name + "?"))
                     axios
                         .delete('/accounts/' + name)
                         .then(response => {
