@@ -19,8 +19,14 @@
 <body style="background-color: #091623;">
     <div id="app" v-cloak class="container-sm" style="max-width: 600px;">
         <div class="mt-3 mb-3" v-if="!hasAccount">
-            <h2 class="text-center display-2">hëllö !</h2>
-            <p class="display-4 text-center">enter ür name</p>
+            <h2 class="text-center display-2">
+                <t :c="ln" ln="en">hëllö!</t>
+                <t :c="ln" ln="fr">sälüt !</t>
+            </h2>
+            <p class="display-4 text-center">
+                <t :c="ln" ln="en">enter ür name</t>
+                <t :c="ln" ln="fr">entre tön nom</t>
+            </p>
             <form class="mb-3 p-3">
                 <div class="input-group">
                     <input v-model="account.name" type="text" class="form-control text-left" maxlength="10">
@@ -42,22 +48,39 @@
                 <small class="align-baseline" style="font-size: 50%;">.{{ digit(account.balance) }}</small> 
                 <small> Ü</small>
             </div>
-            <p class="display-5 text-center" v-if="!account.creator">wallet</p>
-            <p class="display-5 text-center" v-else-if="currency.elapsedTime - account.creationDay > 1"><strong>{{ currency.elapsedTime - account.creationDay }}</strong> days of creation, thx !</p>
-            <p class="display-5 text-center" v-else-if="currency.elapsedTime == account.creationDay">welcöme !</p>
-            <p class="display-5 text-center" v-else>u've created ur first Ü, nice job !</p>
+            <p class="display-5 text-center" v-if="!account.creator">
+                <t :c="ln" ln="en">wallet</t>
+                <t :c="ln" ln="fr">compte simple</t>
+            </p>
+            <p class="display-5 text-center" v-else-if="currency.elapsedTime - account.creationDay > 1">
+                <strong>{{ currency.elapsedTime - account.creationDay }}</strong>
+                <t :c="ln" ln="en"> days of creation, thx!</t>
+                <t :c="ln" ln="fr"> jours de création, merci !</t>
+            </p>
+            <p class="display-5 text-center" v-else-if="currency.elapsedTime == account.creationDay">
+                <t :c="ln" ln="en">welcöme!</t>
+                <t :c="ln" ln="fr">bienvenüe !</t>
+            </p>
+            <p class="display-5 text-center" v-else>
+                <t :c="ln" ln="en">u've created ur first Ü, nice job!</t>
+                <t :c="ln" ln="fr">tu as créé ta première Ü, bon boulot !</t>
+            </p>
             <form class="mb-4 mt-4 row justify-content-center" v-if="account.balance > 0">
                 <div class="col-auto input-group w-auto">
                     <input v-model="tx.value" type="number" :max="Math.round(account.balance/100)" step="any" min="0" class="form-control text-right" style="max-width: 120px;">
                     <small class="input-group-text mr-3">Ü</small>
-                    <label class="input-group-text" for="txTo">tö</label>
+                    <label class="input-group-text" for="txTo">
+                        <t :c="ln" ln="en"> tö </t>
+                        <t :c="ln" ln="fr"> à </t> 
+                    </label>
                     <select v-model="tx.to" id="txTo" class="form-select">
-                        <option disabled value="">someöne</option>
+                        <option v-if="ln == 'en'" disabled value="">someöne</option>
+                        <option v-if="ln == 'fr'" disabled value="">qüi</option>
                         <option v-for="account in otherAccounts" :value="account.name" :class="{ 'text-primary': account.creator, 'text-secondary': !account.creator }">
                             <strong>{{ (account.creator ? '@' : '#') + account.name }}</strong>
                         </option>
                     </select>
-                    <button type="button" class="btn btn-primary ml-3" @click="executeTx()">ök !</button>
+                    <button type="button" class="btn btn-primary ml-3" @click="executeTx()">ök!</button>
                 </div>
             </form>
             <ul class="list-group m-auto">
@@ -65,7 +88,10 @@
                     <div class="d-flex w-100 justify-content-between">
                         <h5 v-if="transaction.from == account.name">
                             <span style="width: 80px;" class="badge bg-secondary text-right">{{ currencyDecimal(transaction.value) }}<small> Ü</small></span>
-                            <span style="width: 80px;" class="d-inline-block text-center"> to </span>
+                            <span style="width: 80px;" class="d-inline-block text-center">
+                                <t :c="ln" ln="en"> to </t>
+                                <t :c="ln" ln="fr"> à </t> 
+                            </span>
                             <strong>
                                 <span v-if="!accountsMap[transaction.to]">
                                     {{ transaction.to }}
@@ -77,7 +103,10 @@
                         </h5>
                         <h5 v-else>
                             <span style="width: 80px;" class="badge bg-primary text-right">{{ currencyDecimal(transaction.value) }}<small> Ü</small></span>
-                            <span style="width: 80px;" class="d-inline-block text-center"> from </span>
+                            <span style="width: 80px;" class="d-inline-block text-center">
+                                <t :c="ln" ln="en"> from </t>
+                                <t :c="ln" ln="fr"> de </t>
+                            </span>
                             <strong>
                                 <span v-if="!accountsMap[transaction.from]">
                                     {{ transaction.from }}
@@ -94,8 +123,14 @@
             <table class="table mt-3">
                 <thead>
                     <tr>                       
-                        <th @click="sortBy('name')" class="pl-4">name</th>
-                        <th @click="sortBy('balance')" class="text-right">balance</th>
+                        <th @click="sortBy('name')" class="pl-4">
+                            <t :c="ln" ln="en">name</t>
+                            <t :c="ln" ln="fr">nom</t> 
+                        </th>
+                        <th @click="sortBy('balance')" class="text-right">
+                            <t :c="ln" ln="en">balance</t>
+                            <t :c="ln" ln="fr">solde</t> 
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -119,10 +154,16 @@
 </body>
 
 <script>
+    const getLanguage = () => (navigator.userLanguage || 
+        (navigator.languages && navigator.languages.length && navigator.languages[0]) || 
+        navigator.language || navigator.browserLanguage || navigator.systemLanguage).substring(0, 2) == 'fr' ? 'fr' : 'en'
+
+    
     let intervalId = 0;
     const app = {
         data() {
             return {
+                ln: getLanguage(),
                 fune: { name: 'fÜne', logo: 'fї', version: '0'},
                 sortKey: "name",
                 sortOrder: 1,
@@ -165,12 +206,21 @@
                     })
             },
             formatDay(day) {
-                if (day >= this.currency.elapsedTime) {
-                    return " today"
-                } else if (day == this.currency.elapsedTime - 1) {
-                    return " yesterday"
+                if (this.ln == 'fr') {
+                    if (day >= this.currency.elapsedTime) {
+                        return "aujourd'hui"
+                    } else if (day == this.currency.elapsedTime - 1) {
+                        return "hier"
+                    }
+                    return  "il y a " + (this.currency.elapsedTime - day) + " jours"
+                } else {
+                    if (day >= this.currency.elapsedTime) {
+                        return "today"
+                    } else if (day == this.currency.elapsedTime - 1) {
+                        return "yesterday"
+                    }
+                    return  (this.currency.elapsedTime - day) + " days ago" 
                 }
-                return  " " + (this.currency.elapsedTime - day) + " days ago" 
             },
             isCreator(name) {
                 var account = this.accountsMap[name];
@@ -237,7 +287,7 @@
                     this.listTransactions()
             },
             deleteAccount() {
-                if (confirm("are ü sure?")) {
+                if (confirm(this.ln == 'fr' ? 'tu es sür.e ?' : 'are ü sure?')) {
                     localStorage.removeItem('name')
                     this.hasAccount = false;
                     this.account = {name: '', creator: true, value: 0}
@@ -286,7 +336,12 @@
     }
 
 
-    Vue.createApp(app).mount('#app')
+    Vue.createApp(app)
+        .component('t', {
+            props: ['c', 'ln'],
+            template: '<template v-if="c == ln"><slot></slot></template>'
+        })
+        .mount('#app')
 
 </script>
 
