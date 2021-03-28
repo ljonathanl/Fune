@@ -65,24 +65,38 @@
                 <t :c="ln" ln="en">u've created ur first Ü, nice job!</t>
                 <t :c="ln" ln="fr">tu as créé ta première Ü, bon boulot !</t>
             </p>
+
             <form class="mb-4 mt-4 row justify-content-center" v-if="account.balance > 0">
-                <div class="col-auto input-group w-auto">
-                    <input v-model="tx.value" type="number" :max="Math.round(account.balance/100)" step="any" min="0" class="form-control text-right" style="max-width: 120px;">
-                    <small class="input-group-text mr-3">Ü</small>
-                    <label class="input-group-text" for="txTo">
-                        <t :c="ln" ln="en"> tö </t>
-                        <t :c="ln" ln="fr"> à </t> 
-                    </label>
-                    <select v-model="tx.to" id="txTo" class="form-select">
-                        <option v-if="ln == 'en'" disabled value="">someöne</option>
-                        <option v-if="ln == 'fr'" disabled value="">qüi</option>
-                        <option v-for="account in otherAccounts" :value="account.name" :class="{ 'text-primary': isCreator(account.name), 'text-secondary': !isCreator(account.name) }">
-                            <strong>{{ (isCreator(account.name) ? '@' : '#') + account.name }}</strong>
-                        </option>
-                    </select>
-                    <button type="button" class="btn btn-primary ml-3" @click="executeTx()">ök!</button>
+                <div>
+                    <div class="col-auto input-group">
+                        <input v-model="tx.value" type="number" :max="Math.round(account.balance/100)" step="any" min="0" class="form-control text-right" style="max-width: 120px;">
+                        <small class="input-group-text mr-3">Ü</small>
+                        <label class="input-group-text" for="txTo">
+                            <t :c="ln" ln="en"> tö </t>
+                            <t :c="ln" ln="fr"> à </t> 
+                        </label>
+                        <select v-model="tx.to" id="txTo" class="form-select">
+                            <option v-if="ln == 'en'" disabled value="">someöne</option>
+                            <option v-if="ln == 'fr'" disabled value="">qüi</option>
+                            <option v-for="account in otherAccounts" :value="account.name" :class="{ 'text-primary': isCreator(account.name), 'text-secondary': !isCreator(account.name) }">
+                                <strong>{{ (isCreator(account.name) ? '@' : '#') + account.name }}</strong>
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-auto input-group">
+                        <label class="input-group-text" for="txMessage">
+                            <t :c="ln" ln="en">message</t>
+                            <t :c="ln" ln="fr">message</t> 
+                        </label>
+                        <input v-model="tx.message" type="text" maxlength="32" class="form-control" id="txMessage">
+                    </div>
+
+                </div>
+                <div>
+                    <button type="button" class="btn btn-primary" @click="executeTx()">ök!</button>
                 </div>
             </form>
+
             <ul class="list-group m-auto" style="max-width: 440px;">
                 <li v-for="transaction in transactions" class="list-group-item" style="background-color: #0c1e2f;">
                     <div class="d-flex w-100 justify-content-between">
@@ -202,7 +216,7 @@
             },
             executeTx() {
                 axios
-                    .post('/tx', {from: this.account.name, to: this.tx.to, value: Math.floor(this.tx.value * 100)})
+                    .post('/tx', {from: this.account.name, to: this.tx.to, message: this.tx.message, value: Math.floor(this.tx.value * 100)})
                     .then(response => {
                         this.listAccounts()
                         this.listTransactions()

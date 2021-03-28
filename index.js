@@ -137,7 +137,7 @@ app.get('/accounts/:id/tx', (req, res) => {
 })
 
 app.post('/tx', async (req, res) => {
-    let tx = doTx(req.body)
+    let tx = await doTx(req.body)
     if (!tx)
         res.status(400).send()
     else 
