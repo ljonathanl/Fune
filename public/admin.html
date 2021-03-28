@@ -29,7 +29,7 @@
             <t :c="ln" ln="en">
                 a crëator account create a new one <small>Ü</small> (the <small>Ü</small>nit of the f<small>Ü</small>ne currency) by day<br>
                 <small>old created <strong><small>Ü</small>nits</strong> melt <strong>celerity</strong> % per <strong>revaluation period</strong></small><br>
-                <small class="fs-3">that's all fölks !</small><br>
+                <small class="fs-3">that's all fölks!</small><br>
             </t>
             <t :c="ln" ln="fr">
                 un compte crëateur crée une nouvelle <small>Ü</small> (l'<small>Ü</small>nité de la monnaie f<small>Ü</small>ne) par jour<br>
@@ -123,8 +123,8 @@
                         <t :c="ln" ln="fr"> à </t> 
                     </label>
                     <select v-model="tx.to" id="txTo" class="form-select">
-                        <option v-if="ln == 'fr'" disabled value="">qüi</option>
                         <option v-if="ln == 'en'" disabled value="">select öne</option>
+                        <option v-if="ln == 'fr'" disabled value="">qüi</option>
                         <option v-for="account in accounts" :value="account.name">{{ account.name }}</option>
                     </select>
                     <button type="button" class="btn btn-primary" @click="executeTx()">ök!</button>
