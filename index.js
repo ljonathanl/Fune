@@ -59,9 +59,13 @@ app.get('/accounts', (req, res) => {
 })
 
 app.post('/accounts', async (req, res) => {
-    var account = accounts[req.body.name] = Object.assign({name: '', balance: 0, creator: false, date: new Date().toISOString(), creationDay: currency.elapsedTime}, req.body)
-    await storage.setItem('accounts', accounts)
-    res.status(201).json(account)
+    if (req.body.name) {
+        var account = accounts[req.body.name] = Object.assign({name: '', balance: 0, creator: false, date: new Date().toISOString(), creationDay: currency.elapsedTime}, req.body)
+        await storage.setItem('accounts', accounts)
+        res.status(201).json(account)
+    } else {
+        res.status(400).send()
+    }
 })
 
 app.patch('/accounts/:id', async (req, res) => {
