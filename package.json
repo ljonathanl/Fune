@@ -1,10 +1,10 @@
 {
   "name": "fune",
-  "version": "1.0.1",
+  "version": "0.0.2",
   "description": "Füne project",
   "main": "index.js",
   "scripts": {
-    "start": "node ./index.js"
+    "start": "node ./fune.js"
   },
   "author": "Jonathan",
   "license": "GPL",
