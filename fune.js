@@ -73,8 +73,12 @@ app.get('/currency', (req, res) => {
 
 app.patch('/currency', async (req, res) => {
     currency = Object.assign(currency, req.body)
-    await storage.setItem('currency', currency)
-    res.status(200).json(currency)
+    if (currency.c < 0  || currency.c > 100) {
+        res.status(400).send()
+    } else {
+        await storage.setItem('currency', currency)
+        res.status(200).json(currency)
+    }
 })
 
 /* 

@@ -47,7 +47,7 @@
                         <t :c="ln" ln="en">melting</t>
                         <t :c="ln" ln="fr">fonte</t>
                     </label>
-                    <input id="currencyCelerity" v-model="editCurrency.c" type="number" class="form-control text-right"
+                    <input id="currencyCelerity" v-model="editCurrency.c" type="number" min="0" max="100" class="form-control text-right"
                         :class="{'bg-primary': editCurrency.c != currency.c}">
                     <span class="input-group-text">%</span>
                 </div>

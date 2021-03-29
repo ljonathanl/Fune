@@ -7,9 +7,8 @@
 
 a crëator account create a new one Ü (the Ünit of the fÜne currency) by day
 
-old created **Ünits** melt **celerity** % per **revaluation period**
+old created **Ünits** melt a given percentage per **revaluation period**
 
-that's all fölks !
 
 ## Installation
 
@@ -22,7 +21,7 @@ Open shell in project folder and type
 ```bash
 > npm install
 
-> node ./index.js
+> node ./fune.js
 ```
 
 A web server will start at localhost:80, go to http://localhost to create your first crëator account or go to http://localhost/admin.html to manage the currency and accounts
