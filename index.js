@@ -9,6 +9,8 @@ app.use(express.static('public'))
 app.use(morgan('tiny'))
 
 const txLimit = 1000
+const statLimit = 100
+const statPeriod = 1
 
 const roles = {
     creator: 'creator',
@@ -27,6 +29,7 @@ let currency = {}
 let accounts = {}
 let transactions = []
 let ideas = {}
+let stats = {}
 
 const doTx = async (simpleTx) => {
     let tx = Object.assign({from: '', to: '', message: '', value: 0, date: new Date().toISOString(), day: currency.elapsedTime}, simpleTx)
@@ -144,6 +147,18 @@ app.post('/tx', async (req, res) => {
         res.status(201).json(tx) 
 })
 
+app.get('/accounts/:id/stats', (req, res) => {
+    const id = req.params.id
+    var account = accounts[id]
+    if (!account) {
+        res.status(404).send()
+    } else {
+        let stat = stats[id]
+        // TODO
+        res.status(200).json(stat)
+    }
+})
+
 /* 
  * IDEA
  */
@@ -221,23 +236,17 @@ async function start() {
             c: 10,
             stepTime: 60,
             elapsedTime: 0,
-            revaluationTime: 30, 
+            revaluationTime: 1, 
             playing: true, 
         }
 
 
     accounts = await storage.getItem('accounts')
 
-    if (!accounts)
-        accounts = {
-            alice: {name: 'alice', balance: 0, role: roles.creator, date: new Date().toISOString(), creationDay: 0},
-            bob: {name: 'bob', balance: 0, role: roles.creator, date: new Date().toISOString(), creationDay: 0},
-            claude: {name: 'claude', balance: 0, role: roles.creator, date: new Date().toISOString(), creationDay: 0},
-            daniel: {name: 'daniel', balance: 0, role: roles.wallet, date: new Date().toISOString(), creationDay: 0},
-        }
+    if (!accounts) 
+        accounts = {}
 
-    if (!accounts[fune.name])
-        accounts[fune.name] = {name: fune.name, balance: 0, role: roles.bank, date: new Date().toISOString(), creationDay: 0}
+    accounts[fune.name] = {name: fune.name, balance: 0, role: roles.bank, date: new Date().toISOString(), creationDay: 0}
 
     ideas = {
         idea1: {name: 'idea1', account: 'alice', text: 'first idea', date: new Date().toISOString()},
@@ -248,23 +257,47 @@ async function start() {
     if (!transactions)
         transactions = [];
 
+    stats = await storage.getItem('stats')
+
+    if (!stats) 
+        stats = {}
+
     play()
 }
 
 
 
 async function play() {
+    const uValue = 100
+    const uGained = currency.revaluationTime * uValue
     if (currency.playing) {
         currency.elapsedTime++;
         const funeAccount = accounts[fune.name]
-        Object.values(accounts).forEach( account => {
-            if (currency.elapsedTime % currency.revaluationTime == 0) 
-                doTx({from: account.name, to: funeAccount.name, message: '!revaluation', value: Math.ceil(account.balance * (currency.c / 100))})
+        Object.values(accounts).forEach( async account => {
+            if (currency.c != 0 && currency.elapsedTime % currency.revaluationTime == 0) {
+                let melting = account.balance * (currency.c / 100)
+                if (melting > uGained) {
+                    melting = Math.ceil(melting)
+                } else {
+                    melting = Math.floor(melting)
+                }
+                await doTx({from: account.name, to: funeAccount.name, message: '!revaluation%' + currency.c, value: melting})
+            }    
             if (account.role == roles.creator)
-                doTx({from: funeAccount.name, to: account.name, message: '!Ucreation', value: 100})
+                await doTx({from: funeAccount.name, to: account.name, message: '!1Ucreation', value: uValue})
+            if (currency.elapsedTime  % statPeriod == 0) {
+                var stat = stats[account.name]
+                if (!stat) {
+                    stat = stats[account.name] = new Array(statLimit)
+                }
+                let index = Math.round(currency.elapsedTime / statPeriod) % statLimit
+                stat[index] = account.balance 
+            }
         });
+        await storage.setItem('stats', stats)
         await storage.setItem('accounts', accounts)
         await storage.setItem('currency', currency)
+        console.log("Day " + currency.elapsedTime)
     }
     setTimeout(play, currency.stepTime * 1000);
 }

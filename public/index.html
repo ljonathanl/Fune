@@ -44,11 +44,15 @@
                 </small>
             </h2>
             <div class="display-2 text-center">
-                <span>{{ Math.round(account.balance/100) }}</span>
+                <span>{{ Math.floor(account.balance/100) }}</span>
                 <small class="align-baseline" style="font-size: 50%;">.{{ digit(account.balance) }}</small> 
                 <small> Ü</small>
             </div>
-            <p class="display-5 text-center" v-if="!isCreator(account.name)">
+            <p class="display-5 text-center" v-if="account.role == 'bank'">
+                <t :c="ln" ln="en">bank</t>
+                <t :c="ln" ln="fr">banque</t>
+            </p>
+            <p class="display-5 text-center" v-else-if="account.role == 'wallet'">
                 <t :c="ln" ln="en">wallet</t>
                 <t :c="ln" ln="fr">compte simple</t>
             </p>
@@ -70,7 +74,7 @@
                 <t :c="ln" ln="en">transaction</t>
                 <t :c="ln" ln="fr">transaction</t>
             </h4>
-            <form class="mb-4 row justify-content-center" v-if="account.balance > 0">
+            <form class="mb-4 row justify-content-center" v-if="account.role == 'bank' || account.balance > 0">
                 <div>
                     <div class="col-auto input-group">
                         <input v-model="tx.value" type="number" :max="Math.round(account.balance/100)" step="any" min="0" class="form-control text-right" style="max-width: 120px;">
@@ -166,6 +170,20 @@
                 </tbody>
             </table>
         </div> 
+
+        <trend
+            :data="chart"
+            :gradientDirection="'top'"
+            :gradient="['#df691a', '#a54f15', '#65300d']"
+            :padding="8"
+            :radius="8"
+            :stroke-width="1"
+            :stroke-linecap="'butt'"
+            auto-draw
+            smooth>
+        </trend>
+
+
         <div class="text-right">
             <span>{{ fune.name }} v{{ fune.version }}</span>
         </div>
@@ -174,7 +192,9 @@
 
 </body>
 
-<script>
+<script type="module">
+    import Trend from "./vue-trend.esm.js"
+
     const getLanguage = () => (navigator.userLanguage || 
         (navigator.languages && navigator.languages.length && navigator.languages[0]) || 
         navigator.language || navigator.browserLanguage || navigator.systemLanguage).substring(0, 2) == 'fr' ? 'fr' : 'en'
@@ -185,6 +205,7 @@
         data() {
             return {
                 ln: getLanguage(),
+                chart: [],
                 fune: { name: 'fÜne', logo: 'fї', version: '0'},
                 sortKey: "name",
                 sortOrder: 1,
@@ -227,16 +248,17 @@
                     })
             },
             translateTxMessage(message) {
-                if (message == '!Ucreation') {
+                if (message == '!1Ucreation') {
                     if (this.ln == 'fr')
                         return '> crëation d\'une Ü !'
                     return '> u crëate 1 Ü!' 
                 }
-
-                if (message == '!revaluation') {
+                
+                if (message.indexOf('!revaluation%') == 0) {
+                    let c = parseInt(message.split('%')[1])
                     if (this.ln == 'fr')
-                        return '> tous les Ü fondent !'
-                    return '> all the Ü melt!' 
+                        return '> tous les Ü fondent de ' + c + '% !'
+                    return '> all the Ü melt by ' + c + '%!' 
                 }
 
                 return message ? '> ' + message : ''
@@ -356,7 +378,7 @@
         mounted() {
             this.about()
             if(window.location.hash) {
-                var hash = window.location.hash.substring(1)
+                var hash = decodeURI(window.location.hash.substring(1))
                 if (hash.length > 0) {
                     this.account.name = hash
                     this.setAccount()
@@ -377,6 +399,7 @@
             props: ['c', 'ln'],
             template: '<template v-if="c == ln"><slot></slot></template>'
         })
+        .component('trend', Trend)
         .mount('#app')
 
 </script>
