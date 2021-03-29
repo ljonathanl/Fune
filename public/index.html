@@ -105,6 +105,26 @@
                 </div>
             </form>
 
+            <h4 class="text-center mt-4">
+                <t :c="ln" ln="en">stats</t>
+                <t :c="ln" ln="fr">stats</t>
+            </h4>
+            <trend
+                :data="stats"
+                :gradientDirection="'top'"
+                :gradient="['#df691a', '#a54f15', '#65300d']"
+                :padding="8"
+                :radius="8"
+                :stroke-width="1"
+                :stroke-linecap="'butt'"
+                auto-draw
+                smooth>
+            </trend>
+
+            <h4 class="text-center mt-4">
+                <t :c="ln" ln="en">accounts</t>
+                <t :c="ln" ln="fr">comptes</t>
+            </h4>
             <ul class="list-group m-auto" style="max-width: 440px;">
                 <li v-for="transaction in transactions" class="list-group-item" style="background-color: #0c1e2f;">
                     <div class="d-flex w-100 justify-content-between">
@@ -171,19 +191,6 @@
             </table>
         </div> 
 
-        <trend
-            :data="chart"
-            :gradientDirection="'top'"
-            :gradient="['#df691a', '#a54f15', '#65300d']"
-            :padding="8"
-            :radius="8"
-            :stroke-width="1"
-            :stroke-linecap="'butt'"
-            auto-draw
-            smooth>
-        </trend>
-
-
         <div class="text-right">
             <span>{{ fune.name }} v{{ fune.version }}</span>
         </div>
@@ -193,7 +200,7 @@
 </body>
 
 <script type="module">
-    import Trend from "./vue-trend.esm.js"
+    import Trend from "./vue-trend.js"
 
     const getLanguage = () => (navigator.userLanguage || 
         (navigator.languages && navigator.languages.length && navigator.languages[0]) || 
@@ -205,7 +212,7 @@
         data() {
             return {
                 ln: getLanguage(),
-                chart: [],
+                stats: [],
                 fune: { name: 'fÜne', logo: 'fї', version: '0'},
                 sortKey: "name",
                 sortOrder: 1,
@@ -300,6 +307,13 @@
                         this.transactions = response.data.reverse()
                     })
             },
+            getStats() {
+                axios
+                    .get('/accounts/' + this.account.name + '/stats')
+                    .then(response => {
+                        this.stats = response.data
+                    })
+            },
             listAccounts() {
                 axios
                     .get('/accounts')
@@ -341,8 +355,10 @@
             refresh() {
                 this.listAccounts()
                 this.getCurrency()
-                if (this.hasAccount)
+                if (this.hasAccount) {
                     this.listTransactions()
+                    this.getStats()
+                }
             },
             deleteAccount() {
                 if (confirm(this.ln == 'fr' ? 'tu es sür.e ?' : 'are ü sure?')) {
