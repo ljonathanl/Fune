@@ -158,8 +158,14 @@ app.get('/accounts/:id/stats', (req, res) => {
         res.status(404).send()
     } else {
         let stat = stats[id]
-        // TODO
-        res.status(200).json(stat)
+        var result
+        if (stat) {
+            let index = (Math.floor(currency.elapsedTime / statPeriod) + 1) % statLimit
+            result = stat.slice(index).concat(stat.slice(0, index)).filter( _ => _ != null)
+        } else {
+            result = []
+        }
+        res.status(200).json(result)
     }
 })
 
