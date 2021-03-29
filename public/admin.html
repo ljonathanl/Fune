@@ -46,8 +46,8 @@
             <form>
                 <div class="input-group mb-3">
                     <label class="input-group-text" for="currencyCelerity">
-                        <t :c="ln" ln="en">celerity</t>
-                        <t :c="ln" ln="fr">célérité</t>
+                        <t :c="ln" ln="en">melting</t>
+                        <t :c="ln" ln="fr">fonte</t>
                     </label>
                     <input id="currencyCelerity" v-model="editCurrency.c" type="number" class="form-control text-right"
                         :class="{'bg-primary': editCurrency.c != currency.c}">
@@ -160,14 +160,11 @@
                             <input :placeholder="ln == 'fr' ? 'nöm' : 'näme'" v-model="newAccount.name" type="text" class="form-control" id="accountName" maxlength="10"/>
                         </td>
                         <td class="text-center">
-                            <span v-if="newAccount.role == 'creator'" class="btn btn-outline-primary" @click="newAccount.role = 'wallet'">
-                                <t :c="ln" ln="en">crëator</t>
-                                <t :c="ln" ln="fr">crëateur</t>
-                            </span>
-                            <span v-else class="btn btn-outline-secondary" @click="newAccount.role = 'creator'">
-                                <t :c="ln" ln="en">wället</t>
-                                <t :c="ln" ln="fr">sïmple</t>
-                            </span>
+                            <select v-model="newAccount.role" class="form-control">
+                                <option value="creator">{{ ln != 'fr' ?  'crëator' : 'crëateur'}}</option>
+                                <option value="wallet">{{ ln != 'fr' ?  'wället' : 'sïmple'}}</option>
+                                <option value="bank">{{ ln != 'fr' ?  'bänk' : 'bänque'}}</option>
+                            </select>
                         </td>
                         <td></td>
                         <td class="text-right">
@@ -179,24 +176,26 @@
                     </tr>
                     <tr v-for="account in sortedAccounts">
                         <td><a :href="'./#' + account.name">{{ account.name }}</a></td>
-                        <td class="text-right">
-                            <template v-if="account.name != fune.name">
-                                <span v-if="account.role == 'creator'" class="badge bg-primary mr-3">
-                                    <t :c="ln" ln="en">crëator</t>
-                                    <t :c="ln" ln="fr">crëateur</t>
-                                </span>
-                                <span v-else class="badge bg-secondary mr-3">
-                                    <t :c="ln" ln="en">wället</t>
-                                    <t :c="ln" ln="fr"> sïmple </t>
-                                </span>
-                                <a href="#" @click.stop.prevent="switchAccountRole(account.name)">
-                                    <t :c="ln" ln="en">change</t>
-                                    <t :c="ln" ln="fr">modifier</t>
-                                </a>
-                            </template>
+                        <td class="text-left">
+                            <span v-if="account.role == 'creator'" class="badge bg-primary mr-3" style="width: 50px;">
+                                <t :c="ln" ln="en">crëator</t>
+                                <t :c="ln" ln="fr">crëateur</t>
+                            </span>
+                            <span v-else-if="account.role == 'wallet'" class="badge bg-secondary mr-3" style="width: 50px;">
+                                <t :c="ln" ln="en">wället</t>
+                                <t :c="ln" ln="fr">sïmple</t>
+                            </span>
+                            <span v-else class="badge bg-secondary mr-3" style="width: 50px;">
+                                <t :c="ln" ln="en">bänk</t>
+                                <t :c="ln" ln="fr">bänque</t>
+                            </span>
+                            <a v-if="account.role != 'bank'" href="#" @click.stop.prevent="switchAccountRole(account)">
+                                <t :c="ln" ln="en">change</t>
+                                <t :c="ln" ln="fr">modifier</t>
+                            </a>
                         </td>
                         <td class="text-right">
-                            <template v-if="account.name != fune.name">
+                            <template v-if="account.role != 'bank'">
                                 <strong>{{ currencyDecimal(account.balance) }}<small class="mr-3"> Ü </small></strong>
                                 <a href="#" @click.stop.prevent="resetBalance(account.name)">
                                     <t :c="ln" ln="en">reset</t>
