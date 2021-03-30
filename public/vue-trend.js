@@ -35,7 +35,7 @@ function moveTo (to, from, radius) {
  * @param  {object}             boundary
  * @return {object[]}
  */
-function genPoints (arr, ref, ref$1) {
+function genPoints (data, ref, ref$1) {
   var minX = ref.minX;
   var minY = ref.minY;
   var maxX = ref.maxX;
@@ -43,7 +43,7 @@ function genPoints (arr, ref, ref$1) {
   var max = ref$1.max;
   var min = ref$1.min;
 
-  arr = arr.map(function (item) { return (typeof item === 'number' ? item : item.value); });
+  var arr = data.map(function (item) { return (typeof item === 'number' ? item : item.value); });
   var minValue = Math.min.apply(Math, arr.concat( [min] )) - 0.001;
   var gridX = (maxX - minX) / (arr.length - 1);
   var gridY = (maxY - minY) / (Math.max.apply(Math, arr.concat( [max] )) + 0.001 - minValue);
@@ -110,8 +110,48 @@ var Path = {
     var d = genPath(points, smooth ? radius : 0);
 
     return h('path', {
-      d: d, fill: 'none', stroke: ("url(#" + id + ")") 
+        d: d, fill: 'none', stroke: ("url(#" + id + ")") 
     })
+  }
+};
+
+var Background = {
+  props: ['data', 'boundary','max', 'min'],
+
+  render: function render () {
+    var data = this.data;
+    var boundary = this.boundary;
+
+    console.log(data)
+
+    return [
+      h('text', {
+        x: boundary.minX,
+        y: boundary.minY - 2,
+        fill: '#CCCCCC88',
+        'font-size': '0.6em'
+      }, (Math.max.apply(Math, data.concat([this.max])) / 100).toFixed(2)),
+      h('line', {
+        x1: boundary.minX,
+        y1: boundary.minY,
+        x2: boundary.maxX,
+        y2: boundary.minY,
+        stroke: '#CCCCCC88'
+      }),
+      h('text', {
+        x: boundary.minX,
+        y: boundary.maxY - 2,
+        fill: '#CCCCCC88',
+        'font-size': '0.6em'
+      }, (Math.min.apply(Math, data.concat([this.min])) / 100).toFixed(2)),
+      h('line', {
+        x1: boundary.minX,
+        y1: boundary.maxY,
+        x2: boundary.maxX,
+        y2: boundary.maxY,
+        stroke: '#CCCCCC88'
+      })
+    ]
   }
 };
 
@@ -230,10 +270,9 @@ var Trend$1 = {
 
   render: function render () {
     if (!this.data || this.data.length < 2) { return }
-    var ref = this;
-    var width = ref.width;
-    var height = ref.height;
-    var padding = ref.padding;
+    var width = this.width;
+    var height = this.height;
+    var padding = this.padding;
     var viewWidth = width || 300;
     var viewHeight = height || 75;
     var boundary = {
@@ -242,6 +281,8 @@ var Trend$1 = {
       maxX: viewWidth - padding,
       maxY: viewHeight - padding
     };
+
+    console.log("##" , this.data)
 
     return h(
       'svg', {
@@ -254,6 +295,12 @@ var Trend$1 = {
           gradient: this.gradient,
           gradientDirection: this.gradientDirection,
           id: 'vue-trend',
+        }),
+        h(Background, {
+          data: this.data,
+          boundary: boundary,
+          max: this.max,
+          min: this.min,
         }),
         h(Path, {
           smooth: this.smooth,
