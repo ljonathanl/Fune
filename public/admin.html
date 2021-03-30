@@ -36,7 +36,7 @@
             </t>
         </p>
 
-        <div class="mb-3 p-3 m-auto" style="width: 320px;">
+        <div class="mb-3 p-3 m-auto" style="width: 350px;">
             <h4 class="text-center">
                 <t :c="ln" ln="en">currency</t>
                 <t :c="ln" ln="fr">monnaie</t>
@@ -47,7 +47,7 @@
                         <t :c="ln" ln="en">melting</t>
                         <t :c="ln" ln="fr">fonte</t>
                     </label>
-                    <input id="currencyCelerity" v-model="editCurrency.c" type="number" min="0" max="100" class="form-control text-right"
+                    <input id="currencyCelerity" v-model="editCurrency.c" type="number" min="0" max="100" step="1" class="form-control text-right"
                         :class="{'bg-primary': editCurrency.c != currency.c}">
                     <span class="input-group-text">%</span>
                 </div>
@@ -56,7 +56,7 @@
                         <t :c="ln" ln="en">day duration</t>
                         <t :c="ln" ln="fr">durée d'un jour</t>
                     </label>
-                    <input id="currencyStepTime" v-model="editCurrency.stepTime" type="number" class="form-control text-right"
+                    <input id="currencyStepTime" v-model="editCurrency.stepTime" type="number" min="60" max="90000" step="60" class="form-control text-right"
                         :class="{'bg-primary': editCurrency.stepTime != currency.stepTime}">
                     <span class="input-group-text">
                         <t :c="ln" ln="en">seconds</t>
@@ -68,7 +68,7 @@
                         <t :c="ln" ln="en">revaluation period</t>
                         <t :c="ln" ln="fr">réévaluation</t>
                     </label>
-                    <input id="currencyRevaluationTime" v-model="editCurrency.revaluationTime" type="number" class="form-control text-right" 
+                    <input id="currencyRevaluationTime" v-model="editCurrency.revaluationTime" type="number" min="1" max="400" step="1" class="form-control text-right" 
                         :class="{'bg-primary': editCurrency.revaluationTime != currency.revaluationTime}">
                     <span class="input-group-text">
                         <t :c="ln" ln="en">days</t>
