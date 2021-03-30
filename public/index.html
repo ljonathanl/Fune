@@ -113,17 +113,18 @@
                 :data="stats"
                 :gradientDirection="'top'"
                 :gradient="['#df691a', '#a54f15', '#65300d']"
-                :padding="8"
+                :padding="10"
                 :radius="8"
                 :stroke-width="1"
                 :stroke-linecap="'butt'"
+                :min="0"
                 auto-draw
                 smooth>
             </trend>
 
             <h4 class="text-center mt-4">
-                <t :c="ln" ln="en">accounts</t>
-                <t :c="ln" ln="fr">comptes</t>
+                <t :c="ln" ln="en">diary</t>
+                <t :c="ln" ln="fr">journal</t>
             </h4>
             <ul class="list-group m-auto" style="max-width: 440px;">
                 <li v-for="transaction in transactions" class="list-group-item" style="background-color: #0c1e2f;">
@@ -165,7 +166,12 @@
                     </div>
                 </li>
             </ul>
-            <table class="table mt-3">
+
+            <h4 class="text-center mt-4">
+                <t :c="ln" ln="en">accounts</t>
+                <t :c="ln" ln="fr">comptes</t>
+            </h4>
+            <table class="table">
                 <thead>
                     <tr>                       
                         <th @click="sortBy('name')" class="pl-4">
