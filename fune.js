@@ -215,7 +215,8 @@ app.get('/db', (req, res) => {
     const db = {
         currency,
         accounts,
-        transactions
+        transactions,
+        stats,
     }
     res.status(200).json(db)
 })
@@ -225,9 +226,11 @@ app.put('/db', async (req, res) => {
     currency = req.body.currency
     accounts = req.body.accounts
     transactions = req.body.transactions
+    stats = req.body.stats
     await storage.setItem('currency', currency)
     await storage.setItem('accounts', accounts)
     await storage.setItem('transactions', transactions)
+    await storage.setItem('stats', stats)
     res.status(204).send()
 })
 
