@@ -95,7 +95,7 @@ function genPath (points, radius) {
 }
 
 var Path = {
-  props: ['smooth', 'data', 'boundary', 'radius', 'id', 'max', 'min'],
+  props: ['smooth', 'data', 'boundary', 'radius', 'id', 'max', 'min', 'color'],
 
   render: function render () {
     var ref = this;
@@ -109,20 +109,24 @@ var Path = {
     var points = genPoints(data, boundary, { max: max, min: min });
     var d = genPath(points, smooth ? radius : 0);
 
+    var strokeValue;
+    if (this.color) {
+      strokeValue = this.color;
+    } else {
+      strokeValue = "url(#" + id + ")";
+    }
+
     return h('path', {
-        d: d, fill: 'none', stroke: ("url(#" + id + ")") 
+        d: d, fill: 'none', stroke: strokeValue 
     })
   }
 };
 
 var Background = {
-  props: ['data', 'boundary','max', 'min'],
+  props: ['boundary','max', 'min'],
 
   render: function render () {
-    var data = this.data;
     var boundary = this.boundary;
-
-    console.log(data)
 
     return [
       h('text', {
@@ -130,7 +134,7 @@ var Background = {
         y: boundary.minY - 2,
         fill: '#CCCCCC88',
         'font-size': '0.6em'
-      }, (Math.max.apply(Math, data.concat([this.max])) / 100).toFixed(2)),
+      }, (this.max / 100).toFixed(2)),
       h('line', {
         x1: boundary.minX,
         y1: boundary.minY,
@@ -143,7 +147,7 @@ var Background = {
         y: boundary.maxY - 2,
         fill: '#CCCCCC88',
         'font-size': '0.6em'
-      }, (Math.min.apply(Math, data.concat([this.min])) / 100).toFixed(2)),
+      }, (this.min / 100).toFixed(2)),
       h('line', {
         x1: boundary.minX,
         y1: boundary.maxY,
@@ -194,7 +198,7 @@ var Gradient = {
   }
 };
 
-var Trend$1 = {
+var Trend = {
   name: 'Trend',
 
   props: {
@@ -282,8 +286,6 @@ var Trend$1 = {
       maxY: viewHeight - padding
     };
 
-    console.log("##" , this.data)
-
     return h(
       'svg', {
         width: width || '100%',
@@ -297,10 +299,9 @@ var Trend$1 = {
           id: 'vue-trend',
         }),
         h(Background, {
-          data: this.data,
           boundary: boundary,
-          max: this.max,
-          min: this.min,
+          max: Math.max.apply(Math, this.data.concat([this.max])),
+          min: Math.min.apply(Math, this.data.concat([this.min])),
         }),
         h(Path, {
           smooth: this.smooth,
@@ -317,12 +318,103 @@ var Trend$1 = {
   }
 };
 
-Trend$1.install = function (Vue) {
-  Vue.component(Trend$1.name, Trend$1);
+var Trends = {
+  name: 'Trends',
+
+  props: {
+    data: {
+      type: Array,
+      required: true
+    },
+    colors: {
+      type: Array,
+      required: true
+    },
+    min: {
+      type: Number,
+      default: Infinity
+    },
+    height: Number,
+    width: Number,
+    padding: {
+      type: Number,
+      default: 8
+    },
+    radius: {
+      type: Number,
+      default: 10
+    },
+    smooth: Boolean
+  },
+
+  render: function render () {
+    if (!this.data) { return }
+    var width = this.width;
+    var height = this.height;
+    var padding = this.padding;
+    var viewWidth = width || 300;
+    var viewHeight = height || 150;
+    var boundary = {
+      minX: padding,
+      minY: padding,
+      maxX: viewWidth - padding,
+      maxY: viewHeight - padding
+    };
+
+    var max = 10;
+    for (let i = 0; i < this.data.length; i++) {
+      const element = this.data[i];
+      if (element && element.length > 2) {
+        for (let j = 0; j < element.length; j++) {
+          max = Math.max(max, element[j])
+        }
+      }
+    }
+
+    var paths = [];
+    for (let index = 0; index < this.data.length; index++) {
+      const element = this.data[index];
+      if (element && element.length > 2) {
+        paths.push(
+          h(Path, {
+            smooth: this.smooth,
+            data: element,
+            boundary: boundary,
+            radius: this.radius,
+            max: max,
+            min: this.min,
+            id: 'vue-trend',
+            ref: 'path' + index,
+            color: this.colors[index]
+          })
+        )
+      }
+    }
+
+    if (paths.length == 0) {
+      return
+    }
+
+    return h(
+      'svg', {
+        width: width || '100%',
+        height: height || '25%',
+        viewBox: ("0 0 " + viewWidth + " " + viewHeight)
+      },
+      [
+        h(Background, {
+          boundary: boundary,
+          max: max,
+          min: this.min,
+        }),
+        paths
+      ]
+    )
+  }
 };
 
-if (typeof window !== 'undefined' && window.Vue && window.Vue.use) {
-  window.Vue.use(Trend$1);
-}
 
-export default Trend$1;
+export {
+  Trend,
+  Trends
+}
