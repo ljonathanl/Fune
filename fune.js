@@ -111,7 +111,8 @@ app.patch('/accounts/:id', async (req, res) => {
     let patched = false
     if (account && account.role != 'bank') {
         account = Object.assign(account, req.body)
-        await storage.setItem('accounts', accounts)    
+        await storage.setItem('accounts', accounts) 
+        patched = true   
     }
     res.status(patched ? 200 : 404).json(account)
 })
@@ -161,7 +162,7 @@ app.get('/accounts/:id/stats', (req, res) => {
         var result
         if (stat) {
             let index = (Math.floor(currency.elapsedTime / statPeriod) + 1) % statLimit
-            result = stat.slice(index).concat(stat.slice(0, index)).filter( _ => _ != null)
+            result = stat.slice(index).concat(stat.slice(0, index))
         } else {
             result = []
         }
@@ -298,7 +299,7 @@ async function play() {
             if (currency.elapsedTime  % statPeriod == 0) {
                 var stat = stats[account.name]
                 if (!stat) {
-                    stat = stats[account.name] = new Array(statLimit)
+                    stat = stats[account.name] = new Array(statLimit).fill(0)
                 }
                 let index = Math.round(currency.elapsedTime / statPeriod) % statLimit
                 stat[index] = account.balance 
