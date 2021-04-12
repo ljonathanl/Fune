@@ -273,7 +273,7 @@
                 }
                 
                 if (message.indexOf('!revaluation%') == 0) {
-                    let c = parseInt(message.split('%')[1])
+                    let c = message.split('%')[1]
                     if (this.ln == 'fr')
                         return '> tous les Ü fondent de ' + c + '% !'
                     return '> all the Ü melt by ' + c + '%!' 
