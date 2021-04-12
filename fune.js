@@ -237,14 +237,22 @@ app.get('/db', (req, res) => {
 
 
 app.put('/db', async (req, res) => {
-    currency = req.body.currency
-    accounts = req.body.accounts
-    transactions = req.body.transactions
-    stats = req.body.stats
-    await storage.setItem('currency', currency)
-    await storage.setItem('accounts', accounts)
-    await storage.setItem('transactions', transactions)
-    await storage.setItem('stats', stats)
+    if (req.body.currency) {
+        currency = req.body.currency
+        await storage.setItem('currency', currency)
+    }
+    if (req.body.accounts) {
+        accounts = req.body.accounts
+        await storage.setItem('accounts', accounts)
+    }
+    if (req.body.transactions) {
+        transactions = req.body.transactions
+        await storage.setItem('transactions', transactions)
+    }
+    if (req.body.stats) {
+        stats = req.body.stats
+        await storage.setItem('stats', stats)
+    }
     res.status(204).send()
 })
 
