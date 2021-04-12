@@ -213,7 +213,7 @@
                         </td>
                         <td></td>
                         <td class="text-right">
-                            <button type="button" :disabled="3 > newAccount.name.length" class="btn btn-primary" @click="createAccount()">
+                            <button type="button" :disabled="3 > newAccount.name.length || accounts.some(_ => _.name == newAccount.name)" class="btn btn-primary" @click="createAccount()">
                                 <t :c="ln" ln="en">nëw!</t>
                                 <t :c="ln" ln="fr">noüveau!</t>
                             </button>
@@ -231,7 +231,7 @@
                                 <t :c="ln" ln="en">wället</t>
                                 <t :c="ln" ln="fr">sïmple</t>
                             </span>
-                            <span v-else class="badge bg-secondary mr-3" style="width: 50px;">
+                            <span v-else class="badge bg-danger mr-3" style="width: 50px;">
                                 <t :c="ln" ln="en">bänk</t>
                                 <t :c="ln" ln="fr">bänque</t>
                             </span>
