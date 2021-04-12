@@ -1,0 +1,87 @@
+{
+    "currency": {
+        "date": "2021-04-12T21:11:23.994Z",
+        "c": 10,
+        "stepTime": "60",
+        "elapsedTime": 19,
+        "revaluationTime": "1",
+        "playing": true,
+        "nbMembers": 9,
+        "monetaryMass": 91407,
+        "mode": "grew",
+        "lastMelt": "9.16",
+        "expression": "0.01 * M / N"
+    },
+    "accounts": {
+        "fÜne": {
+            "name": "fÜne",
+            "balance": 0,
+            "role": "bank",
+            "date": "2021-04-12T21:11:23.995Z",
+            "creationDay": 0
+        },
+        "alain": {
+            "name": "alain",
+            "balance": 10189,
+            "role": "human",
+            "date": "2021-04-12T21:12:07.334Z",
+            "creationDay": 5
+        },
+        "brigitte": {
+            "name": "brigitte",
+            "balance": 11987,
+            "role": "human",
+            "date": "2021-04-12T21:12:21.833Z",
+            "creationDay": 6
+        },
+        "stephane": {
+            "name": "stephane",
+            "balance": 11430,
+            "role": "human",
+            "date": "2021-04-12T21:12:31.140Z",
+            "creationDay": 7
+        },
+        "fred": {
+            "name": "fred",
+            "balance": 11430,
+            "role": "human",
+            "date": "2021-04-12T21:12:35.625Z",
+            "creationDay": 8
+        },
+        "jeremy": {
+            "name": "jeremy",
+            "balance": 11430,
+            "role": "human",
+            "date": "2021-04-12T21:12:42.521Z",
+            "creationDay": 8
+        },
+        "lucie": {
+            "name": "lucie",
+            "balance": 12111,
+            "role": "human",
+            "date": "2021-04-12T21:12:51.571Z",
+            "creationDay": 9
+        },
+        "robert": {
+            "name": "robert",
+            "balance": 7610,
+            "role": "human",
+            "date": "2021-04-12T21:39:00.525Z",
+            "creationDay": 7
+        },
+        "philippe": {
+            "name": "philippe",
+            "balance": 7610,
+            "role": "human",
+            "date": "2021-04-12T21:39:07.185Z",
+            "creationDay": 7
+        },
+        "denise": {
+            "name": "denise",
+            "balance": 7610,
+            "role": "human",
+            "date": "2021-04-12T21:39:18.282Z",
+            "creationDay": 7
+        }
+    }
+}

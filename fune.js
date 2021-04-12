@@ -105,8 +105,8 @@ app.get('/accounts', (req, res) => {
 })
 
 app.post('/accounts', async (req, res) => {
-    if (req.body.name) {
-        req.body.name = req.body.name.trim()
+    req.body.name = req.body.name.trim()
+    if (req.body.name && !accounts[req.body.name]) {
         var account = accounts[req.body.name] = Object.assign({name: '', balance: 0, role: 'wallet', date: new Date().toISOString(), creationDay: currency.elapsedTime}, req.body)
         await storage.setItem('accounts', accounts)
         res.status(201).json(account)
