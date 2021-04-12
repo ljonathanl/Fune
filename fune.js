@@ -131,7 +131,7 @@ app.delete('/accounts/:id', async (req, res) => {
     const id = req.params.id
     var account = accounts[id]
     let deleted = false
-    if (account && account.role != 'bank') {
+    if (account && account.name != fune.name) {
         delete accounts[id]
         delete stats[id]
         await storage.setItem('accounts', accounts)
