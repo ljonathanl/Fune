@@ -27,11 +27,11 @@
 
         <p class="lead text-center mb-5">
             <t :c="ln" ln="en">
-                a crëator account create a new one <small>Ü</small> (the <small>Ü</small>nit of the f<small>Ü</small>ne currency) by day<br>
+                a <small>Ü</small>man account create a new one <small>Ü</small> (the <small>Ü</small>nit of the f<small>Ü</small>ne currency) by day<br>
                 <small>old created <strong><small>Ü</small>nits</strong> melt by a given percentage each <strong>revaluation period</strong></small><br>
             </t>
             <t :c="ln" ln="fr">
-                un compte crëateur crée une nouvelle <small>Ü</small> (l'<small>Ü</small>nité de la monnaie f<small>Ü</small>ne) par jour<br>
+                un compte <small>Ü</small>main crée une nouvelle <small>Ü</small> (l'<small>Ü</small>nité de la monnaie f<small>Ü</small>ne) par jour<br>
                 <small>les anciennes <strong><small>Ü</small>nités</strong> fondent d'un certain pourcentage à chaque <strong>période de réévaluation</strong></small><br>
             </t>
         </p>
@@ -43,20 +43,31 @@
             </h4>
             <form>
                 <div class="input-group mb-3">
-                    <label class="input-group-text" for="currencyCelerity">
-                        <t :c="ln" ln="en">melting</t>
-                        <t :c="ln" ln="fr">fonte</t>
+                    <label class="input-group-text w-50">
+                        <t :c="ln" ln="en">Ü revaluation</t>
+                        <t :c="ln" ln="fr">réévaluation de Ü</t>
                     </label>
-                    <input id="currencyCelerity" v-model="editCurrency.c" type="number" min="0" max="100" step="1" class="form-control text-right"
-                        :class="{'bg-primary': editCurrency.c != currency.c}">
-                    <span class="input-group-text">%</span>
+                    <select v-model="editCurrency.mode" id="currencyMode" class="form-select w-50"
+                        :class="{'bg-primary': editCurrency.mode != currency.mode}">
+                        <option v-if="ln == 'en'" value="melt">melting</option>
+                        <option v-if="ln == 'fr'" value="melt">fonte</option>
+                        <option v-if="ln == 'en'" value="grew">growth</option>
+                        <option v-if="ln == 'fr'" value="grew">croissance</option>
+                    </select>
+                </div>   
+                <div class="input-group mb-3">
+                    <span class="input-group-text" v-if="editCurrency.mode == 'melt'">Ü(t-1) = ( 1 - </span>
+                    <span class="input-group-text" v-else>Ü(t+1) = ( 1 + </span>
+                    <input id="currencyExpression" v-model="editCurrency.expression" type="text" class="form-control text-right"
+                        :class="{'bg-primary': editCurrency.expression != currency.expression}">
+                    <span class="input-group-text"> ) Ü(t)</span>    
                 </div>
                 <div class="input-group mb-3">
                     <label class="input-group-text" for="currencyStepTime">
                         <t :c="ln" ln="en">day duration</t>
                         <t :c="ln" ln="fr">durée d'un jour</t>
                     </label>
-                    <input id="currencyStepTime" v-model="editCurrency.stepTime" type="number" min="60" max="90000" step="60" class="form-control text-right"
+                    <input id="currencyStepTime" v-model="editCurrency.stepTime" type="number" min="10" max="90000" step="10" class="form-control text-right"
                         :class="{'bg-primary': editCurrency.stepTime != currency.stepTime}">
                     <span class="input-group-text">
                         <t :c="ln" ln="en">seconds</t>
@@ -75,6 +86,47 @@
                         <t :c="ln" ln="fr">jours</t>
                     </span>
                 </div>
+                <div class="d-grid gap-2 d-md-flex mb-3" v-if="currencyChange">
+                    <button type="button" class="btn btn-secondary mr-auto" @click="Object.assign(editCurrency, currency)">
+                        <t :c="ln" ln="en">ündo!</t>
+                        <t :c="ln" ln="fr">annüler!</t>
+                    </button>
+                    <button type="button" class="btn btn-primary" @click="updateCurrency()">
+                        <t :c="ln" ln="en">üpdate!</t>
+                        <t :c="ln" ln="fr">valïder!</t>
+                    </button>
+                </div>
+                <div class="input-group mb-3 mt-5">
+                    <label class="input-group-text" for="currencyMass">
+                        <t :c="ln" ln="en">monetary mass (M)</t>
+                        <t :c="ln" ln="fr">masse monétaire (M)</t>
+                    </label>
+                    <input id="currencyMass" :value="currencyDecimal(currency.monetaryMass)" type="text" class="form-control text-right" disabled>
+                    <span class="input-group-text">Ü</span>
+                </div>
+                <div class="input-group mb-3">
+                    <label class="input-group-text" for="currencyNbMembers">
+                        <t :c="ln" ln="en">Üman accounts (N)</t>
+                        <t :c="ln" ln="fr">comptes Ümains (N)</t>
+                    </label>
+                    <input id="currencyNbMembers" :value="currency.nbMembers" type="text" class="form-control text-right" disabled>
+                </div>
+                <div class="input-group mb-3">
+                    <label class="input-group-text" for="currencyAvg">
+                        <t :c="ln" ln="en">average</t>
+                        <t :c="ln" ln="fr">moyenne</t>
+                    </label>
+                    <input id="currencyAvg" :value="currency.nbMembers > 0 ? currencyDecimal(currency.monetaryMass / currency.nbMembers) : 0" type="text" class="form-control text-right" disabled>
+                    <span class="input-group-text">Ü</span>
+                </div>
+                <div class="input-group mb-3">
+                    <label class="input-group-text" for="currencyLastMelt">
+                        <t :c="ln" ln="en">last melting</t>
+                        <t :c="ln" ln="fr">dernière fonte</t>
+                    </label>
+                    <input id="currencyLastMelt" :value="currency.lastMelt" type="text" class="form-control text-right" disabled>
+                    <span class="input-group-text">%</span>
+                </div>
                 <div class="input-group mb-3">
                     <label class="input-group-text" for="currencyElapsedTime">
                         <t :c="ln" ln="en">elapsed time</t>
@@ -85,16 +137,6 @@
                         <t :c="ln" ln="en">days</t>
                         <t :c="ln" ln="fr">jours</t>
                     </span>
-                </div>
-                <div class="d-grid gap-2 d-md-flex" v-if="currencyChange">
-                    <button type="button" class="btn btn-secondary mr-auto" @click="Object.assign(editCurrency, currency)">
-                        <t :c="ln" ln="en">ündo!</t>
-                        <t :c="ln" ln="fr">annüler!</t>
-                    </button>
-                    <button type="button" class="btn btn-primary" @click="updateCurrency()">
-                        <t :c="ln" ln="en">üpdate!</t>
-                        <t :c="ln" ln="fr">valïder!</t>
-                    </button>
                 </div>
             </form>    
         </div>
@@ -164,7 +206,7 @@
                         </td>
                         <td class="text-center">
                             <select v-model="newAccount.role" class="form-control">
-                                <option value="creator">{{ ln != 'fr' ?  'crëator' : 'crëateur'}}</option>
+                                <option value="human">{{ ln != 'fr' ?  'Üman' : 'Ümain'}}</option>
                                 <option value="wallet">{{ ln != 'fr' ?  'wället' : 'sïmple'}}</option>
                                 <option value="bank">{{ ln != 'fr' ?  'bänk' : 'bänque'}}</option>
                             </select>
@@ -181,9 +223,9 @@
                         <td :style="{'background-color': getColor(account)}"><input :checked="hasStats(account)" type="checkbox" @change="showStats(account, $event.target.checked)" v-if="account.role != 'bank'"></td>
                         <td><a :href="'./#' + account.name">{{ account.name }}</a></td>
                         <td class="text-left">
-                            <span v-if="account.role == 'creator'" class="badge bg-primary mr-3" style="width: 50px;">
-                                <t :c="ln" ln="en">crëator</t>
-                                <t :c="ln" ln="fr">crëateur</t>
+                            <span v-if="account.role == 'human'" class="badge bg-primary mr-3" style="width: 50px;">
+                                <t :c="ln" ln="en"><small>Ü</small>man</t>
+                                <t :c="ln" ln="fr"><small>Ü</small>main</t>
                             </span>
                             <span v-else-if="account.role == 'wallet'" class="badge bg-secondary mr-3" style="width: 50px;">
                                 <t :c="ln" ln="en">wället</t>
@@ -240,6 +282,8 @@
 <script type="module">
     import { Trends } from "./vue-trend.js"
 
+    const uValue = 1000
+
     const getLanguage = () => (navigator.userLanguage || 
         (navigator.languages && navigator.languages.length && navigator.languages[0]) || 
         navigator.language || navigator.browserLanguage || navigator.systemLanguage).substring(0, 2) == 'fr' ? 'fr' : 'en'
@@ -256,7 +300,7 @@
                 stats: new Array(4),
                 sortKey: "name",
                 sortOrder: 1,
-                newAccount: {name: '', role: 'creator'},
+                newAccount: {name: '', role: 'human'},
                 accounts: [],
                 tx: {from: 'fÜne', to: '', value: 1},
                 editCurrency: {
@@ -272,6 +316,8 @@
                     elapsedTime: 0,
                     revaluationTime: 0, 
                     playing: false,
+                    nbMembers: 0,
+                    monetaryMass: 0
                 }
             }
         },
@@ -303,11 +349,11 @@
                 this.getStats()
             },
             currencyDecimal(value) {
-                return (value/100).toFixed(2)
+                return (value/uValue).toFixed(2)
             },
             executeTx() {
                 axios
-                    .post('/tx', {from: this.tx.from, to: this.tx.to, value: Math.floor(this.tx.value * 100)})
+                    .post('/tx', {from: this.tx.from, to: this.tx.to, value: Math.floor(this.tx.value * uValue)})
                     .then(response => {
                         this.listAccounts()
                     })
@@ -338,6 +384,7 @@
                     })
             },
             createAccount() {
+                this.newAccount.name = this.newAccount.name.trim()
                 axios
                     .post('/accounts', this.newAccount)
                     .then(response => {
@@ -345,7 +392,7 @@
                     })
             },
             switchAccountRole(account) {
-                let role = account.role == 'creator' ? 'wallet' : 'creator'
+                let role = account.role == 'human' ? 'wallet' : 'human'
                 axios
                     .patch('/accounts/' + account.name, {role: role})
                     .then(response => {
@@ -404,7 +451,8 @@
                 })
             },
             currencyChange() {
-                return this.currency.c != this.editCurrency.c
+                return this.currency.expression != this.editCurrency.expression
+                    || this.currency.mode != this.editCurrency.mode
                     || this.currency.revaluationTime != this.editCurrency.revaluationTime
                     || this.currency.stepTime != this.editCurrency.stepTime;
             }

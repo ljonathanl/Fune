@@ -1,7 +1,8 @@
-var pjson = require('./package.json');
+var pjson = require('./package.json')
 const express = require('express')
 const morgan = require('morgan')
-const storage = require('node-persist');
+const storage = require('node-persist')
+const mathParser = require('mathjs') 
 
 const app = express()
 app.use(express.json())
@@ -13,9 +14,14 @@ const statLimit = 100
 const statPeriod = 1
 
 const roles = {
-    creator: 'creator',
+    human: 'human',
     wallet: 'wallet',
     bank: 'bank'
+}
+
+const modes = {
+    grew: 'grew',
+    melt: 'melt'
 }
 
 
@@ -38,19 +44,22 @@ const doTx = async (simpleTx) => {
     if (tx.value <= 0 
         || !accountFrom
         || !accountTo
+        || accountFrom == accountTo
         || accountFrom.role != roles.bank && (accountFrom.balance - tx.value < 0))
         return null
     if (accountTo.role != roles.bank)
         accountTo.balance += tx.value
-    if (accountFrom.role != roles.bank)
+    if (accountFrom.role != roles.bank) {
         accountFrom.balance -= tx.value
+        if (accountFrom.balance < 5) {
+            accountFrom.balance = 0
+        }
+    }
     tx.balanceFrom = accountFrom.balance
     tx.balanceTo = accountTo.balance
     transactions.push(tx)
     if (transactions.length > txLimit) 
         transactions = transactions.slice(transactions.length - txLimit)
-    await storage.setItem('accounts', accounts)
-    await storage.setItem('transactions', transactions)
     return tx
 }
 
@@ -97,6 +106,7 @@ app.get('/accounts', (req, res) => {
 
 app.post('/accounts', async (req, res) => {
     if (req.body.name) {
+        req.body.name = req.body.name.trim()
         var account = accounts[req.body.name] = Object.assign({name: '', balance: 0, role: 'wallet', date: new Date().toISOString(), creationDay: currency.elapsedTime}, req.body)
         await storage.setItem('accounts', accounts)
         res.status(201).json(account)
@@ -123,6 +133,7 @@ app.delete('/accounts/:id', async (req, res) => {
     let deleted = false
     if (account && account.role != 'bank') {
         delete accounts[id]
+        delete stats[id]
         await storage.setItem('accounts', accounts)
         deleted = true
     }
@@ -145,11 +156,14 @@ app.get('/accounts/:id/tx', (req, res) => {
 })
 
 app.post('/tx', async (req, res) => {
-    let tx = await doTx(req.body)
+    let tx = doTx(req.body)
     if (!tx)
         res.status(400).send()
-    else 
+    else {
+        await storage.setItem('accounts', accounts)
+        await storage.setItem('transactions', transactions)
         res.status(201).json(tx) 
+    }
 })
 
 app.get('/accounts/:id/stats', (req, res) => {
@@ -248,10 +262,15 @@ async function start() {
         currency = {
             date: new Date().toISOString(),
             c: 10,
-            stepTime: 60,
+            stepTime: 10,
             elapsedTime: 0,
             revaluationTime: 1, 
-            playing: true, 
+            playing: true,
+            nbMembers: 0,
+            monetaryMass: 0,
+            mode: modes.melt,
+            lastMelt: 0,
+            expression: '10/100'
         }
 
 
@@ -282,24 +301,37 @@ async function start() {
 
 
 async function play() {
-    const uValue = 100
-    const uGained = currency.revaluationTime * uValue
     if (currency.playing) {
-        currency.elapsedTime++;
+        const uValue = 1000
+        const uGained = uValue * currency.revaluationTime
+        currency.elapsedTime++
         const funeAccount = accounts[fune.name]
-        Object.values(accounts).forEach( async account => {
-            if (currency.c != 0 && currency.elapsedTime % currency.revaluationTime == 0) {
-                let melting = account.balance * (currency.c / 100)
-                if (melting > uGained) {
-                    melting = Math.ceil(melting)
-                } else {
-                    melting = Math.floor(melting)
-                }
-                await doTx({from: account.name, to: funeAccount.name, message: '!revaluation%' + currency.c, value: melting})
+        let m = 0
+        let n = 0
+        const isRevaluation = currency.elapsedTime % currency.revaluationTime == 0
+        let meltValue = 0
+        let meltPercent = 0
+
+        if (isRevaluation && currency.nbMembers > 0) {
+            meltValue = mathParser.evaluate(currency.expression, {M: currency.monetaryMass / uValue, N: currency.nbMembers})
+            if (currency.mode == modes.grew) 
+                meltValue = 1 - 1 / (1 + meltValue)
+            meltValue = Math.max(0, Math.min(1, meltValue))
+            meltPercent = (meltValue * 100).toFixed(2)
+        }
+
+        Object.values(accounts).forEach(account => {
+            if (isRevaluation && meltValue > 0) {
+                let melting = account.balance * meltValue
+                melting = Math.min(melting > uGained ? Math.ceil(melting) : Math.floor(melting), account.balance)
+                doTx({from: account.name, to: funeAccount.name, message: '!revaluation%' + meltPercent, value: melting})
             }    
-            if (account.role == roles.creator)
-                await doTx({from: funeAccount.name, to: account.name, message: '!1Ucreation', value: uValue})
-            if (currency.elapsedTime  % statPeriod == 0) {
+            if (account.role == roles.human) {
+                n++
+                doTx({from: funeAccount.name, to: account.name, message: '!1Ucreation', value: uValue})
+            }
+            m += account.balance
+            if (currency.elapsedTime  % statPeriod == 0 && account.role != roles.bank) {
                 var stat = stats[account.name]
                 if (!stat) {
                     stat = stats[account.name] = new Array(statLimit).fill(0)
@@ -308,10 +340,19 @@ async function play() {
                 stat[index] = account.balance 
             }
         });
+
+        currency.nbMembers = n
+        currency.monetaryMass = m
+        if (isRevaluation)
+            currency.lastMelt = meltPercent
+
         await storage.setItem('stats', stats)
         await storage.setItem('accounts', accounts)
         await storage.setItem('currency', currency)
-        console.log("Day " + currency.elapsedTime)
+
+        console.log("Day " + currency.elapsedTime + " M: " + (m / uValue).toFixed(2) + " N: " + n)
+        if (isRevaluation)
+            console.log("Revaluation melting: " + meltPercent + "%")
     }
     setTimeout(play, currency.stepTime * 1000);
 }
