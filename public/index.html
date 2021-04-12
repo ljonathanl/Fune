@@ -44,7 +44,7 @@
                 </small>
             </h2>
             <div class="display-2 text-center">
-                <span>{{ Math.floor(account.balance/100) }}</span>
+                <span>{{ withoutDigit(account.balance) }}</span>
                 <small class="align-baseline" style="font-size: 50%;">.{{ digit(account.balance) }}</small> 
                 <small> Ü</small>
             </div>
@@ -208,6 +208,8 @@
 <script type="module">
     import { Trend } from "./vue-trend.js"
 
+    const uValue = 1000
+
     const getLanguage = () => (navigator.userLanguage || 
         (navigator.languages && navigator.languages.length && navigator.languages[0]) || 
         navigator.language || navigator.browserLanguage || navigator.systemLanguage).substring(0, 2) == 'fr' ? 'fr' : 'en'
@@ -223,7 +225,7 @@
                 sortKey: "name",
                 sortOrder: 1,
                 hasAccount: false,
-                account: {name: '', role: 'creator', value: 0},
+                account: {name: '', role: 'human', value: 0},
                 accounts: [],
                 accountsMap: {},
                 otherAccounts: [],
@@ -246,15 +248,18 @@
                 }
                 this.sortKey = key
             },
+            withoutDigit(value) {
+                return this.currencyDecimal(value).slice(0, -3)
+            },
             digit(value) {
-                return (value % 100).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false})
+                return this.currencyDecimal(value).slice(-2)
             },
             currencyDecimal(value) {
-                return (value/100).toFixed(2)
+                return (value/uValue).toFixed(2)
             },
             executeTx() {
                 axios
-                    .post('/tx', {from: this.account.name, to: this.tx.to, message: this.tx.message, value: Math.floor(this.tx.value * 100)})
+                    .post('/tx', {from: this.account.name, to: this.tx.to, message: this.tx.message, value: Math.floor(this.tx.value * uValue)})
                     .then(response => {
                         this.listAccounts()
                         this.listTransactions()
@@ -297,7 +302,7 @@
                 var account = this.accountsMap[name];
                 if (!account)
                     return false
-                return this.accountsMap[name].role == 'creator'
+                return this.accountsMap[name].role == 'human'
             },
             getCurrency() {
                 axios
@@ -347,6 +352,7 @@
                     })
             },
             createAccount() {
+                this.account.name = this.account.name.trim()
                 let account = this.accountsMap[this.account.name];
                 if (account) {
                     this.setAccount()
@@ -354,6 +360,7 @@
                     axios
                         .post('/accounts', this.account)
                         .then(response => {
+                            this.account = response.data
                             this.setAccount()
                         })
                 }
@@ -370,7 +377,7 @@
                 if (confirm(this.ln == 'fr' ? 'tu es sür.e ?' : 'are ü sure?')) {
                     localStorage.removeItem('name')
                     this.hasAccount = false;
-                    this.account = {name: '', role: 'creator', value: 0}
+                    this.account = {name: '', role: 'human', value: 0}
                 }
             },
             setAccount() {

@@ -134,7 +134,7 @@ var Background = {
         y: boundary.minY - 2,
         fill: '#CCCCCC88',
         'font-size': '0.6em'
-      }, (this.max / 100).toFixed(2)),
+      }, (this.max / 1000).toFixed(2)),
       h('line', {
         x1: boundary.minX,
         y1: boundary.minY,
@@ -147,7 +147,7 @@ var Background = {
         y: boundary.maxY - 2,
         fill: '#CCCCCC88',
         'font-size': '0.6em'
-      }, (this.min / 100).toFixed(2)),
+      }, (this.min / 1000).toFixed(2)),
       h('line', {
         x1: boundary.minX,
         y1: boundary.maxY,
