@@ -1,13 +1,5 @@
 var pjson = require('./package.json')
-const express = require('express')
-const morgan = require('morgan')
-const storage = require('node-persist')
 const mathParser = require('mathjs') 
-
-const app = express()
-app.use(express.json())
-app.use(express.static('public'))
-app.use(morgan('tiny'))
 
 const txLimit = 1000
 const statLimit = 100
@@ -24,18 +16,19 @@ const modes = {
     melt: 'melt'
 }
 
+let timeOutId = 0
+
 
 let fune = {
     name: 'fÜne',
     logo: 'fї',
     version: pjson.version,
+    currency: {},
+    accounts: {},
+    transactions: [],
+    ideas: {},
+    stats: {},
 }
-
-let currency = {}
-let accounts = {}
-let transactions = []
-let ideas = {}
-let stats = {}
 
 const doTx = async (simpleTx) => {
     let tx = Object.assign({from: '', to: '', message: '', value: 0, date: new Date().toISOString(), day: currency.elapsedTime}, simpleTx)
@@ -63,28 +56,20 @@ const doTx = async (simpleTx) => {
     return tx
 }
 
-/*
- * ABOUT
- */
-
-app.get('/fune', (req, res) => {
-    res.status(200).json(fune)
-})
-
 
 /* 
  * CURRENCY
  */
 
-app.get('/currency', (req, res) => {
-    res.status(200).json(currency)
-})
+fune.getCurrency = () => {
+    return fune.currency
+}
 
-app.patch('/currency', async (req, res) => {
-    currency = Object.assign(currency, req.body)
-    await storage.setItem('currency', currency)
-    res.status(200).json(currency)
-})
+fune.updateCurrency = (newCurrency) => {
+    fune.currency = Object.assign(fune.currency, newCurrency)
+    // TODO delete setTimeout
+}
+
 
 /* 
  * ACCOUNT
@@ -274,7 +259,6 @@ async function start() {
             monetaryMass: 0,
             mode: modes.melt,
             lastMelt: 0,
-            hiddenPopulation: '0',
             expression: '10/100'
         }
 
@@ -300,9 +284,6 @@ async function start() {
     if (!stats) 
         stats = {}
 
-    if (!stats[fune.name])
-        stats[fune.name] = new Array(statLimit).fill(0)
-
     play()
 }
 
@@ -311,12 +292,9 @@ async function start() {
 async function play() {
     if (currency.playing) {
         const uValue = 1000
-        const cheatRegex = /!x(\d+)/
         const uGained = uValue * currency.revaluationTime
         currency.elapsedTime++
         const funeAccount = accounts[fune.name]
-        const isStatDay = currency.elapsedTime % statPeriod == 0
-        const statIndex = isStatDay ? Math.floor(currency.elapsedTime / statPeriod) % statLimit : 0 
         let m = 0
         let n = 0
         const isRevaluation = currency.elapsedTime % currency.revaluationTime == 0
@@ -324,7 +302,7 @@ async function play() {
         let meltPercent = 0
 
         if (isRevaluation && currency.nbMembers > 0) {
-            meltValue = mathParser.evaluate(currency.expression, {M: currency.monetaryMass / uValue, N: currency.nbMembers, D: currency.elapsedTime})
+            meltValue = mathParser.evaluate(currency.expression, {M: currency.monetaryMass / uValue, N: currency.nbMembers})
             if (currency.mode == modes.grew) 
                 meltValue = 1 - 1 / (1 + meltValue)
             meltValue = Math.max(0, Math.min(1, meltValue))
@@ -332,34 +310,28 @@ async function play() {
         }
 
         Object.values(accounts).forEach(account => {
-            const cheat = account.name.match(cheatRegex)
-            let weight = 1
-            if (cheat)
-                weight = parseInt(cheat[1]) 
-
             if (isRevaluation && meltValue > 0) {
                 let melting = account.balance * meltValue
                 melting = Math.min(melting > uGained ? Math.ceil(melting) : Math.floor(melting), account.balance)
                 doTx({from: account.name, to: funeAccount.name, message: '!revaluation%' + meltPercent, value: melting})
             }    
             if (account.role == roles.human) {
-                n += weight
+                n++
                 doTx({from: funeAccount.name, to: account.name, message: '!1Ucreation', value: uValue})
             }
-            m += account.balance * weight
-            if (isStatDay && account.role != roles.bank) {
-                let stat = stats[account.name]
+            m += account.balance
+            if (currency.elapsedTime  % statPeriod == 0 && account.role != roles.bank) {
+                var stat = stats[account.name]
                 if (!stat) {
                     stat = stats[account.name] = new Array(statLimit).fill(0)
                 }
-                stat[statIndex] = account.balance 
+                let index = Math.round(currency.elapsedTime / statPeriod) % statLimit
+                stat[index] = account.balance 
             }
         });
 
         currency.nbMembers = n
         currency.monetaryMass = m
-        if (isStatDay)
-            stats[fune.name][statIndex] = Math.floor(m / n)
         if (isRevaluation)
             currency.lastMelt = meltPercent
 
@@ -371,8 +343,10 @@ async function play() {
         if (isRevaluation)
             console.log("Revaluation melting: " + meltPercent + "%")
     }
-    setTimeout(play, currency.stepTime * 1000);
+    timeOutId = setTimeout(play, currency.stepTime * 1000)
 }
 
 
-start();
+start()
+
+export default fune

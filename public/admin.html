@@ -129,8 +129,8 @@
                 </div>
                 <div class="input-group mb-3">
                     <label class="input-group-text" for="currencyElapsedTime">
-                        <t :c="ln" ln="en">elapsed time</t>
-                        <t :c="ln" ln="fr">temps écoulé</t>
+                        <t :c="ln" ln="en">elapsed time (D)</t>
+                        <t :c="ln" ln="fr">temps écoulé (D)</t>
                     </label>
                     <input id="currencyElapsedTime" v-model="currency.elapsedTime" type="text" class="form-control text-right" disabled>
                     <span class="input-group-text">
@@ -220,8 +220,12 @@
                         </td>
                     </tr>
                     <tr v-for="account in sortedAccounts">
-                        <td :style="{'background-color': getColor(account)}"><input :checked="hasStats(account)" type="checkbox" @change="showStats(account, $event.target.checked)" v-if="account.role != 'bank'"></td>
-                        <td><a :href="'./#' + account.name">{{ account.name }}</a></td>
+                        <td :style="{'background-color': getColor(account)}">
+                            <input :checked="isSelected(account)" type="checkbox" @click="select(account, $event.target.checked)" v-if="account.role != 'bank'">
+                        </td>
+                        <td>
+                            <a :href="'./#' + account.name">{{ account.name }}</a>
+                        </td>
                         <td class="text-left">
                             <span v-if="account.role == 'human'" class="badge bg-primary mr-3" style="width: 50px;">
                                 <t :c="ln" ln="en"><small>Ü</small>man</t>
@@ -293,10 +297,10 @@
             return {
                 ln: getLanguage(),
                 fune: { name: 'fÜne', logo: 'fї', version: '0'},
-                colors: [ '#FE4365', '#F9CDAD', '#83AF9B', '#A7226E', '#F26B38', '#F7DB4F'],
+                colors: [ '#FFFFFFDD', '#FE4365DD', '#F9CDADDD', '#83AF9BDD', '#A7226EDD', '#F26B38DD', '#F7DB4FDD'],
                 accountColors: {},
                 maxStats: 4,
-                selectedAccounts: [],
+                selectedAccounts: ['fÜne'],
                 stats: new Array(4),
                 sortKey: "name",
                 sortOrder: 1,
@@ -304,10 +308,10 @@
                 accounts: [],
                 tx: {from: 'fÜne', to: '', value: 1},
                 editCurrency: {
-                    c: 0,
+                    expression: '',
+                    mode: 'melt',
                     stepTime: 0,
                     revaluationTime: 0,
-
                 },
                 currency: {
                     date: new Date().toISOString(),
@@ -328,17 +332,17 @@
                     return null
                 return this.colors[index] 
             },
-            hasStats(account) {
+            isSelected(account) {
                 return this.selectedAccounts.indexOf(account.name) >= 0
             },
-            showStats(account, visible) {
+            select(account, visible) {
                 let index = this.selectedAccounts.indexOf(account.name)
-                if ((index < 0 && !visible) || (index > 0 && visible)) 
+                if ((index < 1 && !visible) || (index > 0 && visible)) 
                     return 
                 if (visible) {
                     if (this.selectedAccounts.length == this.colors.length) {
-                        this.selectedAccounts.shift()
-                        this.colors.push(this.colors.shift())
+                        this.selectedAccounts.splice(1, 1)
+                        this.colors.push(this.colors.splice(1, 1)[0])
                     }
                     this.selectedAccounts.push(account.name)
                 } else {
@@ -363,7 +367,7 @@
                     .get('/currency')
                     .then(response => {
                         this.currency = response.data
-                        if (this.editCurrency.c == 0) {
+                        if (this.editCurrency.expression == '') {
                             Object.assign(this.editCurrency, this.currency)
                         }
                     })
@@ -445,9 +449,16 @@
         computed: {
             sortedAccounts() {
                 return this.accounts.sort((a, b) => {
-                    a = a[this.sortKey]
-                    b = b[this.sortKey]
-                    return (a === b ? 0 : a > b ? 1 : -1) * this.sortOrder
+                    let va
+                    let vb
+                    if (this.sortKey == "selected") {
+                        va = this.isSelected(a) | 0
+                        vb = this.isSelected(b) | 0
+                    } else {
+                        va = a[this.sortKey]
+                        vb = b[this.sortKey]
+                    }
+                    return (va === vb ? 0 : va > vb ? 1 : -1) * this.sortOrder
                 })
             },
             currencyChange() {
