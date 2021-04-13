@@ -358,7 +358,7 @@ async function play() {
         currency.nbMembers = n
         currency.monetaryMass = m
         if (isStatDay)
-            stats[fune.name][statIndex] = Math.floor(m / n)
+            stats[fune.name][statIndex] = n > 0 ? Math.floor(m / n) : 0
         if (isRevaluation)
             currency.lastMelt = meltPercent
 
