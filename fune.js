@@ -323,7 +323,7 @@ async function play() {
         let meltPercent = 0
 
         if (isRevaluation && currency.nbMembers > 0) {
-            meltValue = mathParser.evaluate(currency.expression, {M: currency.monetaryMass / uValue, N: currency.nbMembers, D: currency.elapsedTime})
+            meltValue = mathParser.evaluate(currency.expression, {M: currency.monetaryMass / uValue, N: currency.nbMembers, T: currency.elapsedTime})
             if (currency.mode == modes.grew) 
                 meltValue = 1 - 1 / (1 + meltValue)
             meltValue = Math.max(0, Math.min(1, meltValue))
