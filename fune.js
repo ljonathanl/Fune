@@ -265,7 +265,6 @@ async function start() {
     if (!currency)
         currency = {
             date: new Date().toISOString(),
-            c: 10,
             stepTime: 10,
             elapsedTime: 0,
             revaluationTime: 1, 
