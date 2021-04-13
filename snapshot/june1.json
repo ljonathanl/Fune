@@ -3,13 +3,13 @@
         "date": "2021-04-12T21:11:23.994Z",
         "c": 10,
         "stepTime": "60",
-        "elapsedTime": 19,
+        "elapsedTime": 604,
         "revaluationTime": "1",
         "playing": true,
-        "nbMembers": 9,
-        "monetaryMass": 91407,
+        "nbMembers": 13,
+        "monetaryMass": 136666,
         "mode": "grew",
-        "lastMelt": "9.16",
+        "lastMelt": "9.51",
         "expression": "0.01 * M / N"
     },
     "accounts": {
@@ -22,66 +22,95 @@
         },
         "alain": {
             "name": "alain",
-            "balance": 10189,
+            "balance": 10513,
             "role": "human",
             "date": "2021-04-12T21:12:07.334Z",
             "creationDay": 5
         },
         "brigitte": {
             "name": "brigitte",
-            "balance": 11987,
+            "balance": 10512,
             "role": "human",
             "date": "2021-04-12T21:12:21.833Z",
             "creationDay": 6
         },
         "stephane": {
             "name": "stephane",
-            "balance": 11430,
+            "balance": 10513,
             "role": "human",
             "date": "2021-04-12T21:12:31.140Z",
             "creationDay": 7
         },
         "fred": {
             "name": "fred",
-            "balance": 11430,
+            "balance": 10513,
             "role": "human",
             "date": "2021-04-12T21:12:35.625Z",
             "creationDay": 8
         },
         "jeremy": {
             "name": "jeremy",
-            "balance": 11430,
+            "balance": 10513,
             "role": "human",
             "date": "2021-04-12T21:12:42.521Z",
             "creationDay": 8
         },
         "lucie": {
             "name": "lucie",
-            "balance": 12111,
+            "balance": 10513,
             "role": "human",
             "date": "2021-04-12T21:12:51.571Z",
             "creationDay": 9
         },
         "robert": {
             "name": "robert",
-            "balance": 7610,
+            "balance": 10513,
             "role": "human",
             "date": "2021-04-12T21:39:00.525Z",
             "creationDay": 7
         },
         "philippe": {
             "name": "philippe",
-            "balance": 7610,
+            "balance": 10513,
             "role": "human",
             "date": "2021-04-12T21:39:07.185Z",
             "creationDay": 7
         },
         "denise": {
             "name": "denise",
-            "balance": 7610,
+            "balance": 10512,
             "role": "human",
             "date": "2021-04-12T21:39:18.282Z",
             "creationDay": 7
+        },
+        "zoé": {
+            "name": "zoé",
+            "balance": 10513,
+            "role": "human",
+            "date": "2021-04-12T22:26:40.066Z",
+            "creationDay": 48
+        },
+        "michel": {
+            "name": "michel",
+            "balance": 10513,
+            "role": "human",
+            "date": "2021-04-12T22:26:51.746Z",
+            "creationDay": 49
+        },
+        "louis": {
+            "name": "louis",
+            "balance": 10513,
+            "role": "human",
+            "date": "2021-04-12T22:27:01.746Z",
+            "creationDay": 49
+        },
+        "hypericum": {
+            "name": "hypericum",
+            "balance": 10512,
+            "role": "human",
+            "date": "2021-04-12T22:52:43.819Z",
+            "creationDay": 75,
+            "value": 0
         }
     }
 }
