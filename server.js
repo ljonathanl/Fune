@@ -1,9 +1,11 @@
-var pjson = require('./package.json')
-const express = require('express')
-const morgan = require('morgan')
-const storage = require('node-persist')
-const funiter = require('./src/funiter').funiter 
+import express from 'express'
+import morgan from 'morgan'
+import storage from 'node-persist'
+import * as math from 'mathjs'
+import funiter from './public/funiter.js'
 
+
+const version = process.env.npm_package_version
 const app = express()
 app.use(express.json())
 app.use(express.static('public'))
@@ -15,7 +17,7 @@ app.use(morgan('tiny'))
  */
 
 app.get('/fune', (req, res) => {
-    const { name, logo, version } = funiter
+    const { name, logo } = funiter
     res.status(200).json({ name, logo, version })
 })
 
@@ -120,7 +122,7 @@ async function start() {
     }
 
     const state = await storage.getItem('state')
-    funiter.start(state)
+    funiter.start(math, state)
 }
 
 

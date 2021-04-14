@@ -3,6 +3,7 @@
   "version": "0.0.3",
   "description": "Füne project",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node ./server.js"
   },

@@ -1,6 +1,3 @@
-var pjson = require('../package.json')
-const mathParser = require('mathjs') 
-
 const txLimit = 1000
 const statLimit = 100
 const statPeriod = 1
@@ -17,7 +14,6 @@ const modes = {
 }
 
 let timeOutId = 0
-let isPlaying = false
 
 let currency 
 let accounts 
@@ -28,7 +24,6 @@ let stats
 let funiter = {
     name: 'fÜne',
     logo: 'fї',
-    version: pjson.version,
     uValue: 1000,
 }
 
@@ -71,6 +66,7 @@ funiter.updateCurrency = newCurrency => {
     funiter.stop()
     currency = Object.assign(currency, newCurrency)
     funiter.play()
+    return currency
 }
 
 
@@ -144,13 +140,13 @@ funiter.getAccountStats = id => {
  */
 
 funiter.getState = () => {
-    const db = {
+    const state = {
         currency,
         accounts,
         transactions,
         stats,
     }
-    return db
+    return state
 }
 
 
@@ -170,7 +166,8 @@ funiter.restoreState = state => {
 }
 
 
-funiter.start = (state) => {
+funiter.start = (math, state) => {
+    funiter.math = math
     funiter.restoreState(state)
 
     if (!currency)
@@ -228,7 +225,7 @@ funiter.play = () => {
     const isRevaluation = currency.elapsedTime % currency.revaluationTime == 0
 
     if (isRevaluation && currency.nbMembers > 0) {
-        meltValue = mathParser.evaluate(currency.expression, {M: currency.monetaryMass / uValue, N: currency.nbMembers, T: currency.elapsedTime})
+        meltValue = funiter.math.evaluate(currency.expression, {M: currency.monetaryMass / uValue, N: currency.nbMembers, T: currency.elapsedTime})
         if (currency.mode == modes.grew) 
             meltValue = 1 - 1 / (1 + meltValue)
         meltValue = Math.max(0, Math.min(1, meltValue))
@@ -274,12 +271,10 @@ funiter.play = () => {
 
 
 funiter.stop = () => {
-    if (isPlaying && timeOutId != 0) {
+    if (timeOutId != 0) {
         clearTimeout(timeOutId)
-        isPlaying = false
         timeOutId = 0
     }
 }
 
-
-exports.funiter = funiter
+export default funiter
