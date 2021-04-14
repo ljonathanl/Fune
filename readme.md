@@ -21,7 +21,7 @@ Open shell in project folder and type
 ```bash
 > npm install
 
-> node ./fune.js
+> node ./server.js
 ```
 
 A web server will start at localhost:80, go to http://localhost to create your first crëator account or go to http://localhost/admin.html to manage the currency and accounts

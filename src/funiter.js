@@ -1,4 +1,4 @@
-var pjson = require('./package.json')
+var pjson = require('../package.json')
 const mathParser = require('mathjs') 
 
 const txLimit = 1000
@@ -17,20 +17,22 @@ const modes = {
 }
 
 let timeOutId = 0
+let isPlaying = false
+
+let currency 
+let accounts 
+let transactions 
+let stats 
 
 
-let fune = {
+let funiter = {
     name: 'fÜne',
     logo: 'fї',
     version: pjson.version,
-    currency: {},
-    accounts: {},
-    transactions: [],
-    ideas: {},
-    stats: {},
+    uValue: 1000,
 }
 
-const doTx = async (simpleTx) => {
+funiter.doTx = simpleTx => {
     let tx = Object.assign({from: '', to: '', message: '', value: 0, date: new Date().toISOString(), day: currency.elapsedTime}, simpleTx)
     var accountFrom = accounts[tx.from]
     var accountTo = accounts[tx.to]
@@ -61,13 +63,14 @@ const doTx = async (simpleTx) => {
  * CURRENCY
  */
 
-fune.getCurrency = () => {
-    return fune.currency
+funiter.getCurrency = () => {
+    return currency
 }
 
-fune.updateCurrency = (newCurrency) => {
-    fune.currency = Object.assign(fune.currency, newCurrency)
-    // TODO delete setTimeout
+funiter.updateCurrency = newCurrency => {
+    funiter.stop()
+    currency = Object.assign(currency, newCurrency)
+    funiter.play()
 }
 
 
@@ -75,130 +78,64 @@ fune.updateCurrency = (newCurrency) => {
  * ACCOUNT
  */
 
-app.get('/accounts/:id', (req, res) => {
-    const id = req.params.id
-    var account = accounts[id]
-    res.status(account ? 200 : 404).json(account)
-})
+funiter.getAccount = id => {
+    return accounts[id]
+}
 
-app.get('/accounts', (req, res) => {
-    res.status(200).json(Object.values(accounts))
-})
+funiter.getAccounts = () => {
+    return Object.values(accounts)
+}
 
-app.post('/accounts', async (req, res) => {
-    req.body.name = req.body.name.trim()
-    if (req.body.name && !accounts[req.body.name]) {
-        var account = accounts[req.body.name] = Object.assign({name: '', balance: 0, role: 'wallet', date: new Date().toISOString(), creationDay: currency.elapsedTime}, req.body)
-        await storage.setItem('accounts', accounts)
-        res.status(201).json(account)
-    } else {
-        res.status(400).send()
-    }
-})
+funiter.createAccount = newAccount => {
+    newAccount.name = newAccount.name.trim()
+    if (!newAccount.name || accounts[newAccount.name]) 
+        return null
 
-app.patch('/accounts/:id', async (req, res) => {
-    const id = req.params.id
-    var account = accounts[id]
-    let patched = false
-    if (account && account.role != 'bank') {
-        account = Object.assign(account, req.body)
-        await storage.setItem('accounts', accounts) 
-        patched = true   
-    }
-    res.status(patched ? 200 : 404).json(account)
-})
+    let account = accounts[newAccount.name] = Object.assign({name: '', balance: 0, role: 'wallet', date: new Date().toISOString(), creationDay: currency.elapsedTime}, newAccount)
+    return account
+}
 
-app.delete('/accounts/:id', async (req, res) => {
-    const id = req.params.id
-    var account = accounts[id]
-    let deleted = false
-    if (account && account.name != fune.name) {
-        delete accounts[id]
-        delete stats[id]
-        await storage.setItem('accounts', accounts)
-        deleted = true
-    }
-    res.status(deleted ? 204 : 404).send();
-})
+funiter.updateAccount = (id, newAccount) => {
+    let account = accounts[id]
+    if (!account || account.role == 'bank' || (newAccount.name && id != newAccount.name)) 
+        return null
+    
+    account = Object.assign(account, newAccount)
+    return account
+}
 
-app.get('/accounts/:id/tx', (req, res) => {
-    const id = req.params.id
-    var account = accounts[id]
-    if (!account) {
-        res.status(404).send()
-    } else {
-        var tx = transactions.filter(transaction => transaction.from == id || transaction.to == id)
-        if (req.query.limit) {
-            const limit = parseInt(req.query.limit)
-            tx = tx.slice(-req.query.limit)
-        }
-        res.status(200).json(tx)
-    }
-})
+funiter.deleteAccount = id => {
+    let account = accounts[id]
+    if (!account || account.name == funiter.name) 
+        return null
 
-app.post('/tx', async (req, res) => {
-    let tx = doTx(req.body)
-    if (!tx)
-        res.status(400).send()
-    else {
-        await storage.setItem('accounts', accounts)
-        await storage.setItem('transactions', transactions)
-        res.status(201).json(tx) 
-    }
-})
+    delete accounts[id]
+    delete stats[id]
+    return account
+}
 
-app.get('/accounts/:id/stats', (req, res) => {
-    const id = req.params.id
-    var account = accounts[id]
-    if (!account) {
-        res.status(404).send()
-    } else {
-        let stat = stats[id]
-        var result
-        if (stat) {
-            let index = (Math.floor(currency.elapsedTime / statPeriod) + 1) % statLimit
-            result = stat.slice(index).concat(stat.slice(0, index))
-        } else {
-            result = []
-        }
-        res.status(200).json(result)
-    }
-})
+funiter.getAccountTx = (id, limit) => {
+    if (!accounts[id]) 
+        return null
 
-/* 
- * IDEA
- */
+    let tx = transactions.filter(transaction => transaction.from == id || transaction.to == id)
+    if (limit > 0 && limit < tx.length) 
+        tx = tx.slice(-limit)
+    
+    return tx
+}
 
-app.get('/ideas/:id', (req, res) => {
-    const id = req.params.id
-    var idea = ideas[id]
-    res.status(idea ? 200 : 404).json(idea)
-})
+funiter.getAccountStats = id => {
+    if (!accounts[id]) 
+        return null
 
-app.get('/ideas', (req, res) => {
-    res.status(200).json(Object.values(ideas))
-})
+    let stat = stats[id]
+    if (!stat) 
+        return []
 
-app.post('/ideas', (req, res) => {
-    var idea = ideas[req.body.name] = Object.assign({name: '', text: '', account: '', date: new Date().toISOString()}, req.body)
-    res.status(201).json(idea)
-})
-
-app.patch('/ideas/:id', (req, res) => {
-    const id = req.params.id
-    var idea = ideas[id]
-    if (idea)
-        idea = Object.assign(idea, req.body)
-    res.status(idea ? 200 : 404).json(idea)
-})
-
-app.delete('/ideas/:id', (req, res) => {
-    const id = req.params.id
-    var idea = ideas[id]
-    if (idea)
-        delete ideas[id]
-    res.status(idea ? 204 : 404).send();
-})
+    let index = (Math.floor(currency.elapsedTime / statPeriod) + 1) % statLimit
+    return stat.slice(index).concat(stat.slice(0, index))
+}
 
 
 
@@ -206,55 +143,42 @@ app.delete('/ideas/:id', (req, res) => {
  * DB
  */
 
-app.get('/db', (req, res) => {
+funiter.getState = () => {
     const db = {
         currency,
         accounts,
         transactions,
         stats,
     }
-    res.status(200).json(db)
-})
+    return db
+}
 
 
-app.put('/db', async (req, res) => {
-    if (req.body.currency) {
-        currency = req.body.currency
-        await storage.setItem('currency', currency)
-    }
-    if (req.body.accounts) {
-        accounts = req.body.accounts
-        await storage.setItem('accounts', accounts)
-    }
-    if (req.body.transactions) {
-        transactions = req.body.transactions
-        await storage.setItem('transactions', transactions)
-    }
-    if (req.body.stats) {
-        stats = req.body.stats
-        await storage.setItem('stats', stats)
-    }
-    res.status(204).send()
-})
+funiter.restoreState = state => {
+    if (!state)
+        return
+    
+    if (state.currency) 
+        currency = state.currency
+    if (state.accounts) 
+        accounts = state.accounts
+    if (state.transactions) 
+        transactions = state.transactions
+    if (state.stats) 
+        stats = state.stats
 
-app.listen(80, () => {
-    console.log("let the fÜne begin !!!")
-})
+}
 
 
-async function start() {
-    await storage.init({dir: 'db'})
-
-    currency = await storage.getItem('currency')
+funiter.start = (state) => {
+    funiter.restoreState(state)
 
     if (!currency)
         currency = {
             date: new Date().toISOString(),
-            c: 10,
             stepTime: 10,
             elapsedTime: 0,
             revaluationTime: 1, 
-            playing: true,
             nbMembers: 0,
             monetaryMass: 0,
             mode: modes.melt,
@@ -262,91 +186,100 @@ async function start() {
             expression: '10/100'
         }
 
-
-    accounts = await storage.getItem('accounts')
-
     if (!accounts) 
         accounts = {}
 
-    accounts[fune.name] = {name: fune.name, balance: 0, role: roles.bank, date: new Date().toISOString(), creationDay: 0}
-
-    ideas = {
-        idea1: {name: 'idea1', account: 'alice', text: 'first idea', date: new Date().toISOString()},
-    }
-
-    transactions = await storage.getItem('transactions')
+    accounts[funiter.name] = {name: funiter.name, balance: 0, role: roles.bank, date: new Date().toISOString(), creationDay: 0}
 
     if (!transactions)
-        transactions = [];
-
-    stats = await storage.getItem('stats')
+        transactions = []
 
     if (!stats) 
         stats = {}
 
-    play()
+    if (!stats[funiter.name])
+        stats[funiter.name] = new Array(statLimit).fill(0)
+
+    funiter.play()
 }
 
 
+funiter.onDayChange = () => {
+    // nothing
+}
 
-async function play() {
-    if (currency.playing) {
-        const uValue = 1000
-        const uGained = uValue * currency.revaluationTime
-        currency.elapsedTime++
-        const funeAccount = accounts[fune.name]
-        let m = 0
-        let n = 0
-        const isRevaluation = currency.elapsedTime % currency.revaluationTime == 0
-        let meltValue = 0
-        let meltPercent = 0
+const cheatRegex = /!x(\d+)/
+const uValue = funiter.uValue
+const revaluationMessage = '!revaluation%'
+const creationMessage = '!1Ucreation'
 
-        if (isRevaluation && currency.nbMembers > 0) {
-            meltValue = mathParser.evaluate(currency.expression, {M: currency.monetaryMass / uValue, N: currency.nbMembers})
-            if (currency.mode == modes.grew) 
-                meltValue = 1 - 1 / (1 + meltValue)
-            meltValue = Math.max(0, Math.min(1, meltValue))
-            meltPercent = (meltValue * 100).toFixed(2)
-        }
+funiter.play = () => {
+    currency.elapsedTime++
+    
+    let monetaryMass = 0
+    let nbMembers = 0
+    let meltValue = 0
+    let meltPercent = 0
 
-        Object.values(accounts).forEach(account => {
-            if (isRevaluation && meltValue > 0) {
-                let melting = account.balance * meltValue
-                melting = Math.min(melting > uGained ? Math.ceil(melting) : Math.floor(melting), account.balance)
-                doTx({from: account.name, to: funeAccount.name, message: '!revaluation%' + meltPercent, value: melting})
-            }    
-            if (account.role == roles.human) {
-                n++
-                doTx({from: funeAccount.name, to: account.name, message: '!1Ucreation', value: uValue})
-            }
-            m += account.balance
-            if (currency.elapsedTime  % statPeriod == 0 && account.role != roles.bank) {
-                var stat = stats[account.name]
-                if (!stat) {
-                    stat = stats[account.name] = new Array(statLimit).fill(0)
-                }
-                let index = Math.round(currency.elapsedTime / statPeriod) % statLimit
-                stat[index] = account.balance 
-            }
-        });
+    const uGained = uValue * currency.revaluationTime
+    const funiterAccount = accounts[funiter.name]
+    const isStatDay = currency.elapsedTime % statPeriod == 0
+    const statIndex = isStatDay ? Math.floor(currency.elapsedTime / statPeriod) % statLimit : 0 
+    const isRevaluation = currency.elapsedTime % currency.revaluationTime == 0
 
-        currency.nbMembers = n
-        currency.monetaryMass = m
-        if (isRevaluation)
-            currency.lastMelt = meltPercent
-
-        await storage.setItem('stats', stats)
-        await storage.setItem('accounts', accounts)
-        await storage.setItem('currency', currency)
-
-        console.log("Day " + currency.elapsedTime + " M: " + (m / uValue).toFixed(2) + " N: " + n)
-        if (isRevaluation)
-            console.log("Revaluation melting: " + meltPercent + "%")
+    if (isRevaluation && currency.nbMembers > 0) {
+        meltValue = mathParser.evaluate(currency.expression, {M: currency.monetaryMass / uValue, N: currency.nbMembers, T: currency.elapsedTime})
+        if (currency.mode == modes.grew) 
+            meltValue = 1 - 1 / (1 + meltValue)
+        meltValue = Math.max(0, Math.min(1, meltValue))
+        meltPercent = (meltValue * 100).toFixed(2)
     }
-    timeOutId = setTimeout(play, currency.stepTime * 1000)
+
+    Object.values(accounts).forEach(account => {
+        const cheat = account.name.match(cheatRegex)
+        let weight = 1
+        if (cheat)
+            weight = parseInt(cheat[1]) 
+
+        if (isRevaluation && meltValue > 0) {
+            let melting = account.balance * meltValue
+            melting = Math.min(melting > uGained ? Math.ceil(melting) : Math.floor(melting), account.balance)
+            funiter.doTx({from: account.name, to: funiterAccount.name, message: revaluationMessage + meltPercent, value: melting})
+        }    
+        if (account.role == roles.human) {
+            nbMembers += weight
+            funiter.doTx({from: funiterAccount.name, to: account.name, message: creationMessage, value: uValue})
+        }
+        monetaryMass += account.balance * weight
+        if (isStatDay && account.role != roles.bank) {
+            let stat = stats[account.name]
+            if (!stat) {
+                stat = stats[account.name] = new Array(statLimit).fill(0)
+            }
+            stat[statIndex] = account.balance 
+        }
+    });
+
+    currency.nbMembers = nbMembers
+    currency.monetaryMass = monetaryMass
+    if (isStatDay)
+        stats[funiter.name][statIndex] = nbMembers > 0 ? Math.floor(monetaryMass / nbMembers) : 0
+    if (isRevaluation)
+        currency.lastMelt = meltPercent
+    
+    timeOutId = setTimeout(funiter.play, currency.stepTime * 1000)
+
+    funiter.onDayChange(currency.elapsedTime)
 }
 
 
-start()
+funiter.stop = () => {
+    if (isPlaying && timeOutId != 0) {
+        clearTimeout(timeOutId)
+        isPlaying = false
+        timeOutId = 0
+    }
+}
 
-export default fune
+
+exports.funiter = funiter
