@@ -3,13 +3,14 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>fÜne admin</title>
+    <title>fÜne</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta property="og:description" content="fÜne manage currency and accounts"/>
     <link href="./bootstrap.superhero.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="favicon.png" />
     <script src="https://unpkg.com/vue@next"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="./math.js"></script>
 </head>
 
 <body>
@@ -67,7 +68,7 @@
                         <t :c="ln" ln="en">day duration</t>
                         <t :c="ln" ln="fr">durée d'un jour</t>
                     </label>
-                    <input id="currencyStepTime" v-model="editCurrency.stepTime" type="number" min="10" max="90000" step="10" class="form-control text-right"
+                    <input id="currencyStepTime" v-model="editCurrency.stepTime" type="number" min="1" max="90000" step="1" class="form-control text-right"
                         :class="{'bg-primary': editCurrency.stepTime != currency.stepTime}">
                     <span class="input-group-text">
                         <t :c="ln" ln="en">seconds</t>
@@ -224,7 +225,7 @@
                             <input :checked="isSelected(account)" type="checkbox" @click="select(account, $event.target.checked)" v-if="account.role != 'bank'">
                         </td>
                         <td>
-                            <a :href="'./#' + account.name">{{ account.name }}</a>
+                            {{ account.name }}
                         </td>
                         <td class="text-left">
                             <span v-if="account.role == 'human'" class="badge bg-primary mr-3" style="width: 50px;">
@@ -285,6 +286,7 @@
 
 <script type="module">
     import { Trends } from "./vue-trend.js"
+    import funiter from "./funiter.js"
 
     const uValue = 1000
 
@@ -297,7 +299,12 @@
             return {
                 ln: getLanguage(),
                 fune: { name: 'fÜne', logo: 'fї', version: '0'},
-                colors: [ '#FFFFFFDD', '#FE4365DD', '#F9CDADDD', '#83AF9BDD', '#A7226EDD', '#F26B38DD', '#F7DB4FDD'],
+                colors: [ 
+                    '#FFFFFFDD', '#FE4365DD', '#F9CDADDD', 
+                    '#83AF9BDD', '#A7226EDD', '#F26B38DD', 
+                    '#F7DB4FDD', '#CAFDE0DD', '#FFB8EADD',
+                    '#C3421ADD', '#4F6ABFDD'
+                ],
                 accountColors: {},
                 maxStats: 4,
                 selectedAccounts: ['fÜne'],
@@ -355,74 +362,47 @@
                 return (value/uValue).toFixed(2)
             },
             executeTx() {
-                axios
-                    .post('/tx', {from: this.tx.from, to: this.tx.to, value: Math.floor(this.tx.value * uValue)})
-                    .then(response => {
-                        this.listAccounts()
-                    })
+                funiter.doTx({from: this.tx.from, to: this.tx.to, value: Math.floor(this.tx.value * uValue)})
+                this.listAccounts()
             },
             getCurrency() {
-                axios
-                    .get('/currency')
-                    .then(response => {
-                        this.currency = response.data
-                        if (this.editCurrency.expression == '') {
-                            Object.assign(this.editCurrency, this.currency)
-                        }
-                    })
+                this.currency = funiter.getCurrency()
+                if (this.editCurrency.expression == '') {
+                    Object.assign(this.editCurrency, this.currency)
+                }
             },
             updateCurrency() {
-                axios
-                    .patch('/currency', this.editCurrency)
-                    .then(response => {
-                        this.currency = response.data
-                        Object.assign(this.editCurrency, this.currency)
-                    })
+                this.currency = funiter.updateCurrency(this.editCurrency)
+                Object.assign(this.editCurrency, this.currency)
             },
             listAccounts() {
-                axios
-                    .get('/accounts')
-                    .then(response => {
-                        this.accounts = response.data
-                    })
+                this.accounts = funiter.getAccounts()
             },
             createAccount() {
                 this.newAccount.name = this.newAccount.name.trim()
-                axios
-                    .post('/accounts', this.newAccount)
-                    .then(response => {
-                        this.listAccounts()
-                    })
+                funiter.createAccount(this.newAccount)
+                this.listAccounts()
             },
             switchAccountRole(account) {
                 let role = account.role == 'human' ? 'wallet' : 'human'
-                axios
-                    .patch('/accounts/' + account.name, {role: role})
-                    .then(response => {
-                        this.listAccounts()
-                    })
+                funiter.updateAccount(account.name, {role: role})
+                this.listAccounts()
             },
             resetBalance(name) {
-                axios
-                    .patch('/accounts/' + name, {balance: 0})
-                    .then(response => {
-                        this.listAccounts()
-                    })
+                funiter.updateAccount(name, {balance: 0})
+                this.listAccounts()
             },
             deleteAccount(name) {
-                if (confirm(this.ln == 'fr' ? "êtes vous sûr de supprimer " + name + " ?" : "Are you sure to delete " + name + "?"))
-                    axios
-                        .delete('/accounts/' + name)
-                        .then(response => {
-                            this.listAccounts()
-                        })
+                if (confirm(this.ln == 'fr' ? "êtes vous sûr de supprimer " + name + " ?" : "Are you sure to delete " + name + "?")) {
+                    funiter.deleteAccount(name)
+                    this.listAccounts()
+                }
             },
-            async getStats() {
+            getStats() {
                 for (let index = 0; index < this.selectedAccounts.length; index++) {
                     const account = this.selectedAccounts[index];
                     if (account) {
-                        let response = await axios.get('/accounts/' + account + '/stats')
-                        this.stats[index] = response.data
+                        this.stats[index] = funiter.getAccountStats(account)
                     }
                 }
             },
@@ -468,9 +448,14 @@
             }
         },
         mounted() {
+            funiter.onDayChange = d => {
+                localStorage.setItem('state', JSON.stringify(funiter.getState()))
+                this.refresh()
+            }
+
+            let state = JSON.parse(localStorage.getItem('state'))
+            funiter.start(math, state)
             this.about()
-            this.refresh()
-            setInterval(this.refresh, 60000)
         }
     }
 
@@ -482,6 +467,10 @@
         })
         .component('trends', Trends)
         .mount('#app')
+
+    window.onbeforeunload = () => {
+        localStorage.setItem('state', JSON.stringify(funiter.getState()))
+    }
 
 
 </script>
