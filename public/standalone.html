@@ -11,10 +11,17 @@
     <script src="https://unpkg.com/vue@next"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="./math.js"></script>
+    <style>
+        [v-cloak] > * { display:none }
+        [v-cloak]::before { content: "loading…" }
+        .pointer {
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <body>
-    <div id="app" class="container-sm">
+    <div id="app" v-cloak>
         <h1 class="display-1 text-center mb-5">
             <!-- <span class="bg-primary pl-1 pr-1 align-middle" style="font-family: monospace;">fї</span> -->
             <img src="favicon64x64.png"/>
@@ -37,262 +44,282 @@
             </t>
         </p>
 
-        <div class="mb-3 p-3 m-auto" style="width: 350px;">
-            <h4 class="text-center">
-                <t :c="ln" ln="en">currency</t>
-                <t :c="ln" ln="fr">monnaie</t>
-            </h4>
-            <form>
-                <div class="input-group mb-3">
-                    <label class="input-group-text w-50">
-                        <t :c="ln" ln="en">Ü revaluation</t>
-                        <t :c="ln" ln="fr">réévaluation de Ü</t>
-                    </label>
-                    <select v-model="editCurrency.mode" id="currencyMode" class="form-select w-50"
-                        :class="{'bg-primary': editCurrency.mode != currency.mode}">
-                        <option v-if="ln == 'en'" value="melt">melting</option>
-                        <option v-if="ln == 'fr'" value="melt">fonte</option>
-                        <option v-if="ln == 'en'" value="grew">growth</option>
-                        <option v-if="ln == 'fr'" value="grew">croissance</option>
-                    </select>
-                </div>   
-                <div class="input-group mb-3">
-                    <span class="input-group-text" v-if="editCurrency.mode == 'melt'">Ü(t-1) = ( 1 - </span>
-                    <span class="input-group-text" v-else>Ü(t+1) = ( 1 + </span>
-                    <input id="currencyExpression" v-model="editCurrency.expression" type="text" class="form-control text-right"
-                        :class="{'bg-primary': editCurrency.expression != currency.expression}">
-                    <span class="input-group-text"> ) Ü(t)</span>    
-                </div>
-                <div class="input-group mb-3">
-                    <label class="input-group-text" for="currencyUPerDay">
-                        <t :c="ln" ln="en">Ü per day</t>
-                        <t :c="ln" ln="fr">Ü par jour</t>
-                    </label>
-                    <input id="currencyUPerDay" v-model="editCurrency.uPerDay" type="number" min="1" max="1000" step="1" class="form-control text-right"
-                        :class="{'bg-primary': editCurrency.uPerDay != currency.uPerDay}">
-                    <span class="input-group-text">Ü</span>
-                </div>
-                <div class="input-group mb-3">
-                    <label class="input-group-text" for="currencyStepTime">
-                        <t :c="ln" ln="en">day duration</t>
-                        <t :c="ln" ln="fr">durée d'un jour</t>
-                    </label>
-                    <input id="currencyStepTime" v-model="editCurrency.stepTime" type="number" min="1" max="90000" step="1" class="form-control text-right"
-                        :class="{'bg-primary': editCurrency.stepTime != currency.stepTime}">
-                    <span class="input-group-text">
-                        <t :c="ln" ln="en">seconds</t>
-                        <t :c="ln" ln="fr">secondes</t>
-                    </span>
-                </div>
-                <div class="input-group mb-3">
-                    <label class="input-group-text" for="currencyRevaluationTime">
-                        <t :c="ln" ln="en">revaluation period</t>
-                        <t :c="ln" ln="fr">réévaluation</t>
-                    </label>
-                    <input id="currencyRevaluationTime" v-model="editCurrency.revaluationTime" type="number" min="1" max="400" step="1" class="form-control text-right" 
-                        :class="{'bg-primary': editCurrency.revaluationTime != currency.revaluationTime}">
-                    <span class="input-group-text">
-                        <t :c="ln" ln="en">days</t>
-                        <t :c="ln" ln="fr">jours</t>
-                    </span>
-                </div>
-                <div class="d-grid gap-2 d-md-flex mb-3" v-if="currencyChange">
-                    <button type="button" class="btn btn-secondary mr-auto" @click="Object.assign(editCurrency, currency)">
-                        <t :c="ln" ln="en">ündo!</t>
-                        <t :c="ln" ln="fr">annüler!</t>
-                    </button>
-                    <button type="button" class="btn btn-primary" @click="updateCurrency()">
-                        <t :c="ln" ln="en">üpdate!</t>
-                        <t :c="ln" ln="fr">valïder!</t>
-                    </button>
-                </div>
-                <div class="input-group mb-3 mt-5">
-                    <label class="input-group-text" for="currencyMass">
-                        <t :c="ln" ln="en">monetary mass (M)</t>
-                        <t :c="ln" ln="fr">masse monétaire (M)</t>
-                    </label>
-                    <input id="currencyMass" :value="currencyWithoutDecimal(currency.monetaryMass)" type="text" class="form-control text-right" disabled>
-                    <span class="input-group-text">Ü</span>
-                </div>
-                <div class="input-group mb-3">
-                    <label class="input-group-text" for="currencyNbMembers">
-                        <t :c="ln" ln="en">Üman accounts (N)</t>
-                        <t :c="ln" ln="fr">comptes Ümains (N)</t>
-                    </label>
-                    <input id="currencyNbMembers" :value="currency.nbMembers" type="text" class="form-control text-right" disabled>
-                </div>
-                <div class="input-group mb-3">
-                    <label class="input-group-text" for="currencyAvg">
-                        <t :c="ln" ln="en">average</t>
-                        <t :c="ln" ln="fr">moyenne</t>
-                    </label>
-                    <input id="currencyAvg" :value="currency.nbMembers > 0 ? currencyDecimal(currency.monetaryMass / currency.nbMembers) : 0" type="text" class="form-control text-right" disabled>
-                    <span class="input-group-text">Ü</span>
-                </div>
-                <div class="input-group mb-3">
-                    <label class="input-group-text" for="currencyLastMelt">
-                        <t :c="ln" ln="en">last melting</t>
-                        <t :c="ln" ln="fr">dernière fonte</t>
-                    </label>
-                    <input id="currencyLastMelt" :value="currency.lastMelt" type="text" class="form-control text-right" disabled>
-                    <span class="input-group-text">%</span>
-                </div>
-                <div class="input-group mb-3">
-                    <label class="input-group-text" for="currencyElapsedTime">
-                        <t :c="ln" ln="en">elapsed time (T)</t>
-                        <t :c="ln" ln="fr">temps écoulé (T)</t>
-                    </label>
-                    <input id="currencyElapsedTime" v-model="currency.elapsedTime" type="text" class="form-control text-right" disabled>
-                    <span class="input-group-text">
-                        <t :c="ln" ln="en">days</t>
-                        <t :c="ln" ln="fr">jours</t>
-                    </span>
-                </div>
-            </form>    
-        </div>
+        <div class="d-flex align-items-start flex-wrap mb-3" style="justify-content: space-evenly;">
 
-        <div class="mb-3 p-3 m-auto" style="width: 500px;">
-            <h4 class="text-center">
-                <t :c="ln" ln="en">transaction</t>
-                <t :c="ln" ln="fr">transaction</t>
-            </h4>
-            <form>
-                <div class="input-group">
-                    <input v-model="tx.value" type="number" step="any" class="form-control text-right" style="width: 80px;">
-                    <span class="input-group-text"><small>Ü</small></span>
-                    <label class="input-group-text" for="txFrom">
-                        <t :c="ln" ln="en"> fröm </t>
-                        <t :c="ln" ln="fr"> de </t> 
-                    </label>
-                    <select v-model="tx.from" id="txFrom" class="form-select">
-                        <option v-for="account in accounts" :value="account.name">{{ account.name }}</option>
-                    </select>
-                    <label class="input-group-text" for="txTo">
-                        <t :c="ln" ln="en"> tö </t>
-                        <t :c="ln" ln="fr"> à </t> 
-                    </label>
-                    <select v-model="tx.to" id="txTo" class="form-select">
-                        <option v-if="ln == 'en'" disabled value="">select öne</option>
-                        <option v-if="ln == 'fr'" disabled value="">qüi</option>
-                        <option v-for="account in accounts" :value="account.name">{{ account.name }}</option>
-                    </select>
-                    <button type="button" class="btn btn-primary" @click="executeTx()">ök!</button>
-                </div>
-            </form>
-        </div>
-
-        <div class="mt-3 p-3 m-auto" style="max-width: 700px;">
-            <h4 class="text-center">
-                <t :c="ln" ln="en">accounts</t>
-                <t :c="ln" ln="fr">comptes</t> 
-            </h4>
-            <table class="table mt-3">
-                <thead>
-                    <tr>
-                        <th @click="onlySelected = !onlySelected" :class="{'bg-primary': onlySelected}">
-                            <t :c="ln" ln="en">stats</t>
-                            <t :c="ln" ln="fr">stats</t> 
-                        </th>
-                        <th @click="sortBy('name')">
-                            <t :c="ln" ln="en">name</t>
-                            <t :c="ln" ln="fr">nom</t> 
-                        </th>
-                        <th @click="sortBy('role')" class="text-center">
-                            <t :c="ln" ln="en">role</t>
-                            <t :c="ln" ln="fr">rôle</t>
-                        </th>
-                        <th @click="sortBy('balance')" class="text-right">
-                            <t :c="ln" ln="en">balance</t>
-                            <t :c="ln" ln="fr">solde</t>
-                        </th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td></td>
-                        <td>
-                            <input :placeholder="ln == 'fr' ? 'nöm' : 'näme'" v-model="newAccount.name" type="text" class="form-control" id="accountName" maxlength="10"/>
-                        </td>
-                        <td class="text-center">
-                            <select v-model="newAccount.role" class="form-control">
-                                <option value="human">{{ ln != 'fr' ?  'Üman' : 'Ümain'}}</option>
-                                <option value="wallet">{{ ln != 'fr' ?  'wället' : 'sïmple'}}</option>
-                                <option value="bank">{{ ln != 'fr' ?  'bänk' : 'bänque'}}</option>
+            <div style="min-width: 500px;">
+                <div class="m-auto" style="width: 400px;">
+                    <h4 class="text-center">
+                        <t :c="ln" ln="en">currency</t>
+                        <t :c="ln" ln="fr">monnaie</t>
+                    </h4>
+                    <form>
+                        <div class="input-group mb-3">
+                            <label class="input-group-text w-50">
+                                <t :c="ln" ln="en">Ü revaluation</t>
+                                <t :c="ln" ln="fr">réévaluation de Ü</t>
+                            </label>
+                            <select v-model="editCurrency.mode" id="currencyMode" class="form-select w-50"
+                                :class="{'bg-primary': editCurrency.mode != currency.mode}">
+                                <option v-if="ln == 'en'" value="melt">melting</option>
+                                <option v-if="ln == 'fr'" value="melt">fonte</option>
+                                <option v-if="ln == 'en'" value="grew">growth</option>
+                                <option v-if="ln == 'fr'" value="grew">croissance</option>
                             </select>
-                        </td>
-                        <td></td>
-                        <td class="text-right">
-                            <button type="button" :disabled="3 > newAccount.name.length || accounts.some(_ => _.name == newAccount.name)" class="btn btn-primary" @click="createAccount()">
-                                <t :c="ln" ln="en">nëw!</t>
-                                <t :c="ln" ln="fr">noüveau!</t>
+                        </div>   
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" v-if="editCurrency.mode == 'melt'">Ü(t-1) = ( 1 - </span>
+                            <span class="input-group-text" v-else>Ü(t+1) = ( 1 + </span>
+                            <input id="currencyExpression" v-model="editCurrency.expression" type="text" class="form-control text-right"
+                                :class="{'bg-primary': editCurrency.expression != currency.expression}">
+                            <span class="input-group-text"> ) Ü(t)</span>    
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="input-group-text" for="currencyUPerDay">
+                                <t :c="ln" ln="en">Ü per day</t>
+                                <t :c="ln" ln="fr">Ü par jour</t>
+                            </label>
+                            <input id="currencyUPerDay" v-model="editCurrency.uPerDay" type="number" min="1" max="1000" step="1" class="form-control text-right"
+                                :class="{'bg-primary': editCurrency.uPerDay != currency.uPerDay}">
+                            <span class="input-group-text">Ü</span>
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="input-group-text" for="currencyStepTime">
+                                <t :c="ln" ln="en">day duration</t>
+                                <t :c="ln" ln="fr">durée d'un jour</t>
+                            </label>
+                            <input id="currencyStepTime" v-model="editCurrency.stepTime" type="number" min="1" max="90000" step="1" class="form-control text-right"
+                                :class="{'bg-primary': editCurrency.stepTime != currency.stepTime}">
+                            <span class="input-group-text">
+                                <t :c="ln" ln="en">seconds</t>
+                                <t :c="ln" ln="fr">secondes</t>
+                            </span>
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="input-group-text" for="currencyRevaluationTime">
+                                <t :c="ln" ln="en">revaluation period</t>
+                                <t :c="ln" ln="fr">réévaluation</t>
+                            </label>
+                            <input id="currencyRevaluationTime" v-model="editCurrency.revaluationTime" type="number" min="1" max="400" step="1" class="form-control text-right" 
+                                :class="{'bg-primary': editCurrency.revaluationTime != currency.revaluationTime}">
+                            <span class="input-group-text">
+                                <t :c="ln" ln="en">days</t>
+                                <t :c="ln" ln="fr">jours</t>
+                            </span>
+                        </div>
+                        <div class="d-grid gap-2 d-md-flex mb-3" v-if="currencyChange">
+                            <button type="button" class="btn btn-secondary mr-auto" @click="Object.assign(editCurrency, currency)">
+                                <t :c="ln" ln="en">ündo!</t>
+                                <t :c="ln" ln="fr">annüler!</t>
                             </button>
-                        </td>
-                    </tr>
-                    <tr v-for="account in sortedAccounts">
-                        <td :style="{'background-color': getColor(account)}">
-                            <input :checked="isSelected(account)" type="checkbox" @click="select(account, $event.target.checked)" v-if="account.role != 'bank'">
-                        </td>
-                        <td>
-                            {{ account.name }}
-                        </td>
-                        <td class="text-left">
-                            <span v-if="account.role == 'human'" class="badge bg-primary mr-3" style="width: 50px;">
-                                <t :c="ln" ln="en"><small>Ü</small>man</t>
-                                <t :c="ln" ln="fr"><small>Ü</small>main</t>
+                            <button type="button" class="btn btn-primary" @click="updateCurrency()">
+                                <t :c="ln" ln="en">üpdate!</t>
+                                <t :c="ln" ln="fr">valïder!</t>
+                            </button>
+                        </div>
+                        <div class="input-group mb-3 mt-5">
+                            <label class="input-group-text" for="currencyMass">
+                                <t :c="ln" ln="en">monetary mass (M)</t>
+                                <t :c="ln" ln="fr">masse monétaire (M)</t>
+                            </label>
+                            <input id="currencyMass" :value="currencyWithoutDecimal(currency.monetaryMass)" type="text" class="form-control text-right" disabled>
+                            <span class="input-group-text">Ü</span>
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="input-group-text" for="currencyNbMembers">
+                                <t :c="ln" ln="en">Üman accounts (N)</t>
+                                <t :c="ln" ln="fr">comptes Ümains (N)</t>
+                            </label>
+                            <input id="currencyNbMembers" :value="currency.nbMembers" type="text" class="form-control text-right" disabled>
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="input-group-text" for="currencyAvg">
+                                <t :c="ln" ln="en">average</t>
+                                <t :c="ln" ln="fr">moyenne</t>
+                            </label>
+                            <input id="currencyAvg" :value="currency.nbMembers > 0 ? currencyDecimal(currency.monetaryMass / currency.nbMembers) : 0" type="text" class="form-control text-right" disabled>
+                            <span class="input-group-text">Ü</span>
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="input-group-text" for="currencyLastMelt">
+                                <t :c="ln" ln="en">last melting</t>
+                                <t :c="ln" ln="fr">dernière fonte</t>
+                            </label>
+                            <input id="currencyLastMelt" :value="currency.lastMelt" type="text" class="form-control text-right" disabled>
+                            <span class="input-group-text">%</span>
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="input-group-text" for="currencyElapsedTime">
+                                <t :c="ln" ln="en">elapsed time (T)</t>
+                                <t :c="ln" ln="fr">temps écoulé (T)</t>
+                            </label>
+                            <input id="currencyElapsedTime" v-model="currency.elapsedTime" type="text" class="form-control text-right" disabled>
+                            <span class="input-group-text">
+                                <t :c="ln" ln="en">days</t>
+                                <t :c="ln" ln="fr">jours</t>
                             </span>
-                            <span v-else-if="account.role == 'wallet'" class="badge bg-secondary mr-3" style="width: 50px;">
-                                <t :c="ln" ln="en">wället</t>
-                                <t :c="ln" ln="fr">sïmple</t>
-                            </span>
-                            <span v-else class="badge bg-danger mr-3" style="width: 50px;">
-                                <t :c="ln" ln="en">bänk</t>
-                                <t :c="ln" ln="fr">bänque</t>
-                            </span>
-                            <a v-if="account.role != 'bank'" href="#" @click.stop.prevent="switchAccountRole(account)">
-                                <t :c="ln" ln="en">change</t>
-                                <t :c="ln" ln="fr">modifier</t>
-                            </a>
-                        </td>
-                        <td class="text-right">
-                            <template v-if="account.role != 'bank'">
-                                <strong>{{ currencyDecimal(account.balance) }}<small class="mr-3"> Ü </small></strong>
-                                <a href="#" @click.stop.prevent="resetBalance(account.name)">
-                                    <t :c="ln" ln="en">reset</t>
-                                    <t :c="ln" ln="fr">raz</t>
-                                </a>
-                            </template>
-                        </td>
-                        <td class="text-right">
-                            <a v-if="account.name != fune.name" href="#" @click.stop.prevent="deleteAccount(account.name)">
-                                <t :c="ln" ln="en">delete</t>
-                                <t :c="ln" ln="fr">supprimer</t>
-                            </a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+                        </div>
+                    </form>    
+                </div>
+        
+                <div class="mt-5">
+                    <h4 class="text-center">
+                        <t :c="ln" ln="en">transaction</t>
+                        <t :c="ln" ln="fr">transaction</t>
+                    </h4>
+                    <form>
+                        <div class="input-group">
+                            <input v-model="tx.value" type="number" step="any" class="form-control text-right" style="width: 80px;">
+                            <span class="input-group-text"><small>Ü</small></span>
+                            <label class="input-group-text" for="txFrom">
+                                <t :c="ln" ln="en"> fröm </t>
+                                <t :c="ln" ln="fr"> de </t> 
+                            </label>
+                            <select v-model="tx.from" id="txFrom" class="form-select">
+                                <option v-for="account in accounts" :value="account.name">{{ account.name }}</option>
+                            </select>
+                            <label class="input-group-text" for="txTo">
+                                <t :c="ln" ln="en"> tö </t>
+                                <t :c="ln" ln="fr"> à </t> 
+                            </label>
+                            <select v-model="tx.to" id="txTo" class="form-select">
+                                <option v-if="ln == 'en'" disabled value="">select öne</option>
+                                <option v-if="ln == 'fr'" disabled value="">qüi</option>
+                                <option v-for="account in accounts" :value="account.name">{{ account.name }}</option>
+                            </select>
+                            <button type="button" class="btn btn-primary" @click="executeTx()">ök!</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+    
+            <div style="min-width: 700px;">
+                <div class="w-auto">
+                    <h4 class="text-center">
+                        <t :c="ln" ln="en">stats</t>
+                        <t :c="ln" ln="fr">stats</t> 
+                    </h4>
+                    <trends
+                        :data="stats"
+                        :colors="colors"
+                        :padding="10"
+                        :radius="8"
+                        :stroke-width="1"
+                        :stroke-linecap="'butt'"
+                        :min="0"
+                        auto-draw
+                        smooth>
+                    </trends>
+                    <div class="text-right">
+                        <t :c="ln" ln="en">last 100 days</t>
+                        <t :c="ln" ln="fr">100 derniers jours</t> 
+                        <div class="custom-control custom-switch d-inline-block ml-3">
+                            <input type="checkbox" class="custom-control-input" id="statsComparedToAverage" v-model="comparedToAverage">
+                            <label class="custom-control-label text-left" for="statsComparedToAverage" style="width: 50px; vertical-align: baseline;">
+                                {{ comparedToAverage ? '%M/N' : 'Ü' }}
+                            </label>
+                        </div>
+                    </div>
+                </div>
 
-        <trends
-            :data="stats"
-            :colors="colors"
-            :padding="10"
-            :radius="8"
-            :stroke-width="1"
-            :stroke-linecap="'butt'"
-            :min="0"
-            auto-draw
-            smooth>
-        </trends>
-        <div class="text-right">
-            <div class="custom-control custom-switch">
-                <input type="checkbox" class="custom-control-input" id="statsComparedToAverage" v-model="comparedToAverage">
-                <label class="custom-control-label text-left" for="statsComparedToAverage" v-if="comparedToAverage" style="width: 50px;">%M/N</label>
-                <label class="custom-control-label text-left" for="statsComparedToAverage" v-else style="width: 50px;">Ü</label>
+                <div class="mt-3">
+                    <h4 class="text-center">
+                        <t :c="ln" ln="en">accounts</t>
+                        <t :c="ln" ln="fr">comptes</t> 
+                    </h4>
+                    <table class="table mt-3">
+                        <thead>
+                            <tr>
+                                <th @click="onlySelected = !onlySelected" :class="{'bg-primary': onlySelected}" class="pointer">
+                                    <t :c="ln" ln="en">stats</t>
+                                    <t :c="ln" ln="fr">stats</t> 
+                                </th>
+                                <th @click="sortBy('name')" class="pointer">
+                                    <t :c="ln" ln="en">name</t>
+                                    <t :c="ln" ln="fr">nom</t> 
+                                </th>
+                                <th @click="sortBy('role')" class="text-center pointer">
+                                    <t :c="ln" ln="en">role</t>
+                                    <t :c="ln" ln="fr">rôle</t>
+                                </th>
+                                <th @click="sortBy('balance')" class="text-right pointer">
+                                    <t :c="ln" ln="en">balance</t>
+                                    <t :c="ln" ln="fr">solde</t>
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <td>
+                                    <input :placeholder="ln == 'fr' ? 'nöm' : 'näme'" v-model="newAccount.name" type="text" class="form-control" id="accountName" maxlength="10"/>
+                                </td>
+                                <td class="text-center">
+                                    <select v-model="newAccount.role" class="form-control">
+                                        <option value="human">{{ ln != 'fr' ?  'Üman' : 'Ümain'}}</option>
+                                        <option value="wallet">{{ ln != 'fr' ?  'wället' : 'sïmple'}}</option>
+                                        <option value="bank">{{ ln != 'fr' ?  'bänk' : 'bänque'}}</option>
+                                    </select>
+                                </td>
+                                <td></td>
+                                <td class="text-right">
+                                    <button type="button" :disabled="3 > newAccount.name.length || accounts.some(_ => _.name == newAccount.name)" class="btn btn-primary" @click="createAccount()">
+                                        <t :c="ln" ln="en">nëw!</t>
+                                        <t :c="ln" ln="fr">noüveau!</t>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr v-for="account in sortedAccounts">
+                                <td :style="{'background-color': getColor(account)}">
+                                    <input :checked="isSelected(account)" type="checkbox" @click="select(account, $event.target.checked)" v-if="account.role != 'bank'">
+                                </td>
+                                <td>
+                                    {{ account.name }}
+                                </td>
+                                <td class="text-left">
+                                    <span v-if="account.role == 'human'" class="badge bg-primary mr-3" style="width: 50px;">
+                                        <t :c="ln" ln="en"><small>Ü</small>man</t>
+                                        <t :c="ln" ln="fr"><small>Ü</small>main</t>
+                                    </span>
+                                    <span v-else-if="account.role == 'wallet'" class="badge bg-secondary mr-3" style="width: 50px;">
+                                        <t :c="ln" ln="en">wället</t>
+                                        <t :c="ln" ln="fr">sïmple</t>
+                                    </span>
+                                    <span v-else class="badge bg-danger mr-3" style="width: 50px;">
+                                        <t :c="ln" ln="en">bänk</t>
+                                        <t :c="ln" ln="fr">bänque</t>
+                                    </span>
+                                    <a v-if="account.role != 'bank'" href="#" @click.stop.prevent="switchAccountRole(account)">
+                                        <t :c="ln" ln="en">change</t>
+                                        <t :c="ln" ln="fr">modifier</t>
+                                    </a>
+                                </td>
+                                <td class="text-right">
+                                    <template v-if="account.role != 'bank'">
+                                        <strong>{{ currencyDecimal(account.balance) }}<small class="mr-3"> Ü </small></strong>
+                                        <a href="#" @click.stop.prevent="resetBalance(account.name)">
+                                            <t :c="ln" ln="en">reset</t>
+                                            <t :c="ln" ln="fr">raz</t>
+                                        </a>
+                                    </template>
+                                </td>
+                                <td class="text-right">
+                                    <a v-if="account.name != fune.name" href="#" @click.stop.prevent="deleteAccount(account.name)">
+                                        <t :c="ln" ln="en">x</t>
+                                        <t :c="ln" ln="fr">x</t>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+        
+                
             </div>
         </div>
-        <div class="text-right mt-5">
+        
+
+        <div class="text-right mt-5 mr-3">
             <span>{{ fune.name }} v{{ fune.version }}</span>
         </div>
     </div>
@@ -344,9 +371,9 @@
                     stepTime: 0,
                     elapsedTime: 0,
                     revaluationTime: 0, 
-                    playing: false,
                     nbMembers: 0,
-                    monetaryMass: 0
+                    monetaryMass: 0,
+                    mode: 'melt'
                 }
             }
         },
@@ -396,6 +423,7 @@
             updateCurrency() {
                 this.currency = funiter.updateCurrency(this.editCurrency)
                 Object.assign(this.editCurrency, this.currency)
+                window.location.hash = "#" + this.currencyToHash(this.currency)
             },
             listAccounts() {
                 this.accounts = funiter.getAccounts()
@@ -457,6 +485,27 @@
                         this.fune = response.data
                     })
             },
+            currencyToHash(currency) {
+                const params = new URLSearchParams()
+                params.append('e', currency.expression)
+                params.append('m', currency.mode)
+                params.append('upd', currency.uPerDay)
+                params.append('rt', currency.revaluationTime)
+                params.append('st', currency.stepTime)
+                console.log(params.toString())
+                return params.toString()   
+            },
+            hashToCurrency(hash) {
+                const params = new URLSearchParams(hash)
+                const currency = {
+                    mode: params.get('m') == 'grew' ? 'grew' : 'melt',
+                    expression: params.get('e'),
+                    uPerDay: parseInt(params.get('upd')),
+                    revaluationTime: parseInt(params.get('rt')),
+                    stepTime: parseInt(params.get('st')),
+                }
+                return currency
+            }
         },
         computed: {
             sortedAccounts() {
@@ -486,6 +535,11 @@
             }
 
             let state = JSON.parse(localStorage.getItem('state'))
+            if(window.location.hash) {
+                if (!state) 
+                    state = {currency: {}}
+                Object.assign(state.currency, this.hashToCurrency(window.location.hash.substring(1)))
+            }
             funiter.start(math, state)
             this.about()
         }

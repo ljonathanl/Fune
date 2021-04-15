@@ -25,6 +25,7 @@ let funiter = {
     name: 'fÜne',
     logo: 'fї',
     uValue: 1000,
+    isPlaying: false,
 }
 
 funiter.doTx = simpleTx => {
@@ -35,13 +36,13 @@ funiter.doTx = simpleTx => {
         || !accountFrom
         || !accountTo
         || accountFrom == accountTo
-        || accountFrom.role != roles.bank && (accountFrom.balance - tx.value < 0))
+        || (accountFrom.role != roles.bank && (accountFrom.balance - tx.value < 0)))
         return null
     if (accountTo.role != roles.bank)
         accountTo.balance += tx.value
     if (accountFrom.role != roles.bank) {
         accountFrom.balance -= tx.value
-        if (accountFrom.balance < 5) {
+        if (accountFrom.balance < 10) {
             accountFrom.balance = 0
         }
     }
@@ -150,13 +151,26 @@ funiter.getState = () => {
     return state
 }
 
+const defaultCurrency = {
+    date: new Date().toISOString(),
+    stepTime: 10,
+    uPerDay: 1,
+    elapsedTime: 0,
+    revaluationTime: 1, 
+    nbMembers: 0,
+    monetaryMass: 0,
+    mode: modes.melt,
+    lastMelt: 0,
+    expression: '10/100'
+}
+
 
 funiter.restoreState = state => {
     if (!state)
         return
     
     if (state.currency) 
-        currency = state.currency
+        currency = Object.assign(defaultCurrency, state.currency)
     if (state.accounts) 
         accounts = state.accounts
     if (state.transactions) 
@@ -172,18 +186,7 @@ funiter.start = (math, state) => {
     funiter.restoreState(state)
 
     if (!currency)
-        currency = {
-            date: new Date().toISOString(),
-            stepTime: 10,
-            uPerDay: 1,
-            elapsedTime: 0,
-            revaluationTime: 1, 
-            nbMembers: 0,
-            monetaryMass: 0,
-            mode: modes.melt,
-            lastMelt: 0,
-            expression: '10/100'
-        }
+        currency = defaultCurrency
 
     if (!accounts) 
         accounts = {}
@@ -212,7 +215,7 @@ const uValue = funiter.uValue
 const revaluationMessage = '!revaluation%'
 const creationMessage = '!1Ucreation'
 
-funiter.play = () => {
+const play = () => {
     currency.elapsedTime++
     
     let monetaryMass = 0
@@ -267,16 +270,31 @@ funiter.play = () => {
     if (isRevaluation)
         currency.lastMelt = meltPercent
     
-    timeOutId = setTimeout(funiter.play, currency.stepTime * 1000)
+    timeOutId = setTimeout(play, currency.stepTime * 1000)
 
     funiter.onDayChange(currency.elapsedTime)
 }
 
+funiter.play = () => {
+    if (!funiter.isPlaying) {
+        if (timeOutId != 0) {
+            clearTimeout(timeOutId)
+            timeOutId = 0
+        }
+        funiter.isPlaying = true
+        play()
+    }
+}
+
+
 
 funiter.stop = () => {
-    if (timeOutId != 0) {
-        clearTimeout(timeOutId)
-        timeOutId = 0
+    if (funiter.isPlaying) {
+        if (timeOutId != 0) {
+            clearTimeout(timeOutId)
+            timeOutId = 0
+        }
+        funiter.isPlaying = false
     }
 }
 
