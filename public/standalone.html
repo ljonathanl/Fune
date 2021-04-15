@@ -189,7 +189,7 @@
             <table class="table mt-3">
                 <thead>
                     <tr>
-                        <th>
+                        <th @click="onlySelected = !onlySelected" :class="{'bg-primary': onlySelected}">
                             <t :c="ln" ln="en">stats</t>
                             <t :c="ln" ln="fr">stats</t> 
                         </th>
@@ -324,6 +324,7 @@
                 ],
                 accountColors: {},
                 comparedToAverage: false,
+                onlySelected: false,
                 selectedAccounts: ['fÜne'],
                 stats: [],
                 sortKey: "name",
@@ -459,18 +460,16 @@
         },
         computed: {
             sortedAccounts() {
-                return this.accounts.sort((a, b) => {
-                    let va
-                    let vb
-                    if (this.sortKey == "selected") {
-                        va = this.isSelected(a) | 0
-                        vb = this.isSelected(b) | 0
-                    } else {
-                        va = a[this.sortKey]
-                        vb = b[this.sortKey]
-                    }
+                let filteredAccount = this.accounts
+                if (this.onlySelected) {
+                    filteredAccount = filteredAccount.filter(a => this.isSelected(a))
+                }
+                let sortedAccount = filteredAccount.sort((a, b) => {
+                    let va = a[this.sortKey]
+                    let vb = b[this.sortKey]
                     return (va === vb ? 0 : va > vb ? 1 : -1) * this.sortOrder
                 })
+                return sortedAccount
             },
             currencyChange() {
                 return this.currency.expression != this.editCurrency.expression
