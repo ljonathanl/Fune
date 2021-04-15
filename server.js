@@ -11,6 +11,10 @@ app.use(express.json())
 app.use(express.static('public'))
 app.use(morgan('tiny'))
 
+app.get('/standalone', function(req, res){
+    res.sendFile('/public/standalone.html', { root: '.' });
+});
+
 
 /*
  * ABOUT
