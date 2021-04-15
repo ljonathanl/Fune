@@ -59,14 +59,15 @@ funiter.doTx = simpleTx => {
  */
 
 funiter.getCurrency = () => {
-    return currency
+    return Object.assign({}, currency)
 }
 
 funiter.updateCurrency = newCurrency => {
+    const { expression, stepTime, revaluationTime, mode, uPerDay } = newCurrency
     funiter.stop()
-    currency = Object.assign(currency, newCurrency)
+    Object.assign(currency, { expression, stepTime, revaluationTime, mode, uPerDay })
     funiter.play()
-    return currency
+    return Object.assign({}, currency)
 }
 
 
@@ -174,6 +175,7 @@ funiter.start = (math, state) => {
         currency = {
             date: new Date().toISOString(),
             stepTime: 10,
+            uPerDay: 1,
             elapsedTime: 0,
             revaluationTime: 1, 
             nbMembers: 0,
@@ -217,15 +219,16 @@ funiter.play = () => {
     let nbMembers = 0
     let meltValue = 0
     let meltPercent = 0
-
-    const uGained = uValue * currency.revaluationTime
+    
+    const uPerDay = currency.uPerDay ? Math.floor(currency.uPerDay) : 1
+    const uGained = uValue * currency.revaluationTime * uPerDay
     const funiterAccount = accounts[funiter.name]
     const isStatDay = currency.elapsedTime % statPeriod == 0
     const statIndex = isStatDay ? Math.floor(currency.elapsedTime / statPeriod) % statLimit : 0 
     const isRevaluation = currency.elapsedTime % currency.revaluationTime == 0
 
     if (isRevaluation && currency.nbMembers > 0) {
-        meltValue = funiter.math.evaluate(currency.expression, {M: currency.monetaryMass / uValue, N: currency.nbMembers, T: currency.elapsedTime})
+        meltValue = funiter.math.evaluate(currency.expression, {M: currency.monetaryMass / uGained, N: currency.nbMembers, T: currency.elapsedTime})
         if (currency.mode == modes.grew) 
             meltValue = 1 - 1 / (1 + meltValue)
         meltValue = Math.max(0, Math.min(1, meltValue))
@@ -245,7 +248,7 @@ funiter.play = () => {
         }    
         if (account.role == roles.human) {
             nbMembers += weight
-            funiter.doTx({from: funiterAccount.name, to: account.name, message: creationMessage, value: uValue})
+            funiter.doTx({from: funiterAccount.name, to: account.name, message: creationMessage, value: uValue * uPerDay})
         }
         monetaryMass += account.balance * weight
         if (isStatDay && account.role != roles.bank) {
