@@ -64,10 +64,13 @@ funiter.getCurrency = () => {
 }
 
 funiter.updateCurrency = newCurrency => {
+    const isPlaying = funiter.isPlaying
     const { expression, stepTime, revaluationTime, mode, uPerDay } = newCurrency
-    funiter.stop()
+    if (isPlaying)
+        funiter.stop()
     Object.assign(currency, { expression, stepTime, revaluationTime, mode, uPerDay })
-    funiter.play()
+    if (isPlaying)
+        funiter.play()
     return Object.assign({}, currency)
 }
 
@@ -201,8 +204,6 @@ funiter.start = (math, state) => {
 
     if (!stats[funiter.name])
         stats[funiter.name] = new Array(statLimit).fill(0)
-
-    funiter.play()
 }
 
 
@@ -273,6 +274,16 @@ const play = () => {
     timeOutId = setTimeout(play, currency.stepTime * 1000)
 
     funiter.onDayChange(currency.elapsedTime)
+}
+
+funiter.reset = () => {
+    funiter.stop()
+    Object.values(accounts).forEach(account => {
+        account.balance = 0
+        stats[account.name] = new Array(statLimit).fill(0)
+    })
+    transactions = []
+    currency.elapsedTime = 0
 }
 
 funiter.play = () => {
