@@ -5,9 +5,10 @@
     <meta charset="UTF-8" />
     <title>fÜne</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta property="og:description" content="fÜne manage currency and accounts"/>
-    <link href="./bootstrap.superhero.min.css" rel="stylesheet">
+    <meta property="og:description" content="fÜne"/>
     <link rel="icon" type="image/png" href="favicon.png" />
+    <link href="./bootstrap.superhero.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <script src="https://unpkg.com/vue@next"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="./math.js"></script>
@@ -43,6 +44,12 @@
                 <small>les anciennes <strong><small>Ü</small>nités</strong> fondent d'un certain pourcentage à chaque <strong>période de réévaluation</strong></small><br>
             </t>
         </p>
+
+        <div class="m-auto text-center"> 
+            <button class="btn btn-primary" @click="play()" :disabled="isPlaying"><i class="fa fa-play"></i> Play</button>
+            <button class="btn btn-secondary" @click="stop()" :disabled="!isPlaying"><i class="fa fa-pause"></i> Pause</button>
+            <button class="btn btn-danger ml-5" @click="reset()"><i class="fa fa-refresh"></i> Reset</button>
+        </div>
 
         <div class="d-flex align-items-start flex-wrap mb-3" style="justify-content: space-evenly;">
 
@@ -270,10 +277,8 @@
                                 </td>
                             </tr>
                             <tr v-for="account in sortedAccounts">
-                                <td :style="{'background-color': getColor(account)}">
-                                    <input :checked="isSelected(account)" type="checkbox" @click="select(account, $event.target.checked)" v-if="account.role != 'bank'">
-                                </td>
-                                <td>
+                                <td :style="{'background-color': getColor(account)}" @click="select(account)" class="pointer"></td>
+                                <td @click="select(account)" class="pointer">
                                     {{ account.name }}
                                 </td>
                                 <td class="text-left">
@@ -352,6 +357,7 @@
                 accountColors: {},
                 comparedToAverage: false,
                 onlySelected: false,
+                isPlaying: false,
                 selectedAccounts: ['fÜne'],
                 stats: [],
                 sortKey: "name",
@@ -378,6 +384,19 @@
             }
         },
         methods: {
+            play() {
+                funiter.play()
+                this.isPlaying = funiter.isPlaying
+            },
+            stop() {
+                funiter.stop()
+                this.isPlaying = funiter.isPlaying
+            },
+            reset() {
+                this.stop()
+                funiter.reset()
+                this.refresh()
+            },
             getColor(account) {
                 let index = this.selectedAccounts.indexOf(account.name)
                 if (index < 0)
@@ -387,11 +406,11 @@
             isSelected(account) {
                 return this.selectedAccounts.indexOf(account.name) >= 0
             },
-            select(account, visible) {
+            select(account) {
+                if (account.role == 'bank')
+                    return
                 let index = this.selectedAccounts.indexOf(account.name)
-                if ((index < 1 && !visible) || (index > 0 && visible)) 
-                    return 
-                if (visible) {
+                if (index < 0) {
                     if (this.selectedAccounts.length == this.colors.length) {
                         this.selectedAccounts.splice(1, 1)
                         this.colors.push(this.colors.splice(1, 1)[0])
@@ -456,7 +475,7 @@
                         let stat = funiter.getAccountStats(account)
                         if (this.comparedToAverage) {
                             for (let j = 0; j < stat.length; j++) {
-                                stat[j] = (stat[j] / funeStat[j]) * 100000;
+                                stat[j] = funeStat[j] == 0 ? 0 : (stat[j] / funeStat[j]) * 100000;
                             }
                         }
                         this.stats[index] = stat
@@ -541,6 +560,7 @@
                 Object.assign(state.currency, this.hashToCurrency(window.location.hash.substring(1)))
             }
             funiter.start(math, state)
+            this.refresh()
             this.about()
         }
     }
