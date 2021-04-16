@@ -1,6 +1,8 @@
 const txLimit = 1000
 const statLimit = 100
-const statPeriod = 1
+const statDayPeriod = 1
+const statMonthPeriod = 60
+const statYearPeriod = 360
 
 const roles = {
     human: 'human',
@@ -11,6 +13,18 @@ const roles = {
 const modes = {
     grew: 'grew',
     melt: 'melt'
+}
+
+const statTypes = {
+    day: 'day',
+    month: 'month',
+    year: 'year'
+}
+
+const statPeriods = {
+    day: 1,
+    month: 60,
+    year: 360
 }
 
 let timeOutId = 0
@@ -126,15 +140,24 @@ funiter.getAccountTx = (id, limit) => {
     return tx
 }
 
-funiter.getAccountStats = id => {
+funiter.getAccountStats = (id, period = statTypes.day) => {
+    period = statTypes[period]
+    if (!period)
+        period = statTypes.day
+
     if (!accounts[id]) 
         return null
 
-    let stat = stats[id]
-    if (!stat) 
+    const statAccount = stats[id]
+    if (!statAccount) 
         return []
 
-    let index = (Math.floor(currency.elapsedTime / statPeriod) + 1) % statLimit
+    const stat = statAccount[period]
+    if (!stat)
+        return []
+
+    
+    let index = (Math.floor(currency.elapsedTime / statPeriods[period]) + 1) % statLimit
     return stat.slice(index).concat(stat.slice(0, index))
 }
 
@@ -202,8 +225,14 @@ funiter.start = (math, state) => {
     if (!stats) 
         stats = {}
 
-    if (!stats[funiter.name])
-        stats[funiter.name] = new Array(statLimit).fill(0)
+    if (!stats[funiter.name]) {
+        const stat = {}
+        stat[statTypes.day] = new Array(statLimit).fill(0)
+        stat[statTypes.month] = new Array(statLimit).fill(0)
+        stat[statTypes.year] = new Array(statLimit).fill(0)
+        stats[funiter.name] = stat
+    }
+        
 }
 
 
@@ -227,8 +256,13 @@ const play = () => {
     const uPerDay = currency.uPerDay ? Math.floor(currency.uPerDay) : 1
     const uGained = uValue * currency.revaluationTime * uPerDay
     const funiterAccount = accounts[funiter.name]
-    const isStatDay = currency.elapsedTime % statPeriod == 0
-    const statIndex = isStatDay ? Math.floor(currency.elapsedTime / statPeriod) % statLimit : 0 
+    
+    const isStatMonth = currency.elapsedTime % statPeriods.month == 0
+    const isStatYear = currency.elapsedTime % statPeriods.year == 0
+    const statDayIndex = currency.elapsedTime % statLimit
+    const statMonthIndex = isStatMonth ? (currency.elapsedTime / statPeriods.month) % statLimit : 0 
+    const statYearIndex = isStatYear ? (currency.elapsedTime / statPeriods.year) % statLimit : 0 
+
     const isRevaluation = currency.elapsedTime % currency.revaluationTime == 0
 
     if (isRevaluation && currency.nbMembers > 0) {
@@ -255,19 +289,34 @@ const play = () => {
             funiter.doTx({from: funiterAccount.name, to: account.name, message: creationMessage, value: uValue * uPerDay})
         }
         monetaryMass += account.balance * weight
-        if (isStatDay && account.role != roles.bank) {
+        if (account.role != roles.bank) {
             let stat = stats[account.name]
             if (!stat) {
-                stat = stats[account.name] = new Array(statLimit).fill(0)
+                stat = {}
+                stat[statTypes.day] = new Array(statLimit).fill(0)
+                stat[statTypes.month] = new Array(statLimit).fill(0)
+                stat[statTypes.year] = new Array(statLimit).fill(0)
+                stats[account.name] = stat
             }
-            stat[statIndex] = account.balance 
+            stat[statTypes.day][statDayIndex] = account.balance
+            if (isStatMonth) 
+                stat[statTypes.month][statMonthIndex] = account.balance
+            if (isStatYear) 
+                stat[statTypes.year][statYearIndex] = account.balance    
         }
     });
 
     currency.nbMembers = nbMembers
     currency.monetaryMass = monetaryMass
-    if (isStatDay)
-        stats[funiter.name][statIndex] = nbMembers > 0 ? Math.floor(monetaryMass / nbMembers) : 0
+    currency.average = nbMembers > 0 ? Math.floor(monetaryMass / nbMembers) : 0
+    let statFuniter = stats[funiter.name]
+    statFuniter[statTypes.day][statDayIndex] = currency.average
+    if (isStatMonth) 
+        statFuniter[statTypes.month][statMonthIndex] = currency.average
+    if (isStatYear) 
+        statFuniter[statTypes.year][statYearIndex] = currency.average
+
+
     if (isRevaluation)
         currency.lastMelt = meltPercent
     
@@ -280,10 +329,18 @@ funiter.reset = () => {
     funiter.stop()
     Object.values(accounts).forEach(account => {
         account.balance = 0
-        stats[account.name] = new Array(statLimit).fill(0)
+        if (account.role == roles.human)
+            account.role = roles.wallet
+        const stat = stats[account.name]
+        stat[statTypes.day] = new Array(statLimit).fill(0)
+        stat[statTypes.month] = new Array(statLimit).fill(0)
+        stat[statTypes.year] = new Array(statLimit).fill(0)
     })
     transactions = []
     currency.elapsedTime = 0
+    currency.lastMelt = 0
+    currency.monetaryMass = 0
+    currency.nbMembers = 0
 }
 
 funiter.play = () => {
