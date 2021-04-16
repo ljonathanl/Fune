@@ -46,9 +46,9 @@
         </p>
 
         <div class="m-auto text-center"> 
-            <button class="btn btn-primary" @click="play()" :disabled="isPlaying"><i class="fa fa-play"></i> Play</button>
-            <button class="btn btn-secondary" @click="stop()" :disabled="!isPlaying"><i class="fa fa-pause"></i> Pause</button>
-            <button class="btn btn-danger ml-5" @click="reset()"><i class="fa fa-refresh"></i> Reset</button>
+            <button class="btn btn-primary" @click="play()" :disabled="isPlaying"><i class="fa fa-play"></i> play</button>
+            <button class="btn btn-secondary mr-5" @click="stop()" :disabled="!isPlaying"><i class="fa fa-pause"></i> pause</button>
+            <button class="btn btn-danger ml-5" @click="reset()"><i class="fa fa-refresh"></i> reset</button>
         </div>
 
         <div class="d-flex align-items-start flex-wrap mb-3" style="justify-content: space-evenly;">
@@ -90,18 +90,6 @@
                             <span class="input-group-text">Ü</span>
                         </div>
                         <div class="input-group mb-3">
-                            <label class="input-group-text" for="currencyStepTime">
-                                <t :c="ln" ln="en">day duration</t>
-                                <t :c="ln" ln="fr">durée d'un jour</t>
-                            </label>
-                            <input id="currencyStepTime" v-model="editCurrency.stepTime" type="number" min="1" max="90000" step="1" class="form-control text-right"
-                                :class="{'bg-primary': editCurrency.stepTime != currency.stepTime}">
-                            <span class="input-group-text">
-                                <t :c="ln" ln="en">second<span v-if="editCurrency.stepTime > 1">s</span></t>
-                                <t :c="ln" ln="fr">seconde<span v-if="editCurrency.stepTime > 1">s</span></t>
-                            </span>
-                        </div>
-                        <div class="input-group mb-3">
                             <label class="input-group-text" for="currencyRevaluationTime">
                                 <t :c="ln" ln="en">revaluation period</t>
                                 <t :c="ln" ln="fr">réévaluation</t>
@@ -111,6 +99,18 @@
                             <span class="input-group-text">
                                 <t :c="ln" ln="en">day<span v-if="editCurrency.revaluationTime > 1">s</span></t>
                                 <t :c="ln" ln="fr">jour<span v-if="editCurrency.revaluationTime > 1">s</span></t>
+                            </span>
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="input-group-text" for="currencyStepTime">
+                                <t :c="ln" ln="en">day duration</t>
+                                <t :c="ln" ln="fr">durée d'un jour</t>
+                            </label>
+                            <input id="currencyStepTime" v-model="editCurrency.stepTime" type="number" min="1" max="90000" step="1" class="form-control text-right"
+                                :class="{'bg-primary': editCurrency.stepTime != currency.stepTime}">
+                            <span class="input-group-text">
+                                <t :c="ln" ln="en">second<span v-if="editCurrency.stepTime > 1">s</span></t>
+                                <t :c="ln" ln="fr">seconde<span v-if="editCurrency.stepTime > 1">s</span></t>
                             </span>
                         </div>
                         <div class="d-grid gap-2 d-md-flex mb-3" v-if="currencyChange">

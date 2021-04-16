@@ -6,8 +6,8 @@
     <title>fÜne</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta property="og:description" content="fÜne the libre currency"/>
-    <link href="./bootstrap.superhero.min.css" rel="stylesheet">
-    <link rel="icon" type="image/png" href="favicon.png" />
+    <link href="/bootstrap.superhero.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/favicon.png" />
     <script src="https://unpkg.com/vue@next"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
@@ -76,7 +76,7 @@
             </h4>
             <form class="mb-4 row justify-content-center" v-if="account.role == 'bank' || account.balance > 0">
                 <div>
-                    <div class="col-auto input-group">
+                    <div class="col-auto input-group" style="width: 400px;">
                         <input v-model="tx.value" type="number" :max="Math.round(account.balance/100)" step="any" min="0" class="form-control text-right" style="max-width: 120px;">
                         <small class="input-group-text mr-3">Ü</small>
                         <label class="input-group-text" for="txTo">
@@ -90,6 +90,7 @@
                                 <strong>{{ (isCreator(account.name) ? '@' : '#') + account.name }}</strong>
                             </option>
                         </select>
+                        <button type="button" class="btn btn-primary" @click="executeTx()">ök!</button>
                     </div>
                     <div class="col-auto input-group">
                         <label class="input-group-text" for="txMessage">
@@ -99,9 +100,6 @@
                         <input v-model="tx.message" type="text" maxlength="32" class="form-control" id="txMessage">
                     </div>
 
-                </div>
-                <div>
-                    <button type="button" class="btn btn-primary" @click="executeTx()">ök!</button>
                 </div>
             </form>
 
@@ -206,7 +204,7 @@
 </body>
 
 <script type="module">
-    import { Trend } from "./vue-trend.js"
+    import { Trend } from "/vue-trend.js"
 
     const uValue = 1000
 
