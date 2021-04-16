@@ -532,6 +532,11 @@
                 return currency
             }
         },
+        watch: {
+            comparedToAverage: function (val) {
+                this.getStats()
+            }
+        },
         computed: {
             sortedAccounts() {
                 let filteredAccount = this.accounts
