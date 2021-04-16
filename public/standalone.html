@@ -216,10 +216,16 @@
                         auto-draw
                         smooth>
                     </trends>
-                    <div class="text-right">
-                        <t :c="ln" ln="en">last 100 days</t>
-                        <t :c="ln" ln="fr">100 derniers jours</t> 
-                        <div class="custom-control custom-switch d-inline-block ml-3">
+                    <div class="w-100">
+                        <div class="d-inline-block ml-4">
+                            100
+                            <select v-model="statType">
+                                <option value="day">{{ ln != 'fr' ?  'days' : 'jours'}}</option>
+                                <option value="month">{{ ln != 'fr' ?  'months' : 'mois'}}</option>
+                                <option value="year">{{ ln != 'fr' ?  'years' : 'années'}}</option>
+                            </select> 
+                        </div>
+                        <div class="custom-control custom-switch d-inline-block mr-2" style="float: right;">
                             <input type="checkbox" class="custom-control-input" id="statsComparedToAverage" v-model="comparedToAverage">
                             <label class="custom-control-label text-left" for="statsComparedToAverage" style="width: 50px; vertical-align: baseline;">
                                 {{ comparedToAverage ? '%M/N' : 'Ü' }}
@@ -233,7 +239,7 @@
                         <t :c="ln" ln="en">accounts</t>
                         <t :c="ln" ln="fr">comptes</t> 
                     </h4>
-                    <table class="table mt-3">
+                    <table class="table table-hover">
                         <thead>
                             <tr>
                                 <th @click="onlySelected = !onlySelected" :class="{'bg-primary': onlySelected}" class="pointer">
@@ -349,7 +355,7 @@
         data() {
             return {
                 ln: getLanguage(),
-                fune: { name: 'fÜne', logo: 'fї', version: '0'},
+                fune: { name: funiter.name, logo: 'fї', version: '0'},
                 colors: [ 
                     '#FFFFFFDD', '#FE4365DD', '#F9CDADDD', 
                     '#83AF9BDD', '#A7226EDD', '#F26B38DD', 
@@ -358,9 +364,10 @@
                 ],
                 accountColors: {},
                 comparedToAverage: false,
+                statType: 'day',
                 onlySelected: false,
                 isPlaying: false,
-                selectedAccounts: ['fÜne'],
+                selectedAccounts: [funiter.name],
                 stats: [],
                 sortKey: "name",
                 sortOrder: 1,
@@ -474,11 +481,11 @@
                 }
             },
             getStats() {
-                let funeStat = funiter.getAccountStats('fÜne')
+                let funeStat = funiter.getAccountStats(funiter.name, this.statType)
                 for (let index = 1; index < this.selectedAccounts.length; index++) {
                     const account = this.selectedAccounts[index];
                     if (account) {
-                        let stat = funiter.getAccountStats(account)
+                        let stat = funiter.getAccountStats(account, this.statType)
                         if (this.comparedToAverage) {
                             for (let j = 0; j < stat.length; j++) {
                                 stat[j] = funeStat[j] == 0 ? 0 : (stat[j] / funeStat[j]) * 100000;
@@ -534,6 +541,9 @@
         },
         watch: {
             comparedToAverage: function (val) {
+                this.getStats()
+            },
+            statType: function (val) {
                 this.getStats()
             }
         },
