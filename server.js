@@ -11,10 +11,17 @@ app.use(express.json())
 app.use(express.static('public'))
 app.use(morgan('tiny'))
 
-app.get('/standalone', function(req, res){
+app.get('/', function(req, res){
     res.sendFile('/public/standalone.html', { root: '.' });
-});
+})
 
+app.get('/admin', function(req, res){
+    res.sendFile('/public/admin.html', { root: '.' });
+})
+
+app.get('/account', function(req, res){
+    res.sendFile('/public/account.html', { root: '.' });
+})
 
 /*
  * ABOUT

@@ -6,8 +6,8 @@
     <title>fÜne admin</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta property="og:description" content="fÜne manage currency and accounts"/>
-    <link href="./bootstrap.superhero.min.css" rel="stylesheet">
-    <link rel="icon" type="image/png" href="favicon.png" />
+    <link href="/bootstrap.superhero.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/favicon.png" />
     <script src="https://unpkg.com/vue@next"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
@@ -16,7 +16,7 @@
     <div id="app" class="container-sm">
         <h1 class="display-1 text-center mb-5">
             <!-- <span class="bg-primary pl-1 pr-1 align-middle" style="font-family: monospace;">fї</span> -->
-            <img src="favicon64x64.png"/>
+            <img src="/favicon64x64.png"/>
             <span class="align-middle"> f<small>Ü</small>ne</span>
         </h1>
 
@@ -224,7 +224,7 @@
                             <input :checked="isSelected(account)" type="checkbox" @click="select(account, $event.target.checked)" v-if="account.role != 'bank'">
                         </td>
                         <td>
-                            <a :href="'./#' + account.name">{{ account.name }}</a>
+                            <a :href="'/account/#' + account.name">{{ account.name }}</a>
                         </td>
                         <td class="text-left">
                             <span v-if="account.role == 'human'" class="badge bg-primary mr-3" style="width: 50px;">
@@ -284,7 +284,7 @@
 </body>
 
 <script type="module">
-    import { Trends } from "./vue-trend.js"
+    import { Trends } from "/vue-trend.js"
 
     const uValue = 1000
 
