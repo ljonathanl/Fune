@@ -97,8 +97,8 @@
                             <input id="currencyStepTime" v-model="editCurrency.stepTime" type="number" min="1" max="90000" step="1" class="form-control text-right"
                                 :class="{'bg-primary': editCurrency.stepTime != currency.stepTime}">
                             <span class="input-group-text">
-                                <t :c="ln" ln="en">seconds</t>
-                                <t :c="ln" ln="fr">secondes</t>
+                                <t :c="ln" ln="en">second<span v-if="editCurrency.stepTime > 1">s</span></t>
+                                <t :c="ln" ln="fr">seconde<span v-if="editCurrency.stepTime > 1">s</span></t>
                             </span>
                         </div>
                         <div class="input-group mb-3">
@@ -109,8 +109,8 @@
                             <input id="currencyRevaluationTime" v-model="editCurrency.revaluationTime" type="number" min="1" max="400" step="1" class="form-control text-right" 
                                 :class="{'bg-primary': editCurrency.revaluationTime != currency.revaluationTime}">
                             <span class="input-group-text">
-                                <t :c="ln" ln="en">days</t>
-                                <t :c="ln" ln="fr">jours</t>
+                                <t :c="ln" ln="en">day<span v-if="editCurrency.revaluationTime > 1">s</span></t>
+                                <t :c="ln" ln="fr">jour<span v-if="editCurrency.revaluationTime > 1">s</span></t>
                             </span>
                         </div>
                         <div class="d-grid gap-2 d-md-flex mb-3" v-if="currencyChange">
@@ -161,8 +161,8 @@
                             </label>
                             <input id="currencyElapsedTime" v-model="currency.elapsedTime" type="text" class="form-control text-right" disabled>
                             <span class="input-group-text">
-                                <t :c="ln" ln="en">days</t>
-                                <t :c="ln" ln="fr">jours</t>
+                                <t :c="ln" ln="en">day<span v-if="currency.elapsedTime > 1">s</span></t>
+                                <t :c="ln" ln="fr">jour<span v-if="currency.elapsedTime > 1">s</span></t>
                             </span>
                         </div>
                     </form>    
@@ -309,7 +309,7 @@
                                     </template>
                                 </td>
                                 <td class="text-right">
-                                    <a v-if="account.name != fune.name" href="#" @click.stop.prevent="deleteAccount(account.name)">
+                                    <a v-if="account.name != fune.name" href="#" @click.stop.prevent="deleteAccount(account)">
                                         <t :c="ln" ln="en">x</t>
                                         <t :c="ln" ln="fr">x</t>
                                     </a>
@@ -338,6 +338,8 @@
     import funiter from "/funiter.js"
 
     const uValue = 1000
+
+    let lastSave = 0
 
     const getLanguage = () => (navigator.userLanguage || 
         (navigator.languages && navigator.languages.length && navigator.languages[0]) || 
@@ -461,8 +463,12 @@
                 funiter.updateAccount(name, {balance: 0})
                 this.listAccounts()
             },
-            deleteAccount(name) {
+            deleteAccount(account) {
+                const name = account.name
                 if (confirm(this.ln == 'fr' ? "êtes vous sûr de supprimer " + name + " ?" : "Are you sure to delete " + name + "?")) {
+                    if (this.isSelected(account)) {
+                        this.select(account)
+                    }
                     funiter.deleteAccount(name)
                     this.listAccounts()
                 }
@@ -549,7 +555,10 @@
         },
         mounted() {
             funiter.onDayChange = d => {
-                localStorage.setItem('state', JSON.stringify(funiter.getState()))
+                if (Date.now() - lastSave > 60000) {
+                    localStorage.setItem('state', JSON.stringify(funiter.getState()))
+                    lastSave = Date.now()
+                }
                 this.refresh()
             }
 
