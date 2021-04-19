@@ -331,10 +331,11 @@ funiter.reset = () => {
         account.balance = 0
         if (account.role == roles.human)
             account.role = roles.wallet
-        const stat = stats[account.name]
+        const stat = {}
         stat[statTypes.day] = new Array(statLimit).fill(0)
         stat[statTypes.month] = new Array(statLimit).fill(0)
         stat[statTypes.year] = new Array(statLimit).fill(0)
+        stats[account.name] = stat
     })
     transactions = []
     currency.elapsedTime = 0
