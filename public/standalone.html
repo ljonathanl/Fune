@@ -144,7 +144,10 @@
                                 <t :c="ln" ln="fr">moyenne</t>
                             </label>
                             <input id="currencyAvg" :value="currency.nbMembers > 0 ? currencyDecimal(currency.monetaryMass / currency.nbMembers) : 0" type="text" class="form-control text-right" disabled>
-                            <span class="input-group-text">Ü</span>
+                            <span class="input-group-text">
+                                <t :c="ln" ln="en">Ü / Üman</t>
+                                <t :c="ln" ln="fr">Ü / Ümain</t>
+                            </span>
                         </div>
                         <div class="input-group mb-3">
                             <label class="input-group-text" for="currencyLastMelt">
@@ -404,6 +407,7 @@
             reset() {
                 this.stop()
                 funiter.reset()
+                localStorage.removeItem('state')
                 this.refresh()
             },
             getColor(account) {
