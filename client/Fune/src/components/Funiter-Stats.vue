@@ -103,7 +103,6 @@ const getStats = () => {
         stats[0] = new Array(funeStat.length).fill(100000)
     } 
     state.stats = stats
-    console.log(stats)
 }
 
 onMounted(() => {
