@@ -133,7 +133,7 @@ async function start() {
     }
 
     const state = await storage.getItem('state')
-    funiter.start(math, state)
+    funiter.start(math.evaluate, state)
     // funiter.play()
 }
 
