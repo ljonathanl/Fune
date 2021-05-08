@@ -92,11 +92,19 @@
                     <en>average</en>
                     <fr>moyenne</fr>
                 </label>
-                <input id="currencyAvg" :value="funiter.currency.nbMembers > 0 ? funiter.currencyDecimal(funiter.currency.monetaryMass / funiter.currency.nbMembers) : 0" type="text" class="form-control text-right" disabled>
+                <input id="currencyAvg" :value="funiter.currency.nbMembers > 0 ? funiter.currencyWithoutDecimal(funiter.currency.monetaryMass / funiter.currency.nbMembers) : 0" type="text" class="form-control text-right" disabled>
                 <span class="input-group-text">
                     <en>Ü / Üman</en>
                     <fr>Ü / Ümain</fr>
                 </span>
+            </div>
+            <div class="input-group mb-3">
+                <label class="input-group-text" for="currencyLastGrew">
+                    <en>last growth</en>
+                    <fr>dernière croissance</fr>
+                </label>
+                <input id="currencyLastGrew" :value="lastGrew" type="text" class="form-control text-right" disabled>
+                <span class="input-group-text">%</span>
             </div>
             <div class="input-group mb-3">
                 <label class="input-group-text" for="currencyLastMelt">
@@ -122,9 +130,9 @@
 </template>
 
 <script setup>
-import funiter from '../lib/funiterStandalone.js'
+import funiter from '../lib/funiterReactive.js'
 import { fr, en } from './Translate.js'
-import { defineProps, reactive, computed, onMounted } from 'vue'
+import { reactive, computed, onMounted } from 'vue'
 
 const editedCurrency = reactive({
     expression: '',
@@ -132,6 +140,10 @@ const editedCurrency = reactive({
     uPerDay: 1,
     stepTime: 0,
     revaluationTime: 0,
+})
+
+const lastGrew = computed(() => {
+    return ((1 / (1 / (funiter.currency.lastMelt / 100) - 1)) * 100).toFixed(2)
 })
 
 const currencyChange = computed(() => {

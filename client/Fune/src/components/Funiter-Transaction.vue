@@ -32,7 +32,7 @@
 
 <script setup>
 import { fr, en } from './Translate.js'
-import funiter from '../lib/funiterStandalone.js'
+import funiter from '../lib/funiterReactive.js'
 import { reactive, computed } from 'vue'
 
 const tx = reactive({

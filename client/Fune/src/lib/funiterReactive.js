@@ -117,6 +117,15 @@ funiterProxy.stop = () => {
     funiterProxy.isPlaying = funiter.isPlaying
 }
 
+funiterProxy.getState = () => {
+    return funiter.getState()
+}
+
+funiterProxy.restoreState = state => {
+    funiter.restoreState(state)
+    funiterProxy.refresh()
+}
+
 
 funiterProxy.currencyWithoutDecimal = (value) => {
     return Math.floor(value/uValue)
