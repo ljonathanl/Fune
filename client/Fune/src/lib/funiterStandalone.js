@@ -62,19 +62,21 @@ funiterProxy.createAccount = newAccount => {
 
 funiterProxy.updateAccount = (oldAccount, newAccount) => {
     let account = funiter.updateAccount(oldAccount.name, newAccount)
-    if (account) 
+    if (account) {
         account = Object.assign(oldAccount, account)
+        funiterProxy.refresh()
+    }
     return account
 }
 
 funiterProxy.deleteAccount = (accountToDelete) => {
     let account = null;
     if (funiter.deleteAccount(accountToDelete.name)) {
-        if (funiterProxy.isSelected(account)) {
-            funiterProxy.select(account)
+        if (funiterProxy.isSelected(accountToDelete)) {
+            funiterProxy.select(accountToDelete)
         }
         account = accountToDelete
-        funiterProxy.accounts.splice(funiterProxy.accounts.indexOf(accountToDelete), 1)
+        funiterProxy.refresh()
     }
     return account
 }
@@ -86,13 +88,6 @@ funiterProxy.getAccountTx = (id, limit) => {
 funiterProxy.getAccountStats = (id, period = statTypes.day) => {
     return funiter.getAccountStats(id, period)
 }
-
-funiterProxy.start = (initialState) => {
-    funiter.onDayChange = funiterProxy.onDayChange
-    funiter.start(evaluate, initialState)
-    funiterProxy.refresh()
-}
-
 
 funiterProxy.onDayChange = () => {
     funiterProxy.refresh()
@@ -130,5 +125,9 @@ funiterProxy.currencyWithoutDecimal = (value) => {
 funiterProxy.currencyDecimal = (value) => {
     return (value/uValue).toFixed(2)
 }
+
+funiter.onDayChange = funiterProxy.onDayChange
+funiter.start(evaluate, {})
+funiterProxy.refresh()
 
 export default funiterProxy

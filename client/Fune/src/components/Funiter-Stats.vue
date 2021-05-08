@@ -60,11 +60,10 @@ const state = reactive({
     stats: [],
 })
 
-watch(() => funiter.selectedAccounts,
+watch(() => funiter.selectedAccounts.length,
     () => {
         getStats()
-    },
-    { deep: true }
+    }
 )
 
 watch(() => funiter.currency.elapsedTime,
@@ -87,6 +86,7 @@ watch(() => state.statType,
 
 const getStats = () => {
     let funeStat = funiter.getAccountStats(funiter.name, state.statType)
+    let stats = [funeStat]
     for (let index = 1; index < funiter.selectedAccounts.length; index++) {
         const account = funiter.selectedAccounts[index];
         if (account) {
@@ -96,13 +96,13 @@ const getStats = () => {
                     stat[j] = funeStat[j] == 0 ? 0 : (stat[j] / funeStat[j]) * 100000;
                 }
             }
-            state.stats[index] = stat
+            stats.push(stat)
         }
     }
     if (state.comparedToAverage) {
-        funeStat = new Array(funeStat.length).fill(100000)
+        stats[0] = new Array(funeStat.length).fill(100000)
     } 
-    state.stats[0] = funeStat
+    state.stats = stats
 }
 
 onMounted(() => {

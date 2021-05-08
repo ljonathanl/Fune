@@ -34,7 +34,7 @@
                     <en>Ü per day</en>
                     <fr>Ü par jour</fr>
                 </label>
-                <input id="currencyUPerDay" v-model="editedCurrency.uPerDay" type="number" min="1" max="1000" step="1" class="form-control text-right"
+                <input id="currencyUPerDay" v-model="editedCurrency.uPerDay" type="number" min="0" max="1000" step="1" class="form-control text-right"
                     :class="{'bg-primary': editedCurrency.uPerDay != funiter.currency.uPerDay}">
                 <span class="input-group-text">Ü</span>
             </div>
@@ -67,7 +67,7 @@
                     <en>ündo!</en>
                     <fr>annüler!</fr>
                 </button>
-                <button type="button" class="btn btn-primary" @click="funiter.updateCurrency(editedCurrency)">
+                <button type="button" class="btn btn-primary" @click="updateCurrency()">
                     <en>üpdate!</en>
                     <fr>valïder!</fr>
                 </button>
@@ -143,6 +143,11 @@ const currencyChange = computed(() => {
         || funiter.currency.revaluationTime != editedCurrency.revaluationTime
         || funiter.currency.stepTime != editedCurrency.stepTime;
 })
+
+const updateCurrency = () => {
+    const { expression, mode, uPerDay, revaluationTime, stepTime } = editedCurrency
+    funiter.updateCurrency({ expression, mode, uPerDay, revaluationTime, stepTime })
+}
 
 onMounted(() => {
     Object.assign(editedCurrency, funiter.currency)

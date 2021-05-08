@@ -123,7 +123,7 @@ const state = reactive({
 const sortedAccounts = computed(() => {
     let filteredAccount = funiter.accounts
     if (state.onlySelected) {
-        filteredAccount = filteredAccount.filter(a => isSelected(a))
+        filteredAccount = filteredAccount.filter(a => funiter.isSelected(a))
     }
     let result = filteredAccount.sort((a, b) => {
         let va = a[state.sortKey]
