@@ -103,7 +103,7 @@
 
 <script setup>
 import { fr, en, translate } from './Translate.js'
-import funiter from '../lib/funiterStandalone.js'
+import funiter from '../lib/funiterReactive.js'
 import { defineProps, reactive, ref, computed, onMounted, defineEmit } from 'vue'
 
 

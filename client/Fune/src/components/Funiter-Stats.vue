@@ -47,7 +47,7 @@
 <script setup>
 import { Trends } from './Trend.js'
 import { fr, en } from './Translate.js'
-import funiter from '../lib/funiterStandalone.js'
+import funiter from '../lib/funiterReactive.js'
 import { defineProps, watch, onMounted, reactive } from 'vue'
 
 const { colors } = defineProps({
@@ -103,6 +103,7 @@ const getStats = () => {
         stats[0] = new Array(funeStat.length).fill(100000)
     } 
     state.stats = stats
+    console.log(stats)
 }
 
 onMounted(() => {

@@ -135,7 +135,7 @@ var Background = {
         y: boundary.minY - 2,
         fill: '#CCCCCC88',
         'font-size': '0.6em'
-      }, (this.max / 1000).toFixed(2)),
+      }, Math.floor(this.max / 1000)),
       h('line', {
         x1: boundary.minX,
         y1: boundary.minY,
@@ -148,7 +148,7 @@ var Background = {
         y: boundary.maxY - 2,
         fill: '#CCCCCC88',
         'font-size': '0.6em'
-      }, (this.min / 1000).toFixed(2)),
+      }, Math.floor(this.min / 1000)),
       h('line', {
         x1: boundary.minX,
         y1: boundary.maxY,
@@ -377,7 +377,7 @@ var Trends = {
     var paths = [];
     for (let index = 0; index < this.data.length; index++) {
       const element = this.data[index];
-      if (element && element.length > 2) {
+      if (element && element.length > 1) {
         paths.push(
           h(Path, {
             smooth: this.smooth,

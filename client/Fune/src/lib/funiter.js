@@ -149,8 +149,12 @@ funiter.getAccountStats = (id, period = statTypes.day) => {
     if (!stat)
         return []
 
+    if (state.currency.elapsedTime < statPeriods[period])
+        return [0, 0]
     
     let index = (Math.floor(state.currency.elapsedTime / statPeriods[period]) + 1) % statLimit
+    if (index > 0 && state.currency.elapsedTime < statPeriods[period] * statLimit) 
+        return stat.slice(0, index)
     return stat.slice(index).concat(stat.slice(0, index))
 }
 
@@ -161,13 +165,13 @@ funiter.getAccountStats = (id, period = statTypes.day) => {
  */
 
 funiter.getState = () => {
-    const state = {
+    const result = {
         currency: state.currency,
         accounts: state.accounts,
         transactions: state.transactions,
         stats: state.stats,
     }
-    return state
+    return result
 }
 
 const defaultCurrency = {
@@ -184,19 +188,18 @@ const defaultCurrency = {
 }
 
 
-funiter.restoreState = state => {
-    if (!state)
+funiter.restoreState = savedState => {
+    if (!savedState)
         return
     
-    if (state.currency) 
-        state.currency = Object.assign(defaultCurrency, state.currency)
-    if (state.accounts) 
-        state.accounts = state.accounts
-    if (state.transactions) 
-        state.transactions = state.transactions
-    if (state.stats) 
-        state.stats = state.stats
-
+    if (savedState.currency) 
+        state.currency = Object.assign(defaultCurrency, savedState.currency)
+    if (savedState.accounts) 
+        state.accounts = savedState.accounts
+    if (savedState.transactions) 
+        state.transactions = savedState.transactions
+    if (savedState.stats) 
+        state.stats = savedState.stats
 }
 
 funiter.expressionParser = (expression, values) => {
@@ -205,10 +208,9 @@ funiter.expressionParser = (expression, values) => {
 
 
 funiter.start = (expressionParser, initialState) => {
-    state = initialState
+    funiter.restoreState(initialState)
     if (expressionParser)
         funiter.expressionParser = expressionParser
-    // funiter.restoreState(state)
 
     if (!state.currency)
         state.currency = defaultCurrency

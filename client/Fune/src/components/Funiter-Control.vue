@@ -7,6 +7,6 @@
 </template>
 
 <script setup>
-import funiter from '../lib/funiterStandalone.js'
+import funiter from '../lib/funiterReactive.js'
 
 </script>

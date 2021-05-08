@@ -26,7 +26,7 @@
         </fr>
     </p>
 
-    <funiter :currency="currency" :accounts="accounts" :selectedAccounts="accounts">
+    <funiter :accounts="accounts" :selectedAccounts="accounts">
       <funiter-control class="m-auto" />
       <div class="d-flex align-items-start flex-wrap mb-3" style="justify-content: space-evenly;">
         <div style="min-width: 500px;">
@@ -43,7 +43,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { watch } from 'vue'
+import funiterLib from './lib/funiterReactive.js'
 import funiter from './components/Funiter.vue'
 import { fr, en } from './components/Translate.js'
 import funiterControl from './components/Funiter-Control.vue'
@@ -52,6 +53,12 @@ import funiterTransaction from './components/Funiter-Transaction.vue'
 import funiterAccounts from './components/Funiter-Accounts.vue'
 import funiterStats from './components/Funiter-Stats.vue'
 
+watch(() => funiterLib.currency,
+  () => {
+    window.location.hash = "#" + currencyToHash(funiterLib.currency)
+    localStorage.setItem('state', JSON.stringify(funiterLib.getState()))
+  }
+)
 
 const colors = [ 
   '#FFFFFFDD', '#FE4365DD', '#F9CDADDD', 
@@ -68,13 +75,49 @@ const currency = {
 }
 
 const accounts = [
-  {name: 'Alice', balance: 3837 * 1000, role: 'human'},
-  {name: 'Bob', balance: 3837 * 1000 * 2, role: 'human'},
+  {name: 'Alice', balance: 0, role: 'human'},
+  {name: 'Bob', balance: 0, role: 'human'},
   {name: 'Carole', balance: 0, role: 'human'},
 ]
 
+
+
 // This starter template is using Vue 3 experimental <script setup> SFCs
 // Check out https://github.com/vuejs/rfcs/blob/script-setup-2/active-rfcs/0000-script-setup.md
+</script>
+
+<script>
+const currencyToHash = (currency) => {
+  const params = new URLSearchParams()
+  params.append('e', currency.expression)
+  params.append('m', currency.mode)
+  params.append('upd', currency.uPerDay)
+  params.append('rt', currency.revaluationTime)
+  params.append('st', currency.stepTime)
+  return params.toString()   
+}
+
+const hashToCurrency= (hash) => {
+  const params = new URLSearchParams(hash)
+  const currency = {
+    mode: params.get('m') == 'grew' ? 'grew' : 'melt',
+    expression: params.get('e'),
+    uPerDay: parseInt(params.get('upd')),
+    revaluationTime: parseInt(params.get('rt')),
+    stepTime: parseInt(params.get('st')),
+  }
+  return currency
+}
+
+
+let state = JSON.parse(localStorage.getItem('state'))
+if(window.location.hash) {
+  if (!state) 
+    state = {currency: {}}
+  Object.assign(state.currency, hashToCurrency(window.location.hash.substring(1)))
+}
+
+funiterLib.restoreState(state)
 </script>
 
 
