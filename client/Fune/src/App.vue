@@ -26,15 +26,16 @@
         </fr>
     </p>
 
-    <funiter>
+    <funiter :currency="currency" :accounts="accounts" :selectedAccounts="accounts">
+      <funiter-control class="m-auto" />
       <div class="d-flex align-items-start flex-wrap mb-3" style="justify-content: space-evenly;">
         <div style="min-width: 500px;">
-          <funiter-currency class="m-auto" style="width: 400px;"/>
+          <funiter-currency class="m-auto" style="width: 400px;" />
           <funiter-transaction class="mt-5" />
         </div>
         <div style="min-width: 700px;">
-          <funiter-stats :colors="colors" class="w-auto"/>
-          <funiter-accounts :colors="colors" class="mt-3"/>
+          <funiter-stats :colors="colors" class="w-auto" />
+          <funiter-accounts :colors="colors" class="mt-3" />
         </div>
       </div>
     </funiter>
@@ -45,26 +46,36 @@
 import { ref } from 'vue'
 import funiter from './components/Funiter.vue'
 import { fr, en } from './components/Translate.js'
+import funiterControl from './components/Funiter-Control.vue'
 import funiterCurrency from './components/Funiter-Currency.vue'
 import funiterTransaction from './components/Funiter-Transaction.vue'
 import funiterAccounts from './components/Funiter-Accounts.vue'
 import funiterStats from './components/Funiter-Stats.vue'
 
 
-const colors = ref([ 
+const colors = [ 
   '#FFFFFFDD', '#FE4365DD', '#F9CDADDD', 
   '#83AF9BDD', '#A7226EDD', '#F26B38DD', 
   '#F7DB4FDD', '#CAFDE0DD', '#FFB8EADD',
   '#C3421ADD', '#4F6ABFDD'
-])
+]
+
+const currency = {
+  expression: '(M/N)*0.01',
+  mode: 'grew',
+  uPerDay: 365,
+  stepTime: 1,
+}
+
+const accounts = [
+  {name: 'Alice', balance: 3837 * 1000, role: 'human'},
+  {name: 'Bob', balance: 3837 * 1000 * 2, role: 'human'},
+  {name: 'Carole', balance: 0, role: 'human'},
+]
 
 // This starter template is using Vue 3 experimental <script setup> SFCs
 // Check out https://github.com/vuejs/rfcs/blob/script-setup-2/active-rfcs/0000-script-setup.md
 </script>
 
 
-<style>
-  .pointer {
-    cursor: pointer;
-  }
-</style>
+

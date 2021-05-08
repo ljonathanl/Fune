@@ -1,20 +1,36 @@
 <template>
-  <div class="m-auto text-center"> 
-            <button class="btn btn-primary" @click="funiter.play()" :disabled="funiter.isPlaying"><i class="fa fa-play"></i> play</button>
-            <button class="btn btn-secondary mr-5" @click="funiter.stop()" :disabled="!funiter.isPlaying"><i class="fa fa-pause"></i> pause</button>
-            <button class="btn btn-danger ml-5" @click="funiter.reset()"><i class="fa fa-refresh"></i> reset</button>
-  </div>
   <slot />
 </template>
 
 <script setup>
 import funiter from '../lib/funiterStandalone.js'
-import { onMounted } from 'vue'
+import { defineProps, onMounted } from 'vue'
 
-let lastSave = 0
+const { currency, accounts, selectedAccounts } = defineProps({
+  currency: Object,
+  accounts: Array,
+  selectedAccounts: Array,
+  autoPlay: Boolean,
+})
 
 
-funiter.start({})
-
+if (currency) {
+  funiter.updateCurrency(currency)
+}
+if (accounts) {
+  accounts.forEach(account => {
+    funiter.createAccount(account)
+  })
+}
+if (selectedAccounts) {
+  selectedAccounts.forEach(account => {
+    funiter.select(account)
+  })
+}
 </script>
 
+<style>
+  .pointer {
+    cursor: pointer;
+  }
+</style>

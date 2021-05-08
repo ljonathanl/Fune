@@ -73,10 +73,9 @@ funiter.getCurrency = () => {
 
 funiter.updateCurrency = newCurrency => {
     const isPlaying = funiter.isPlaying
-    const { expression, stepTime, revaluationTime, mode, uPerDay } = newCurrency
     if (isPlaying)
         funiter.stop()
-    Object.assign(state.currency, { expression, stepTime, revaluationTime, mode, uPerDay })
+    Object.assign(state.currency, newCurrency)
     if (isPlaying)
         funiter.play()
     return Object.assign({}, state.currency)
@@ -253,7 +252,7 @@ const play = (autoPlay = true) => {
     let meltValue = 0
     let meltPercent = 0
     
-    const uPerDay = state.currency.uPerDay ? Math.floor(state.currency.uPerDay) : 1
+    const uPerDay = state.currency.uPerDay >= 0 ? Math.floor(state.currency.uPerDay) : 0
     const uGained = uValue * state.currency.revaluationTime * uPerDay
     const funiterAccount = state.accounts[funiter.name]
     
