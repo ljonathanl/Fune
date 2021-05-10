@@ -39,8 +39,14 @@ let funiter = {
     isPlaying: false,
 }
 
+function uuid() {
+    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+}
+
 funiter.doTx = simpleTx => {
-    let tx = Object.assign({from: '', to: '', message: '', value: 0, date: new Date().toISOString(), day: currency.elapsedTime}, simpleTx)
+    let tx = Object.assign({id: uuid(), from: '', to: '', message: '', value: 0, date: new Date().toISOString(), day: currency.elapsedTime}, simpleTx)
     var accountFrom = accounts[tx.from]
     var accountTo = accounts[tx.to]
     if (tx.value <= 0 

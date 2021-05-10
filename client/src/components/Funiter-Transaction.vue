@@ -1,12 +1,12 @@
 <template>
-    <div>
+    <div style="width: 400px;">
         <h4 class="text-center">
             <en>transaction</en>
             <fr>transaction</fr>
         </h4>
         <form>
             <div class="input-group">
-                <input v-model="tx.value" type="number" step="any" class="form-control text-right" style="width: 80px;">
+                <input v-model="tx.value" type="number" step="any" class="form-control text-right">
                 <span class="input-group-text"><small>Ü</small></span>
                 <label class="input-group-text" for="txFrom">
                     <en> fröm </en>
