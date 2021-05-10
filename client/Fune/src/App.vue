@@ -42,7 +42,7 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { watch } from 'vue'
 import funiterLib from './lib/funiterReactive.js'
 import funiter from './components/Funiter.vue'
@@ -53,40 +53,6 @@ import funiterTransaction from './components/Funiter-Transaction.vue'
 import funiterAccounts from './components/Funiter-Accounts.vue'
 import funiterStats from './components/Funiter-Stats.vue'
 
-watch(() => funiterLib.currency,
-  () => {
-    window.location.hash = "#" + currencyToHash(funiterLib.currency)
-    localStorage.setItem('state', JSON.stringify(funiterLib.getState()))
-  }
-)
-
-const colors = [ 
-  '#FFFFFFDD', '#FE4365DD', '#F9CDADDD', 
-  '#83AF9BDD', '#A7226EDD', '#F26B38DD', 
-  '#F7DB4FDD', '#CAFDE0DD', '#FFB8EADD',
-  '#C3421ADD', '#4F6ABFDD'
-]
-
-const currency = {
-  expression: '(M/N)*0.01',
-  mode: 'grew',
-  uPerDay: 365,
-  stepTime: 1,
-}
-
-const accounts = [
-  {name: 'Alice', balance: 0, role: 'human'},
-  {name: 'Bob', balance: 0, role: 'human'},
-  {name: 'Carole', balance: 0, role: 'human'},
-]
-
-
-
-// This starter template is using Vue 3 experimental <script setup> SFCs
-// Check out https://github.com/vuejs/rfcs/blob/script-setup-2/active-rfcs/0000-script-setup.md
-</script>
-
-<script>
 const currencyToHash = (currency) => {
   const params = new URLSearchParams()
   params.append('e', currency.expression)
@@ -118,7 +84,38 @@ if(window.location.hash) {
 }
 
 funiterLib.restoreState(state)
+
 </script>
+
+<script setup>
+
+watch(() => funiterLib.currency,
+  () => {
+    window.location.hash = "#" + currencyToHash(funiterLib.currency)
+    localStorage.setItem('state', JSON.stringify(funiterLib.getState()))
+  }
+)
+
+const colors = [ 
+  '#FFFFFFDD', '#FE4365DD', '#F9CDADDD', 
+  '#83AF9BDD', '#A7226EDD', '#F26B38DD', 
+  '#F7DB4FDD', '#CAFDE0DD', '#FFB8EADD',
+  '#C3421ADD', '#4F6ABFDD'
+]
+
+const accounts = []
+
+if (funiterLib.accounts.length <= 1) {
+  accounts.push({name: 'Alice', balance: 10000, role: 'human'})
+  accounts.push({name: 'Bob', balance: 20000, role: 'human'})
+  accounts.push({name: 'Carole', balance: 0, role: 'human'})
+}
+
+// This starter template is using Vue 3 experimental <script setup> SFCs
+// Check out https://github.com/vuejs/rfcs/blob/script-setup-2/active-rfcs/0000-script-setup.md
+</script>
+
+
 
 
 

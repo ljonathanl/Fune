@@ -143,6 +143,8 @@ const editedCurrency = reactive({
 })
 
 const lastGrew = computed(() => {
+    if (funiter.currency.lastMelt == 0)
+        return 0
     return ((1 / (1 / (funiter.currency.lastMelt / 100) - 1)) * 100).toFixed(2)
 })
 

@@ -51,11 +51,24 @@ funiterProxy.updateCurrency = newCurrency => {
 /* 
  * ACCOUNT
  */
+funiterProxy.addAccounts = accounts => {
+    if (!accounts)
+        return
+
+    accounts.forEach(account => {
+        if (!funiter.createAccount(account)) 
+          funiter.updateAccount(account.name, account)
+    })
+
+    funiterProxy.refresh()
+}
+
+
 funiterProxy.createAccount = newAccount => {
     let account = funiter.createAccount(newAccount)
     if (account) {
         funiterProxy.accounts.push(account)
-        account = funiterProxy.accounts[funiterProxy.length - 1]
+        funiterProxy.refresh()
     }
     return account
 }
@@ -118,10 +131,15 @@ funiterProxy.stop = () => {
 }
 
 funiterProxy.getState = () => {
-    return funiter.getState()
+    const state = funiter.getState()
+    state.selectedAccounts = funiterProxy.selectedAccounts
+    return state
 }
 
 funiterProxy.restoreState = state => {
+    if (state.selectedAccounts)
+        funiterProxy.selectedAccounts = state.selectedAccounts
+    
     funiter.restoreState(state)
     funiterProxy.refresh()
 }

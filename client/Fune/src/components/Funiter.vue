@@ -13,20 +13,19 @@ const { currency, accounts, selectedAccounts } = defineProps({
   autoPlay: Boolean,
 })
 
-
-if (currency) {
-  funiter.updateCurrency(currency)
-}
-if (accounts) {
-  accounts.forEach(account => {
-    funiter.createAccount(account)
-  })
-}
-if (selectedAccounts) {
-  selectedAccounts.forEach(account => {
-    funiter.select(account)
-  })
-}
+onMounted(() => {
+  if (currency) {
+    funiter.updateCurrency(currency)
+  }
+  if (accounts) {
+    funiter.addAccounts(accounts)
+  }
+  if (selectedAccounts) {
+    selectedAccounts.forEach(account => {
+      funiter.select(account)
+    })
+  }
+})
 </script>
 
 <style>

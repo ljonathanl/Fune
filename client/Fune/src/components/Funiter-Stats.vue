@@ -15,9 +15,11 @@
             auto-draw
             smooth>
         </trends>
-        <div class="w-100">
-            <div class="d-inline-block ml-4">
-                100
+        <div class="w-100 d-flex justify-content-between">
+            <div class="input-group w-auto ml-4">
+                <label class="input-group-text">
+                    100
+                </label>
                 <select v-model="state.statType">
                     <option value="day">
                         <en>days</en>
@@ -33,11 +35,25 @@
                     </option>
                 </select> 
             </div>
-            <div class="custom-control custom-switch d-inline-block mr-2" style="float: right;">
-                <input type="checkbox" class="custom-control-input" id="statsComparedToAverage" v-model="state.comparedToAverage">
-                <label class="custom-control-label text-left" for="statsComparedToAverage" style="width: 50px; vertical-align: baseline;">
-                    {{ state.comparedToAverage ? '%M/N' : 'Ü' }}
+            <div class="ms-auto w-auto input-group mr-4">
+                <label class="input-group-text">  
+                    <en>referential</en>
+                    <fr>référentiel</fr>
                 </label>
+                <select v-model="state.referential">
+                    <option value="relative">
+                        <en>relative</en>
+                        <fr>relatif</fr>
+                    </option>
+                    <option value="quantitative">
+                        <en>quantitative</en>
+                        <fr>quantitatif</fr>
+                    </option>
+                    <option value="average">
+                        <en>average</en>
+                        <fr>moyenne</fr>
+                    </option>
+                </select> 
             </div>
         </div>
     </div>
@@ -55,55 +71,55 @@ const { colors } = defineProps({
 })
 
 const state = reactive({
-    comparedToAverage: false,
+    referential: 'relative',
     statType: 'day',
     stats: [],
 })
 
-watch(() => funiter.selectedAccounts.length,
-    () => {
-        getStats()
-    }
-)
-
-watch(() => funiter.currency.elapsedTime,
-    () => {
-        getStats()
-    }
-)
-
-watch(() => state.comparedToAverage, 
-    () => {
-        getStats()
-    }
-)
-
-watch(() => state.statType, 
-    () => {
-        getStats()
-    }
-)
-
 const getStats = () => {
     let funeStat = funiter.getAccountStats(funiter.name, state.statType)
-    let stats = [funeStat]
+    let stats = [[]]
     for (let index = 1; index < funiter.selectedAccounts.length; index++) {
         const account = funiter.selectedAccounts[index];
         if (account) {
             let stat = funiter.getAccountStats(account, state.statType)
-            if (state.comparedToAverage) {
+            if (state.referential == 'average') {
                 for (let j = 0; j < stat.length; j++) {
-                    stat[j] = funeStat[j] == 0 ? 0 : (stat[j] / funeStat[j]) * 100000;
+                    stat[j] = funeStat[j].average == 0 ? 0 : (stat[j] / funeStat[j].average) * 100000;
+                }
+            } else if (state.referential == 'quantitative') {
+                for (let j = 0; j < stat.length; j++) {
+                    stat[j] = stat[j] * funeStat[j].quantitative;
                 }
             }
             stats.push(stat)
         }
     }
-    if (state.comparedToAverage) {
+
+    if (state.referential == 'average') {
         stats[0] = new Array(funeStat.length).fill(100000)
-    } 
+    } else if (state.referential == 'relative') {
+        stats[0] = funeStat.map(c => {
+            return c.average
+        })
+    } else if (state.referential == 'quantitative') {
+        stats[0] = funeStat.map(c => {
+            return c.average * c.quantitative
+        })
+    }
     state.stats = stats
+    console.log("stats")
 }
+
+watch(() => funiter.selectedAccounts.length, getStats)
+
+watch(() => funiter.currency, getStats, { deep: true})
+
+watch(() => state.comparedToAverage,  getStats)
+
+watch(() => state.statType,  getStats)
+
+
 
 onMounted(() => {
     getStats()
