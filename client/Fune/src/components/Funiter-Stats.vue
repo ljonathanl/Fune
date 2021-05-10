@@ -108,14 +108,13 @@ const getStats = () => {
         })
     }
     state.stats = stats
-    console.log("stats")
 }
 
 watch(() => funiter.selectedAccounts.length, getStats)
 
 watch(() => funiter.currency, getStats, { deep: true})
 
-watch(() => state.comparedToAverage,  getStats)
+watch(() => state.referential,  getStats)
 
 watch(() => state.statType,  getStats)
 

@@ -370,6 +370,7 @@ funiter.reset = () => {
     state.stats = {}
     state.currency.elapsedTime = 0
     state.currency.lastMelt = 0
+    state.currency.quantitative = 1
     refreshCurrencyAndStats()
 }
 

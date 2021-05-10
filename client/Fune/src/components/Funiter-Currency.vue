@@ -92,10 +92,21 @@
                     <en>average</en>
                     <fr>moyenne</fr>
                 </label>
-                <input id="currencyAvg" :value="funiter.currency.nbMembers > 0 ? funiter.currencyWithoutDecimal(funiter.currency.monetaryMass / funiter.currency.nbMembers) : 0" type="text" class="form-control text-right" disabled>
+                <input id="currencyAvg" :value="funiter.currencyWithoutDecimal(funiter.currency.average)" type="text" class="form-control text-right" disabled>
                 <span class="input-group-text">
                     <en>Ü / Üman</en>
                     <fr>Ü / Ümain</fr>
+                </span>
+            </div>
+            <div class="input-group mb-3">
+                <label class="input-group-text" for="currencyQuantitative">
+                    <en>quantitative value</en>
+                    <fr>valeur quantitative</fr>
+                </label>
+                <input id="currencyQuantitative" :value="funiter.currency.quantitative.toFixed(2)" type="text" class="form-control text-right" disabled>
+                <span class="input-group-text">
+                    <en>Ü(0) / Ü</en>
+                    <fr>Ü(0) / Ü</fr>
                 </span>
             </div>
             <div class="input-group mb-3">
