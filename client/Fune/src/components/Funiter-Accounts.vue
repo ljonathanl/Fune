@@ -42,10 +42,10 @@
                                 <en>wället</en>
                                 <fr>sïmple</fr>
                             </option>
-                            <option value="bank">
+                            <!-- <option value="bank">
                                 <en>bänk</en>
                                 <fr>bänque</fr>
-                            </option>
+                            </option> -->
                         </select>
                     </td>
                     <td></td>
@@ -121,7 +121,7 @@ const state = reactive({
 
 
 const sortedAccounts = computed(() => {
-    let filteredAccount = funiter.accounts
+    let filteredAccount = funiter.accounts.filter(a => a.role != "bank")
     if (state.onlySelected) {
         filteredAccount = filteredAccount.filter(a => funiter.isSelected(a))
     }

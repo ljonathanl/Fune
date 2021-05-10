@@ -96,7 +96,7 @@ function genPath(points, radius) {
 }
 
 var Path = {
-  props: ['smooth', 'data', 'boundary', 'radius', 'id', 'max', 'min', 'color'],
+  props: ['smooth', 'data', 'boundary', 'radius', 'id', 'max', 'min', 'color', 'width', 'dash'],
 
   render: function render() {
     var ref = this;
@@ -107,6 +107,8 @@ var Path = {
     var id = ref.id;
     var max = ref.max;
     var min = ref.min;
+    var width = ref.width;
+    var dash = ref.dash
     var points = genPoints(data, boundary, { max: max, min: min });
     var d = genPath(points, smooth ? radius : 0);
 
@@ -118,7 +120,7 @@ var Path = {
     }
 
     return h('path', {
-      d: d, fill: 'none', stroke: strokeValue
+      d: d, fill: 'none', stroke: strokeValue, 'stroke-width': width, 'stroke-dasharray': dash
     })
   }
 };
@@ -314,7 +316,9 @@ var Trend = {
           max: this.max,
           min: this.min,
           id: 'stats',
-          ref: 'path'
+          ref: 'path',
+          width: 1,
+          dash: '0'
         })
       ]
     )
@@ -367,7 +371,7 @@ var Trends = {
     var max = 10;
     for (let i = 0; i < this.data.length; i++) {
       const element = this.data[i];
-      if (element && element.length > 2) {
+      if (element && element.length > 1) {
         for (let j = 0; j < element.length; j++) {
           max = Math.max(max, element[j])
         }
@@ -388,7 +392,9 @@ var Trends = {
             min: this.min,
             id: 'stats',
             ref: 'path' + index,
-            color: this.colors[index]
+            color: this.colors[index],
+            width: index == 0 ? 1.3 : 1,
+            dash: index == 0 ? '2 2' : '0'
           })
         )
       }

@@ -36,7 +36,7 @@ const funiter = {
     isPlaying: false,
 }
 
-funiter.doTx = simpleTx => {
+funiter.doTx = (simpleTx, refresh = true) => {
     let tx = Object.assign({from: '', to: '', message: '', value: 0, date: new Date().toISOString(), day: state.currency.elapsedTime}, simpleTx)
     var accountFrom = state.accounts[tx.from]
     var accountTo = state.accounts[tx.to]
@@ -59,6 +59,8 @@ funiter.doTx = simpleTx => {
     state.transactions.push(tx)
     if (state.transactions.length > txLimit) 
         state.transactions = state.transactions.slice(state.transactions.length - txLimit)
+    if (refresh)
+        refreshCurrencyAndStats()
     return tx
 }
 
@@ -100,6 +102,7 @@ funiter.createAccount = newAccount => {
         return null
 
     let account = state.accounts[newAccount.name] = Object.assign({name: '', balance: 0, role: 'wallet', date: new Date().toISOString(), creationDay: state.currency.elapsedTime}, newAccount)
+    refreshCurrencyAndStats()
     return account
 }
 
@@ -107,8 +110,8 @@ funiter.updateAccount = (id, newAccount) => {
     let account = state.accounts[id]
     if (!account || account.role == 'bank' || (newAccount.name && id != newAccount.name)) 
         return null
-    
     account = Object.assign(account, newAccount)
+    refreshCurrencyAndStats()
     return account
 }
 
@@ -119,6 +122,7 @@ funiter.deleteAccount = id => {
 
     delete state.accounts[id]
     delete state.stats[id]
+    refreshCurrencyAndStats()
     return account
 }
 
@@ -150,7 +154,7 @@ funiter.getAccountStats = (id, period = statTypes.day) => {
         return []
 
     if (state.currency.elapsedTime < statPeriods[period])
-        return [0, 0]
+        return [stat[0], stat[0]]
     
     let index = (Math.floor(state.currency.elapsedTime / statPeriods[period]) + 1) % statLimit
     if (index > 0 && state.currency.elapsedTime < statPeriods[period] * statLimit) 
@@ -184,9 +188,138 @@ const defaultCurrency = {
     monetaryMass: 0,
     mode: modes.melt,
     lastMelt: 0,
+    average: 0,
+    quantitative: 1,
     expression: '10/100'
 }
 
+funiter.expressionParser = (expression, values) => {
+    return parseFloat(expression)
+}
+
+
+const cheatRegex = /!x(\d+)/
+const uValue = funiter.uValue
+const revaluationMessage = '!revaluation%'
+const creationMessage = '!1Ucreation'
+
+const getStatInfo = () => {
+    return {
+        isStatMonth: state.currency.elapsedTime % statPeriods.month == 0,
+        isStatYear: state.currency.elapsedTime % statPeriods.year == 0,
+        statDayIndex: state.currency.elapsedTime % statLimit,
+        statMonthIndex: (state.currency.elapsedTime / statPeriods.month) % statLimit,
+        statYearIndex: (state.currency.elapsedTime / statPeriods.year) % statLimit,
+    }
+}
+
+const saveStat = (account, value, statInfo = null) => {
+    if (!statInfo)
+        statInfo = getStatInfo()
+    let stat = state.stats[account.name]
+    if (!stat) {
+        stat = {}
+        stat[statTypes.day] = new Array(statLimit).fill(0)
+        stat[statTypes.month] = new Array(statLimit).fill(0)
+        stat[statTypes.year] = new Array(statLimit).fill(0)
+        state.stats[account.name] = stat
+    }
+    stat[statTypes.day][statInfo.statDayIndex] = value
+    if (statInfo.isStatMonth) 
+        stat[statTypes.month][statInfo.statMonthIndex] = value
+    if (statInfo.isStatYear) 
+        stat[statTypes.year][statInfo.statYearIndex] = value    
+}
+
+const saveCurrencyStat = (statInfo = null) => {
+    if (!statInfo)
+        statInfo = getStatInfo()
+    let value = Object.assign({}, state.currency)
+    let stat = state.stats[funiter.name]
+    if (!stat) {
+        stat = {}
+        stat[statTypes.day] = new Array(statLimit).fill(defaultCurrency)
+        stat[statTypes.month] = new Array(statLimit).fill(defaultCurrency)
+        stat[statTypes.year] = new Array(statLimit).fill(defaultCurrency)
+        state.stats[funiter.name] = stat
+    }
+    stat[statTypes.day][statInfo.statDayIndex] = value
+    if (statInfo.isStatMonth) 
+        stat[statTypes.month][statInfo.statMonthIndex] = value
+    if (statInfo.isStatYear) 
+        stat[statTypes.year][statInfo.statYearIndex] = value    
+}
+
+const refreshCurrencyAndStats = () => {
+    let monetaryMass = 0
+    let nbMembers = 0
+
+    const statInfo = getStatInfo()
+    Object.values(state.accounts).forEach(account => {
+        const cheat = account.name.match(cheatRegex)
+        let weight = 1
+        if (cheat)
+            weight = parseInt(cheat[1]) 
+
+        if (account.role == roles.human) 
+            nbMembers += weight
+            
+        if (account.role != roles.bank) {
+            monetaryMass += account.balance * weight
+            saveStat(account, account.balance, statInfo)
+        }
+    })
+
+    state.currency.nbMembers = nbMembers
+    state.currency.monetaryMass = monetaryMass
+    state.currency.average = nbMembers > 0 ? Math.floor(monetaryMass / nbMembers) : 0
+    saveCurrencyStat(statInfo)
+}
+
+const play = (autoPlay = true) => {
+    state.currency.elapsedTime++
+    
+    let meltValue = 0
+    let meltPercent = 0
+    
+    const uPerDay = state.currency.uPerDay >= 0 ? Math.floor(state.currency.uPerDay) : 0
+    const uGained = uValue * state.currency.revaluationTime * uPerDay
+    const funiterAccount = state.accounts[funiter.name]
+    
+    const isRevaluation = state.currency.elapsedTime % state.currency.revaluationTime == 0
+
+    if (isRevaluation && state.currency.nbMembers > 0) {
+        meltValue = funiter.expressionParser(state.currency.expression, {M: state.currency.monetaryMass / uGained, N: state.currency.nbMembers, T: state.currency.elapsedTime})
+        if (state.currency.mode == modes.grew) 
+            meltValue = 1 - 1 / (1 + meltValue)
+        meltValue = Math.max(0, Math.min(1, meltValue))
+        meltPercent = (meltValue * 100).toFixed(2)
+    }
+
+    Object.values(state.accounts).forEach(account => {
+        if (isRevaluation && meltValue > 0) {
+            let melting = account.balance * meltValue
+            melting = Math.min(melting > uGained ? Math.ceil(melting) : Math.floor(melting), account.balance)
+            funiter.doTx({from: account.name, to: funiterAccount.name, message: revaluationMessage + meltPercent, value: melting}, false)
+        }    
+        if (account.role == roles.human) {
+            funiter.doTx({from: funiterAccount.name, to: account.name, message: creationMessage, value: uValue * uPerDay}, false)
+        }
+    })
+
+    
+    if (isRevaluation) {
+        state.currency.lastMelt = meltPercent
+        state.currency.quantitative = state.currency.quantitative + 1 / ( ( 1 / meltValue ) - 1)
+    }
+    
+    refreshCurrencyAndStats()
+
+    if (autoPlay)
+        timeOutId = setTimeout(play, state.currency.stepTime * 1000, true)
+
+    funiter.onDayChange(state.currency.elapsedTime)
+}
 
 funiter.restoreState = savedState => {
     if (!savedState)
@@ -200,10 +333,6 @@ funiter.restoreState = savedState => {
         state.transactions = savedState.transactions
     if (savedState.stats) 
         state.stats = savedState.stats
-}
-
-funiter.expressionParser = (expression, values) => {
-    return parseFloat(expression)
 }
 
 
@@ -225,15 +354,6 @@ funiter.start = (expressionParser, initialState) => {
 
     if (!state.stats) 
         state.stats = {}
-
-    if (!state.stats[funiter.name]) {
-        const stat = {}
-        stat[statTypes.day] = new Array(statLimit).fill(0)
-        stat[statTypes.month] = new Array(statLimit).fill(0)
-        stat[statTypes.year] = new Array(statLimit).fill(0)
-        state.stats[funiter.name] = stat
-    }
-        
 }
 
 
@@ -241,109 +361,16 @@ funiter.onDayChange = () => {
     // nothing
 }
 
-const cheatRegex = /!x(\d+)/
-const uValue = funiter.uValue
-const revaluationMessage = '!revaluation%'
-const creationMessage = '!1Ucreation'
-
-const play = (autoPlay = true) => {
-    state.currency.elapsedTime++
-    
-    let monetaryMass = 0
-    let nbMembers = 0
-    let meltValue = 0
-    let meltPercent = 0
-    
-    const uPerDay = state.currency.uPerDay >= 0 ? Math.floor(state.currency.uPerDay) : 0
-    const uGained = uValue * state.currency.revaluationTime * uPerDay
-    const funiterAccount = state.accounts[funiter.name]
-    
-    const isStatMonth = state.currency.elapsedTime % statPeriods.month == 0
-    const isStatYear = state.currency.elapsedTime % statPeriods.year == 0
-    const statDayIndex = state.currency.elapsedTime % statLimit
-    const statMonthIndex = isStatMonth ? (state.currency.elapsedTime / statPeriods.month) % statLimit : 0 
-    const statYearIndex = isStatYear ? (state.currency.elapsedTime / statPeriods.year) % statLimit : 0 
-
-    const isRevaluation = state.currency.elapsedTime % state.currency.revaluationTime == 0
-
-    if (isRevaluation && state.currency.nbMembers > 0) {
-        meltValue = funiter.expressionParser(state.currency.expression, {M: state.currency.monetaryMass / uGained, N: state.currency.nbMembers, T: state.currency.elapsedTime})
-        if (state.currency.mode == modes.grew) 
-            meltValue = 1 - 1 / (1 + meltValue)
-        meltValue = Math.max(0, Math.min(1, meltValue))
-        meltPercent = (meltValue * 100).toFixed(2)
-    }
-
-    Object.values(state.accounts).forEach(account => {
-        const cheat = account.name.match(cheatRegex)
-        let weight = 1
-        if (cheat)
-            weight = parseInt(cheat[1]) 
-
-        if (isRevaluation && meltValue > 0) {
-            let melting = account.balance * meltValue
-            melting = Math.min(melting > uGained ? Math.ceil(melting) : Math.floor(melting), account.balance)
-            funiter.doTx({from: account.name, to: funiterAccount.name, message: revaluationMessage + meltPercent, value: melting})
-        }    
-        if (account.role == roles.human) {
-            nbMembers += weight
-            funiter.doTx({from: funiterAccount.name, to: account.name, message: creationMessage, value: uValue * uPerDay})
-        }
-        monetaryMass += account.balance * weight
-        if (account.role != roles.bank) {
-            let stat = state.stats[account.name]
-            if (!stat) {
-                stat = {}
-                stat[statTypes.day] = new Array(statLimit).fill(0)
-                stat[statTypes.month] = new Array(statLimit).fill(0)
-                stat[statTypes.year] = new Array(statLimit).fill(0)
-                state.stats[account.name] = stat
-            }
-            stat[statTypes.day][statDayIndex] = account.balance
-            if (isStatMonth) 
-                stat[statTypes.month][statMonthIndex] = account.balance
-            if (isStatYear) 
-                stat[statTypes.year][statYearIndex] = account.balance    
-        }
-    });
-
-    state.currency.nbMembers = nbMembers
-    state.currency.monetaryMass = monetaryMass
-    state.currency.average = nbMembers > 0 ? Math.floor(monetaryMass / nbMembers) : 0
-    let statFuniter = state.stats[funiter.name]
-    statFuniter[statTypes.day][statDayIndex] = state.currency.average
-    if (isStatMonth) 
-        statFuniter[statTypes.month][statMonthIndex] = state.currency.average
-    if (isStatYear) 
-        statFuniter[statTypes.year][statYearIndex] = state.currency.average
-
-
-    if (isRevaluation)
-        state.currency.lastMelt = meltPercent
-    
-    if (autoPlay)
-        timeOutId = setTimeout(play, state.currency.stepTime * 1000, true)
-
-    funiter.onDayChange(state.currency.elapsedTime)
-}
-
 funiter.reset = () => {
     funiter.stop()
     Object.values(state.accounts).forEach(account => {
         account.balance = 0
-        if (account.role == roles.human)
-            account.role = roles.wallet
-        const stat = {}
-        stat[statTypes.day] = new Array(statLimit).fill(0)
-        stat[statTypes.month] = new Array(statLimit).fill(0)
-        stat[statTypes.year] = new Array(statLimit).fill(0)
-        state.stats[account.name] = stat
     })
     state.transactions = []
+    state.stats = {}
     state.currency.elapsedTime = 0
     state.currency.lastMelt = 0
-    state.currency.monetaryMass = 0
-    state.currency.nbMembers = 0
+    refreshCurrencyAndStats()
 }
 
 funiter.play = (autoPlay = true) => {
