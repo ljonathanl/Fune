@@ -8,20 +8,13 @@ import funiter from './public/funiter.js'
 const version = process.env.npm_package_version
 const app = express()
 app.use(express.json())
-app.use(express.static('public'))
+app.use(express.static('client/dist'))
 app.use(morgan('tiny'))
 
 app.get('/', function(req, res){
-    res.sendFile('/public/standalone.html', { root: '.' });
+    res.sendFile('/client/dist/index.html', { root: '.' });
 })
 
-app.get('/admin', function(req, res){
-    res.sendFile('/public/admin.html', { root: '.' });
-})
-
-app.get('/account', function(req, res){
-    res.sendFile('/public/account.html', { root: '.' });
-})
 
 /*
  * ABOUT
