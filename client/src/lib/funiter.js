@@ -297,12 +297,14 @@ const play = (autoPlay = true) => {
     }
 
     Object.values(state.accounts).forEach(account => {
-        if (isRevaluation && meltValue > 0) {
+        if (isRevaluation && meltValue > 0 && account.balance > 9) {
             let melting = account.balance * meltValue
             melting = Math.min(melting > uGained ? Math.ceil(melting) : Math.floor(melting), account.balance)
+            if (melting < 10)
+                melting = 10
             funiter.doTx({from: account.name, to: funiterAccount.name, message: revaluationMessage + meltPercent, value: melting}, false)
         }    
-        if (account.role == roles.human) {
+        if (account.role == roles.human && uPerDay > 0) {
             funiter.doTx({from: funiterAccount.name, to: account.name, message: creationMessage, value: uValue * uPerDay}, false)
         }
     })

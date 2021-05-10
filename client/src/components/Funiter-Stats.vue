@@ -112,7 +112,7 @@ const getStats = () => {
 
 watch(() => funiter.selectedAccounts.length, getStats)
 
-watch(() => funiter.currency, getStats, { deep: true})
+watch(() => funiter.currency, getStats, { deep: true })
 
 watch(() => state.referential,  getStats)
 

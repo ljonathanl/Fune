@@ -30,14 +30,16 @@
       <funiter-control class="m-auto" />
       <div class="d-flex align-items-start flex-wrap mb-3" style="justify-content: space-evenly;">
         <div style="min-width: 500px;">
-          <funiter-currency class="m-auto" style="width: 400px;" />
+          <funiter-currency style="width: 400px;" />
           <funiter-transaction class="mt-5" />
+          <funiter-account class="mt-5" />
         </div>
         <div style="min-width: 700px;">
           <funiter-stats :colors="colors" class="w-auto" />
-          <funiter-accounts :colors="colors" class="mt-3" />
+          <funiter-accounts :colors="colors" class="mt-5" />
         </div>
       </div>
+      
     </funiter>
   </div>
 </template>
@@ -50,6 +52,7 @@ import { fr, en } from './components/Translate.js'
 import funiterControl from './components/Funiter-Control.vue'
 import funiterCurrency from './components/Funiter-Currency.vue'
 import funiterTransaction from './components/Funiter-Transaction.vue'
+import funiterAccount from './components/Funiter-Account.vue'
 import funiterAccounts from './components/Funiter-Accounts.vue'
 import funiterStats from './components/Funiter-Stats.vue'
 
