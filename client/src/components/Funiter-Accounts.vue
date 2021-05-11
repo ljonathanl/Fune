@@ -4,14 +4,49 @@
             <en>accounts</en>
             <fr>comptes</fr> 
         </h4>
-        <table class="table table-hover">
+
+        <div class="input-group">
+            <span class="input-group-text">
+                <en>name</en>
+                <fr>nom</fr>
+            </span>
+            <input v-model="state.newAccount.name" type="text" class="form-control" id="accountName" maxlength="10"/>
+            <span class="input-group-text ml-5">
+                <en>role</en>
+                <fr>rôle</fr>
+            </span>
+            <select v-model="state.newAccount.role" class="form-control">
+                <option value="human">
+                    <en>Üman</en>
+                    <fr>Ümain</fr>
+                </option>
+                <option value="wallet">
+                    <en>wället</en>
+                    <fr>sïmple</fr>
+                </option>
+                <!-- <option value="bank">
+                    <en>bänk</en>
+                    <fr>bänque</fr>
+                </option> -->
+            </select>
+            <button 
+                type="button" 
+                :disabled="3 > state.newAccount.name.length || funiter.accounts.some(_ => _.name == state.newAccount.name)" 
+                class="btn btn-primary ml-5" 
+                @click="createAccount()">
+                <en>nëw!</en>
+                <fr>noüveau!</fr>
+            </button>
+        </div>
+
+        <table class="table table-hover mt-5">
             <thead>
                 <tr>
-                    <th @click="state.onlySelected = !state.onlySelected" :class="{'bg-primary': state.onlySelected}" class="pointer">
+                    <th @click="state.onlySelected = !state.onlySelected" :class="{'bg-primary': state.onlySelected}" class="pointer" style="width: 20px;">
                         <en>stats</en>
                         <fr>stats</fr> 
                     </th>
-                    <th @click="sortBy('name')" class="pointer">
+                    <th @click="sortBy('name')" class="pointer" style="width: 250px;">
                         <en>name</en>
                         <fr>nom</fr> 
                     </th>
@@ -27,45 +62,12 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td></td>
-                    <td>
-                        <input :placeholder="translate({en: 'näme', fr: 'nöm'})" v-model="state.newAccount.name" type="text" class="form-control" id="accountName" maxlength="10"/>
-                    </td>
-                    <td class="text-center">
-                        <select v-model="state.newAccount.role" class="form-control">
-                            <option value="human">
-                                <en>Üman</en>
-                                <fr>Ümain</fr>
-                            </option>
-                            <option value="wallet">
-                                <en>wället</en>
-                                <fr>sïmple</fr>
-                            </option>
-                            <!-- <option value="bank">
-                                <en>bänk</en>
-                                <fr>bänque</fr>
-                            </option> -->
-                        </select>
-                    </td>
-                    <td></td>
-                    <td class="text-right">
-                        <button 
-                            type="button" 
-                            :disabled="3 > state.newAccount.name.length || funiter.accounts.some(_ => _.name == state.newAccount.name)" 
-                            class="btn btn-primary" 
-                            @click="createAccount()">
-                            <en>nëw!</en>
-                            <fr>noüveau!</fr>
-                        </button>
-                    </td>
-                </tr>
                 <tr v-for="account in sortedAccounts" :key="account.name">
                     <td :style="{'background-color': getColor(account)}" @click="funiter.select(account)" class="pointer"></td>
                     <td @click="funiter.select(account)" class="pointer">
                         {{ account.name }}
                     </td>
-                    <td class="text-left">
+                    <td class="text-center">
                         <span v-if="account.role == 'human'" class="badge bg-primary mr-3" style="width: 50px;">
                             <en><small>Ü</small>man</en>
                             <fr><small>Ü</small>main</fr>

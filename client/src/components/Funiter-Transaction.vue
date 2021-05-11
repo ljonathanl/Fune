@@ -1,5 +1,5 @@
 <template>
-    <div style="width: 400px;">
+    <div>
         <h4 class="text-center">
             <en>transaction</en>
             <fr>transaction</fr>
