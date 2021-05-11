@@ -1,5 +1,5 @@
 import funiter from '../lib/funiter.js'
-import { evaluate } from 'mathjs'
+import { evaluate } from 'mathjs/number'
 import { reactive } from 'vue'
 
 const funiterProxy = reactive({
