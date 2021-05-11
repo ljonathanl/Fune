@@ -382,7 +382,7 @@ funiter.play = (autoPlay = true) => {
             clearTimeout(timeOutId)
             timeOutId = 0
         }
-        funiter.isPlaying = true
+        funiter.isPlaying = autoPlay
         play(autoPlay)
     }
 }
