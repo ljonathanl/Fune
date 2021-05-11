@@ -28,6 +28,7 @@ onMounted(() => {
 })
 </script>
 
+
 <style>
   .pointer {
     cursor: pointer;
