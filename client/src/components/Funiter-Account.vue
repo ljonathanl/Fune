@@ -63,6 +63,7 @@
                                     <strong>{{ otherAccount.name }}</strong>
                                 </option>
                             </select>
+                            <button type="button" class="btn btn-primary ml-3" @click="doTx()">ök!</button>
                         </div>
                         <div class="input-group">
                             <label class="input-group-text" for="txMessage" style="width: 90px;">
@@ -70,7 +71,6 @@
                                 <fr>message</fr> 
                             </label>
                             <input v-model="state.tx.message" type="text" maxlength="32" class="form-control" id="txMessage">
-                            <button type="button" class="btn btn-primary" @click="doTx()">ök!</button>
                         </div>
 
                     </div>

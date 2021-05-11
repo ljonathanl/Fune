@@ -105,8 +105,8 @@
                 </label>
                 <input id="currencyQuantitative" :value="funiter.currency.quantitative.toFixed(2)" type="text" class="form-control text-right" disabled>
                 <span class="input-group-text">
-                    <en>Ü(0) / Ü</en>
-                    <fr>Ü(0) / Ü</fr>
+                    <en>Ü / Ü(0)</en>
+                    <fr>Ü / Ü(0)</fr>
                 </span>
             </div>
             <div class="input-group mb-3">

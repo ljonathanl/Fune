@@ -31,7 +31,7 @@
       <div class="d-flex align-items-start flex-wrap mb-3" style="justify-content: space-evenly;">
         <div style="min-width: 500px;">
           <funiter-currency style="width: 400px;" />
-          <funiter-transaction class="mt-5" />
+          <funiter-transaction class="mt-5" style="width: 400px;" />
           <funiter-account class="mt-5" />
         </div>
         <div style="min-width: 700px;">
