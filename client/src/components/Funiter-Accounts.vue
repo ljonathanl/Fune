@@ -1,21 +1,67 @@
 <template>
     <div>
-        <h4 class="text-center">
+        <h4 class="text-center mb-3">
             <en>accounts</en>
             <fr>comptes</fr> 
         </h4>
 
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th @click="state.onlySelected = !state.onlySelected" :class="{'bg-primary': state.onlySelected}" class="pointer" style="width: 25px;">
+                        <en>stats</en>
+                        <fr>stats</fr> 
+                    </th>
+                    <th @click="sortBy('name')" class="pointer">
+                        <en>name</en>
+                        <fr>nom</fr> 
+                    </th>
+                    <th @click="sortBy('role')" class="text-center pointer">
+                        <en>role</en>
+                        <fr>rôle</fr>
+                    </th>
+                    <th @click="sortBy('balance')" class="text-right pointer">
+                        <en>balance</en>
+                        <fr>solde</fr>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="account in sortedAccounts" :key="account.name">
+                    <td :style="{'background-color': getColor(account)}" @click="funiter.select(account)" class="pointer"></td>
+                    <td @click="funiter.select(account)" class="pointer">
+                        {{ account.name }}
+                    </td>
+                    <td class="text-center">
+                        <button v-if="account.role == 'human'" class="btn btn-sm btn-primary" @click="switchAccountRole(account)">
+                            <en><small>Ü</small>man</en>
+                            <fr><small>Ü</small>main</fr>
+                        </button>
+                        <button v-else-if="account.role == 'wallet'" class="btn btn-sm btn-secondary" @click="switchAccountRole(account)">
+                            <en>wället</en>
+                            <fr>sïmple</fr>
+                        </button>
+                        <button v-else class="btn btn-sm btn-danger" disabled>
+                            <en>bänk</en>
+                            <fr>bänque</fr>
+                        </button>
+                    </td>
+                    <td class="text-right">
+                        <template v-if="account.role != 'bank'">
+                            <strong>{{ funiter.currencyDecimal(account.balance) }}<small> Ü </small></strong>
+                            <a href="#" @click.stop.prevent="resetBalance(account)" class="mx-2">
+                                <en>reset</en>
+                                <fr>raz</fr>
+                            </a>
+                        </template>
+                        <a v-if="account.name != funiter.name" href="#" @click.stop.prevent="deleteAccount(account)">x</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
         <div class="input-group">
-            <span class="input-group-text">
-                <en>name</en>
-                <fr>nom</fr>
-            </span>
-            <input v-model="state.newAccount.name" type="text" class="form-control" id="accountName" maxlength="10"/>
-            <span class="input-group-text ml-5">
-                <en>role</en>
-                <fr>rôle</fr>
-            </span>
-            <select v-model="state.newAccount.role" class="form-control">
+            <input :placeholder="translate({en: 'näme', fr: 'nöm'})" v-model="state.newAccount.name" type="text" class="form-control" id="accountName" maxlength="10"/>
+            <select v-model="state.newAccount.role" class="form-control mr-3">
                 <option value="human">
                     <en>Üman</en>
                     <fr>Ümain</fr>
@@ -32,74 +78,12 @@
             <button 
                 type="button" 
                 :disabled="3 > state.newAccount.name.length || funiter.accounts.some(_ => _.name == state.newAccount.name)" 
-                class="btn btn-primary ml-5" 
+                class="btn btn-primary" 
                 @click="createAccount()">
                 <en>nëw!</en>
                 <fr>noüveau!</fr>
             </button>
         </div>
-
-        <table class="table table-hover mt-5">
-            <thead>
-                <tr>
-                    <th @click="state.onlySelected = !state.onlySelected" :class="{'bg-primary': state.onlySelected}" class="pointer" style="width: 20px;">
-                        <en>stats</en>
-                        <fr>stats</fr> 
-                    </th>
-                    <th @click="sortBy('name')" class="pointer" style="width: 250px;">
-                        <en>name</en>
-                        <fr>nom</fr> 
-                    </th>
-                    <th @click="sortBy('role')" class="text-center pointer">
-                        <en>role</en>
-                        <fr>rôle</fr>
-                    </th>
-                    <th @click="sortBy('balance')" class="text-right pointer">
-                        <en>balance</en>
-                        <fr>solde</fr>
-                    </th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="account in sortedAccounts" :key="account.name">
-                    <td :style="{'background-color': getColor(account)}" @click="funiter.select(account)" class="pointer"></td>
-                    <td @click="funiter.select(account)" class="pointer">
-                        {{ account.name }}
-                    </td>
-                    <td class="text-center">
-                        <span v-if="account.role == 'human'" class="badge bg-primary mr-3" style="width: 50px;">
-                            <en><small>Ü</small>man</en>
-                            <fr><small>Ü</small>main</fr>
-                        </span>
-                        <span v-else-if="account.role == 'wallet'" class="badge bg-secondary mr-3" style="width: 50px;">
-                            <en>wället</en>
-                            <fr>sïmple</fr>
-                        </span>
-                        <span v-else class="badge bg-danger mr-3" style="width: 50px;">
-                            <en>bänk</en>
-                            <fr>bänque</fr>
-                        </span>
-                        <a v-if="account.role != 'bank'" href="#" @click.stop.prevent="switchAccountRole(account)">
-                            <en>change</en>
-                            <fr>modifier</fr>
-                        </a>
-                    </td>
-                    <td class="text-right">
-                        <template v-if="account.role != 'bank'">
-                            <strong>{{ funiter.currencyDecimal(account.balance) }}<small class="mr-3"> Ü </small></strong>
-                            <a href="#" @click.stop.prevent="resetBalance(account)">
-                                <en>reset</en>
-                                <fr>raz</fr>
-                            </a>
-                        </template>
-                    </td>
-                    <td class="text-right">
-                        <a v-if="account.name != funiter.name" href="#" @click.stop.prevent="deleteAccount(account)">x</a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
     </div>
 </template>
 
