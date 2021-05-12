@@ -11,7 +11,7 @@
                     <fr>réévaluation de Ü</fr>
                 </label>
                 <select v-model="editedCurrency.mode" id="currencyMode" class="form-select w-50"
-                    :class="{'bg-primary': editedCurrency.mode != funiter.currency.mode}">
+                    :class="{'bg-primary': editedCurrency.mode != funiter.currency.mode}" :disabled="funiter.isPlaying">
                     <option value="melt">
                         <en>melting</en>
                         <fr>fonte</fr>
@@ -26,7 +26,7 @@
                 <span class="input-group-text" v-if="editedCurrency.mode == 'melt'">Ü(t-1) = ( 1 - </span>
                 <span class="input-group-text" v-else>Ü(t+1) = ( 1 + </span>
                 <input id="currencyExpression" v-model="editedCurrency.expression" type="text" class="form-control text-right"
-                    :class="{'bg-primary': editedCurrency.expression != funiter.currency.expression}">
+                    :class="{'bg-primary': editedCurrency.expression != funiter.currency.expression}" :disabled="funiter.isPlaying">
                 <span class="input-group-text"> ) Ü(t)</span>    
             </div>
             <div class="input-group mb-3">
@@ -35,7 +35,7 @@
                     <fr>Ü par jour</fr>
                 </label>
                 <input id="currencyUPerDay" v-model="editedCurrency.uPerDay" type="number" min="0" max="1000" step="1" class="form-control text-right"
-                    :class="{'bg-primary': editedCurrency.uPerDay != funiter.currency.uPerDay}">
+                    :class="{'bg-primary': editedCurrency.uPerDay != funiter.currency.uPerDay}" :disabled="funiter.isPlaying">
                 <span class="input-group-text">Ü</span>
             </div>
             <div class="input-group mb-3">
@@ -44,7 +44,7 @@
                     <fr>réévaluation</fr>
                 </label>
                 <input id="currencyRevaluationTime" v-model="editedCurrency.revaluationTime" type="number" min="1" max="400" step="1" class="form-control text-right" 
-                    :class="{'bg-primary': editedCurrency.revaluationTime != funiter.currency.revaluationTime}">
+                    :class="{'bg-primary': editedCurrency.revaluationTime != funiter.currency.revaluationTime}" :disabled="funiter.isPlaying">
                 <span class="input-group-text">
                     <en>day<span v-if="editedCurrency.revaluationTime > 1">s</span></en>
                     <fr>jour<span v-if="editedCurrency.revaluationTime > 1">s</span></fr>
@@ -56,7 +56,7 @@
                     <fr>durée d'un jour</fr>
                 </label>
                 <input id="currencyStepTime" v-model="editedCurrency.stepTime" type="number" min="1" max="90000" step="1" class="form-control text-right"
-                    :class="{'bg-primary': editedCurrency.stepTime != funiter.currency.stepTime}">
+                    :class="{'bg-primary': editedCurrency.stepTime != funiter.currency.stepTime}" :disabled="funiter.isPlaying">
                 <span class="input-group-text">
                     <en>second<span v-if="editedCurrency.stepTime > 1">s</span></en>
                     <fr>seconde<span v-if="editedCurrency.stepTime > 1">s</span></fr>
@@ -143,7 +143,7 @@
 <script setup>
 import funiter from '../lib/funiterReactive.js'
 import { fr, en } from './Translate.js'
-import { reactive, computed, onMounted } from 'vue'
+import { reactive, computed, onMounted, watch } from 'vue'
 
 const editedCurrency = reactive({
     expression: '',
@@ -173,6 +173,16 @@ const updateCurrency = () => {
     const { expression, mode, uPerDay, revaluationTime, stepTime } = editedCurrency
     funiter.updateCurrency({ expression, mode, uPerDay, revaluationTime, stepTime })
 }
+
+watch(() => [
+    funiter.currency.expression,
+    funiter.currency.mode,
+    funiter.currency.uPerDay,
+    funiter.currency.revaluationTime,
+    funiter.currency.stepTime
+], () => {
+    Object.assign(editedCurrency, funiter.currency)
+})
 
 onMounted(() => {
     Object.assign(editedCurrency, funiter.currency)
