@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h4 class="text-center">
+        <h4 class="text-center mb-3">
             <en>currency</en>
             <fr>monnaie</fr>
         </h4>
@@ -62,7 +62,8 @@
                     <fr>seconde<span v-if="editedCurrency.stepTime > 1">s</span></fr>
                 </span>
             </div>
-            <div class="d-grid gap-2 d-md-flex mb-3" v-if="currencyChange">
+
+            <div class="d-flex align-items-start flex-wrap" style="justify-content: space-evenly;" v-if="currencyChange">
                 <button type="button" class="btn btn-secondary mr-auto" @click="Object.assign(editedCurrency, funiter.currency)">
                     <en>ündo!</en>
                     <fr>annüler!</fr>
@@ -72,6 +73,7 @@
                     <fr>valïder!</fr>
                 </button>
             </div>
+
             <div class="input-group mb-3 mt-5">
                 <label class="input-group-text" for="currencyMass">
                     <en>monetary mass (M)</en>

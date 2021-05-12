@@ -27,17 +27,17 @@
     </p>
 
     <funiter :accounts="accounts" :selectedAccounts="accounts">
-      <funiter-control class="m-auto" />
-      <div class="d-flex align-items-start flex-wrap mt-5" style="justify-content: space-evenly;">
-        <div>
-          <funiter-currency class="mx-auto" style="width: 400px;" />
-          <funiter-transaction class="mx-auto mt-5" style="width: 450px;" />
-          <funiter-account class="mx-auto mt-5" />
-        </div>
-        <div style="min-width: 700px;">
-          <funiter-stats :colors="colors" class="w-auto" />
-          <funiter-accounts :colors="colors" class="mt-5" />
-        </div>
+      <funiter-control class="mx-auto" style="max-width: 400px;" />
+      <div class="d-flex align-items-start flex-wrap mt-3" style="justify-content: space-evenly;">
+          <div>
+            <funiter-stats :colors="colors" class="mb-5" style="min-width: 33vw;" />
+            <funiter-accounts :colors="colors" class="mb-5 mx-auto" style="max-width: 450px;" />
+          </div>  
+          <div>
+            <funiter-currency class="mb-5" style="max-width: 400px;"/>
+            <funiter-transaction class="mb-5 mx-auto" style="max-width: 450px;" />
+          </div>
+        <funiter-account class="mb-5" />
       </div>
       
     </funiter>
@@ -100,7 +100,7 @@ watch(() => funiterLib.currency,
 )
 
 const colors = [ 
-  '#FFFFFFDD', '#FE4365DD', '#F9CDADDD', 
+  '#DDDDDDDD', '#FE4365DD', '#F9CDADDD', 
   '#83AF9BDD', '#A7226EDD', '#F26B38DD', 
   '#F7DB4FDD', '#CAFDE0DD', '#FFB8EADD',
   '#C3421ADD', '#4F6ABFDD'

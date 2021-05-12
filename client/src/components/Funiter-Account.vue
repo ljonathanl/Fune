@@ -1,6 +1,6 @@
 <template>
     <div style="width: 400px;">
-        <h4 class="text-center">
+        <h4 class="text-center mb-3">
             <en>account</en>
             <fr>compte</fr> 
         </h4>
@@ -63,7 +63,7 @@
                                     <strong>{{ otherAccount.name }}</strong>
                                 </option>
                             </select>
-                            <button type="button" class="btn btn-primary ml-3" @click="doTx()">ök!</button>
+                            <button type="button" class="btn btn-primary" @click="doTx()">ök!</button>
                         </div>
                         <div class="input-group">
                             <label class="input-group-text" for="txMessage" style="width: 90px;">

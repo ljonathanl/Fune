@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h4 class="text-center">
+        <h4 class="text-center mb-3">
             <en>stats</en>
             <fr>stats</fr> 
         </h4>
@@ -16,7 +16,7 @@
             smooth>
         </trends>
         <div class="w-100 d-flex justify-content-between">
-            <div class="input-group w-auto ml-4">
+            <div class="input-group w-auto">
                 <label class="input-group-text">
                     100
                 </label>
@@ -35,7 +35,7 @@
                     </option>
                 </select> 
             </div>
-            <div class="ms-auto w-auto input-group mr-4">
+            <div class="ms-auto w-auto input-group">
                 <label class="input-group-text">  
                     <en>referential</en>
                     <fr>référentiel</fr>
