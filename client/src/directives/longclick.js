@@ -3,17 +3,19 @@ export default {
     const delay = 200
     const interval = 50
     if (typeof binding.value !== 'function') {
-      let warn = `[longclick:] provided expression '${binding.expression}' is not a function, but has to be`
-      console.warn(warn) // eslint-disable-line
+      return
     }
 
     let pressTimer = null
     let pressInterval = null
 
     const start = (e) => {
+      console.log("start " + e.type)
       if (e.type === 'click' && e.button !== 0) {
         return
       }
+
+      e.preventDefault();
 
       if (pressTimer === null) {
         handler()
