@@ -15,7 +15,7 @@
             auto-draw
             smooth>
         </trends>
-        <div class="w-100 d-flex justify-content-between">
+        <div class="mx-3 d-flex justify-content-between">
             <div class="input-group w-auto">
                 <label class="input-group-text">
                     100

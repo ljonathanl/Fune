@@ -6,18 +6,17 @@
         </h4>
 
         <div class="mt-3 mb-3">
-            <h2 class="text-center mb-6">
-                <div class="dropdown">
-                    <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                        {{ state.account ? state.account.name : translate({en: 'account', fr: 'compte'}) }}
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="dropdownMenuButton1">
-                        <li v-for="selectedAccount in state.accounts" :value="selectedAccount.name" :key="selectedAccount.name">
-                            <button class="dropdown-item" type="button" @click="state.account = selectedAccount">{{ selectedAccount.name }}</button>
-                        </li>
-                    </ul>
-                </div>
-            </h2>
+            <h3 class="text-center mb-6">
+                <select v-model="state.account">
+                    <option disabled :value="null">
+                        <en>whö</en>
+                        <fr>qüi</fr>
+                    </option>
+                    <option v-for="selectedAccount in state.accounts" :value="selectedAccount" :key="selectedAccount.name">
+                        <strong>{{ selectedAccount.name }}</strong>
+                    </option>
+                </select>
+            </h3>
             <div v-if="state.account">
                 <div class="display-3 text-center">
                     <span>{{ withoutDigit(state.account.balance) }}</span>
@@ -43,18 +42,14 @@
                 </h4>
                 <form class="mb-4 justify-content-center" v-if="state.account.role == 'bank' || state.account.balance > 0">
                     <div>
-                        <div class="input-group" style="width: 400px;">
-                            <label class="input-group-text" for="txMessage" style="width: 90px;">
-                                <en> value </en>
-                                <fr> valeur </fr>
-                            </label>
+                        <div class="input-group mb-3">
                             <input v-model="state.tx.value" type="number" :max="Math.round(state.account.balance/100)" step="any" min="0" class="form-control text-right">
                             <small class="input-group-text">Ü</small>
                             <label class="input-group-text" for="txTo">
                                 <en> tö </en>
                                 <fr> à </fr> 
                             </label>
-                            <select v-model="state.tx.to" id="txTo" class="form-select">
+                            <select v-model="state.tx.to" id="txTo" class="form-control">
                                 <option disabled value="">
                                     <en>someöne</en>
                                     <fr>qüi</fr>
@@ -66,7 +61,7 @@
                             <button type="button" class="btn btn-primary" @click="doTx()">ök!</button>
                         </div>
                         <div class="input-group">
-                            <label class="input-group-text" for="txMessage" style="width: 90px;">
+                            <label class="input-group-text" for="txMessage">
                                 <en>message</en>
                                 <fr>message</fr> 
                             </label>
@@ -90,8 +85,6 @@
                     :stroke-linecap="'butt'"
                     :min="0"
                     :max="1000"
-                    :height="200"
-                    :width="400"
                     auto-draw
                     smooth>
                 </trend>

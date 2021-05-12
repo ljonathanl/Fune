@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <h1 class="display-1 text-center mb-5">
         <!-- <span class="bg-primary pl-1 pr-1 align-middle" style="font-family: monospace;">fї</span> -->
         <img src="/favicon64x64.png"/>
@@ -26,22 +26,24 @@
         </fr>
     </p>
 
-    <funiter :accounts="accounts" :selectedAccounts="accounts">
-      <funiter-control class="mx-auto" style="max-width: 400px;" />
-      <div class="d-flex align-items-start flex-wrap mt-3" style="justify-content: space-evenly;">
-          <div>
-            <funiter-stats :colors="colors" class="mb-5" style="min-width: 33vw;" />
-            <funiter-accounts :colors="colors" class="mb-5 mx-auto" style="max-width: 450px;" />
-          </div>  
-          <div>
-            <funiter-currency class="mb-5" style="max-width: 400px;"/>
-            <funiter-transaction class="mb-5 mx-auto" style="max-width: 450px;" />
-          </div>
-        <funiter-account class="mb-5" />
-      </div>
-      
-    </funiter>
+    
   </div>
+  <funiter :accounts="accounts" :selectedAccounts="accounts">
+    <funiter-data class="mx-auto" style="max-width: 400px;" />
+    <funiter-control class="mx-auto sticky-top" />
+    <div class="d-flex align-items-start flex-wrap mt-3" style="justify-content: space-evenly;">
+        <div>
+          <funiter-stats :colors="colors" class="mb-5" style="min-width: 33vw;" />
+          <funiter-accounts :colors="colors" class="mb-5 mx-auto" style="max-width: 450px;" />
+        </div>  
+        <div>
+          <funiter-currency class="mb-5 mx-auto" style="max-width: 350px;"/>
+          <funiter-transaction class="mb-5 mx-auto" style="max-width: 450px;" />
+        </div>
+      <funiter-account class="mb-5 mx-3" />
+    </div>
+      
+  </funiter>
 </template>
 
 <script>
@@ -49,6 +51,7 @@ import { watch } from 'vue'
 import funiterLib from './lib/funiterReactive.js'
 import funiter from './components/Funiter.vue'
 import { fr, en } from './components/Translate.js'
+import funiterData from './components/Funiter-Data.vue'
 import funiterControl from './components/Funiter-Control.vue'
 import funiterCurrency from './components/Funiter-Currency.vue'
 import funiterTransaction from './components/Funiter-Transaction.vue'

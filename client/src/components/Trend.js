@@ -283,7 +283,7 @@ var Trend = {
     var height = this.height;
     var padding = this.padding;
     var viewWidth = width || 300;
-    var viewHeight = height || 75;
+    var viewHeight = height || 150;
     var boundary = {
       minX: padding,
       minY: padding,
