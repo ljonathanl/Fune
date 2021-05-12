@@ -105,7 +105,7 @@
                         <div class="d-flex w-100 justify-content-between">
                             <div>
                                 <h5 v-if="transaction.from == state.account.name">
-                                    <span style="width: 80px;" class="badge bg-light text-right">{{ funiter.currencyDecimal(transaction.value) }}<small> Ü</small></span>
+                                    <span style="width: 80px;" class="badge bg-light text-dark text-right">{{ funiter.currencyDecimal(transaction.value) }}<small> Ü</small></span>
                                     <span style="width: 50px;" class="d-inline-block text-center">
                                         <en> to </en>
                                         <fr> à </fr> 

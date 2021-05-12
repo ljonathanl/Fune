@@ -28,11 +28,11 @@
 
     <funiter :accounts="accounts" :selectedAccounts="accounts">
       <funiter-control class="m-auto" />
-      <div class="d-flex align-items-start flex-wrap mb-3" style="justify-content: space-evenly;">
-        <div style="min-width: 500px;">
-          <funiter-currency style="width: 400px;" />
-          <funiter-transaction class="mt-5" style="width: 400px;" />
-          <funiter-account class="mt-5" />
+      <div class="d-flex align-items-start flex-wrap mt-5" style="justify-content: space-evenly;">
+        <div>
+          <funiter-currency class="mx-auto" style="width: 400px;" />
+          <funiter-transaction class="mx-auto mt-5" style="width: 450px;" />
+          <funiter-account class="mx-auto mt-5" />
         </div>
         <div style="min-width: 700px;">
           <funiter-stats :colors="colors" class="w-auto" />

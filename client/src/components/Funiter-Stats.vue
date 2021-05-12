@@ -89,7 +89,7 @@ const getStats = () => {
                 }
             } else if (state.referential == 'quantitative') {
                 for (let j = 0; j < stat.length; j++) {
-                    stat[j] = stat[j] * funeStat[j].quantitative;
+                    stat[j] = stat[j] * funeStat[j].quantitative
                 }
             }
             stats.push(stat)

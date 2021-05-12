@@ -312,7 +312,7 @@ const play = (autoPlay = true) => {
     
     if (isRevaluation) {
         state.currency.lastMelt = meltPercent
-        state.currency.quantitative = state.currency.quantitative + 1 / ( ( 1 / meltValue ) - 1)
+        state.currency.quantitative = state.currency.quantitative * ( 1 + 1 / ( ( 1 / meltValue ) - 1))
     }
     
     refreshCurrencyAndStats()
