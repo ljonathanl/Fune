@@ -1,4 +1,5 @@
-export default (el, binding) => {
+export default {
+  mounted: (el, binding) => {
     const delay = 200
     const interval = 50
     if (typeof binding.value !== 'function') {
@@ -45,4 +46,5 @@ export default (el, binding) => {
 
     ;['mousedown', 'touchstart'].forEach(e => el.addEventListener(e, start))
     ;['click', 'mouseout', 'touchend', 'touchcancel'].forEach(e => el.addEventListener(e, cancel))
+}
 }
