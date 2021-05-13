@@ -7,7 +7,7 @@
 
         <div class="mt-3 mb-3">
             <h3 class="text-center mb-6">
-                <select v-model="state.account">
+                <select v-model="state.account" class="text-center">
                     <option disabled :value="null">
                         <en>whö</en>
                         <fr>qüi</fr>

@@ -11,7 +11,7 @@
       <en> save</en>
       <fr> sauvegarder</fr>
     </button>
-    <button class="btn btn-danger ml-3" @click="funiter.reset()">
+    <button class="btn btn-sm btn-outline-danger ml-3" @click="funiter.reset()">
       <i class="fa fa-undo"></i>
       <en> reset</en>
       <fr> RAZ</fr>
@@ -44,7 +44,7 @@ const readSingleFile = (evt) => {
     }
     r.readAsText(f)
   } else { 
-    alert('failed to load file')
+    alert(translate({ en: 'file not found', fr: 'fichier introuvable' }))
   }
 
   evt.target.value = null
@@ -58,7 +58,7 @@ const load = (content) => {
     funiter.restoreState(state)
   } catch (e) {
     console.log(e)
-    alert('failed to load file')
+    alert(translate({ en: 'can not read the file', fr: 'le fichier ne peut pas être lu' }))
   }
 }
 

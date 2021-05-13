@@ -6,11 +6,11 @@
         </h4>
         <form>
             <div class="input-group mb-3">
-                <label class="input-group-text w-50">
+                <label class="input-group-text">
                     <en>Ü revaluation</en>
                     <fr>réévaluation de Ü</fr>
                 </label>
-                <select v-model="editedCurrency.mode" id="currencyMode" class="form-select w-50"
+                <select v-model="editedCurrency.mode" id="currencyMode" class="form-control"
                     :class="{'bg-primary': editedCurrency.mode != funiter.currency.mode}" :disabled="funiter.isPlaying">
                     <option value="melt">
                         <en>melting</en>

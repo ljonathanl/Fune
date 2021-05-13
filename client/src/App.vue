@@ -1,56 +1,59 @@
 <template>
-  <div class="container">
-    <h1 class="display-1 text-center mb-5">
-        <!-- <span class="bg-primary pl-1 pr-1 align-middle" style="font-family: monospace;">fї</span> -->
-        <img src="/favicon64x64.png"/>
-        <span class="align-middle"> f<small>Ü</small>ne</span>
-    </h1>
+  <div>
+    <div class="container">
+      <h1 class="display-1 text-center mb-3">
+          <!-- <span class="bg-primary pl-1 pr-1 align-middle" style="font-family: monospace;">fї</span> -->
+          <img src="/favicon64x64.png"/>
+          <span class="align-middle"> f<small>Ü</small>ne</span>
+      </h1>
+      <div class="text-center mb-3">
+        <button class="btn btn-sm btn-outline-secondary text-light" :disabled="language == 'fr'" @click="setLanguage('fr')">FR</button>
+        <button class="btn btn-sm btn-outline-secondary text-light" :disabled="language == 'en'" @click="setLanguage('en')">EN</button>
+      </div>
+      <p class="lead text-center mb-3">
+          <en>
+            <strong>f<small>Ü</small>ne</strong> is a web app to test and play with a simple <a href="https://libre-currency.org">Libre Currency</a> called <strong>f<small>Ü</small>ne</strong> (pronounced /fən/ like fun)
+          </en>
+          <fr>
+            <strong>f<small>Ü</small>ne</strong> est une appli web qui permet de jouer avec une simple <a href="https://monnaie-libre.fr/">Monnaie Libre</a> appelée <strong>f<small>Ü</small>ne</strong> (prononcée /fən/ comme fun en anglais)
+          </fr>
+      </p>
 
-    <p class="lead text-center mb-3">
-        <en>
-          <strong>f<small>Ü</small>ne</strong> is a web app to test and play with a simple <a href="https://libre-currency.org">Libre Currency</a> called <strong>f<small>Ü</small>ne</strong> (pronounced /fən/ like fun)
-        </en>
-        <fr>
-          <strong>f<small>Ü</small>ne</strong> est une appli web qui permet de jouer avec une simple <a href="https://monnaie-libre.fr/">Monnaie Libre</a> appelée <strong>f<small>Ü</small>ne</strong> (prononcée /fən/ comme fun en anglais)
-        </fr>
-    </p>
-
-    <p class="lead text-center mb-5">
-        <en>
-            a <small>Ü</small>man account create some new <small>Ü</small> (the <small>Ü</small>nit of the f<small>Ü</small>ne currency) each day<br>
-            <small>old created <strong><small>Ü</small>nits</strong> melt by a given percentage each <strong>revaluation period</strong></small><br>
-        </en>
-        <fr>
-            un compte <small>Ü</small>main crée de nouvelles <small>Ü</small> (l'<small>Ü</small>nité de la monnaie f<small>Ü</small>ne) chaque jour<br>
-            <small>les anciennes <strong><small>Ü</small>nités</strong> fondent d'un certain pourcentage à chaque <strong>période de réévaluation</strong></small><br>
-        </fr>
-    </p>
-
-    
-  </div>
-  <funiter :accounts="accounts" :selectedAccounts="accounts">
-    <funiter-data class="mx-auto" style="max-width: 400px;" />
-    <funiter-control class="mx-auto sticky-top" />
-    <div class="d-flex align-items-start flex-wrap mt-3" style="justify-content: space-evenly;">
-        <div>
-          <funiter-stats class="mb-5" style="min-width: 33vw;" />
-          <funiter-accounts class="mb-5 mx-auto" style="max-width: 450px;" />
-        </div>  
-        <div>
-          <funiter-currency class="mb-5 mx-auto" style="max-width: 350px;"/>
-          <funiter-transaction class="mb-5 mx-auto" style="max-width: 450px;" />
-        </div>
-      <funiter-account class="mb-5 mx-3" />
+      <p class="lead text-center mb-5">
+          <en>
+              a <small>Ü</small>man account create some new <small>Ü</small> (the <small>Ü</small>nit of the f<small>Ü</small>ne currency) each day<br>
+              <small>old created <strong><small>Ü</small>nits</strong> melt by a given percentage each <strong>revaluation period</strong></small><br>
+          </en>
+          <fr>
+              un compte <small>Ü</small>main crée de nouvelles <small>Ü</small> (l'<small>Ü</small>nité de la monnaie f<small>Ü</small>ne) chaque jour<br>
+              <small>les anciennes <strong><small>Ü</small>nités</strong> fondent d'un certain pourcentage à chaque <strong>période de réévaluation</strong></small><br>
+          </fr>
+      </p>
     </div>
-      
-  </funiter>
+
+    <funiter :accounts="accounts" :selectedAccounts="accounts">
+      <funiter-data class="mx-auto" style="max-width: 400px;" />
+      <funiter-control class="mx-auto sticky-top" />
+      <div class="d-flex align-items-start flex-wrap mt-3" style="justify-content: space-evenly;">
+          <div>
+            <funiter-currency class="mb-5 mx-auto" style="max-width: 350px;"/>
+            <funiter-transaction class="mb-5 mx-auto" style="max-width: 450px;" />
+          </div>
+          <div>
+            <funiter-stats class="mb-5" style="min-width: 33vw; max-width: 600px;" />
+            <funiter-accounts class="mb-5 mx-auto" style="max-width: 450px;" />
+          </div>  
+        <funiter-account class="mb-5 mx-3" />
+      </div>
+    </funiter>
+  </div>
 </template>
 
 <script>
 import { watch } from 'vue'
 import funiterLib from './lib/funiterReactive.js'
 import funiter from './components/Funiter.vue'
-import { fr, en } from './components/Translate.js'
+import { fr, en, language, setLanguage } from './components/Translate.js'
 import funiterData from './components/Funiter-Data.vue'
 import funiterControl from './components/Funiter-Control.vue'
 import funiterCurrency from './components/Funiter-Currency.vue'

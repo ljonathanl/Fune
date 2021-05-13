@@ -142,12 +142,14 @@ funiterProxy.getState = () => {
 }
 
 funiterProxy.restoreState = state => {
-    if (state.selectedAccounts && state.selectedAccounts[funiter.name]) {
-        funiterProxy.selectedAccounts = new Map(Object.entries(state.selectedAccounts))
+    if (state) {
+        if (state.selectedAccounts && state.selectedAccounts[funiter.name]) {
+            funiterProxy.selectedAccounts = new Map(Object.entries(state.selectedAccounts))
+        }
+        
+        funiter.restoreState(state)
+        funiterProxy.refresh()
     }
-    
-    funiter.restoreState(state)
-    funiterProxy.refresh()
 }
 
 
