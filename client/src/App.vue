@@ -33,8 +33,8 @@
     <funiter-control class="mx-auto sticky-top" />
     <div class="d-flex align-items-start flex-wrap mt-3" style="justify-content: space-evenly;">
         <div>
-          <funiter-stats :colors="colors" class="mb-5" style="min-width: 33vw;" />
-          <funiter-accounts :colors="colors" class="mb-5 mx-auto" style="max-width: 450px;" />
+          <funiter-stats class="mb-5" style="min-width: 33vw;" />
+          <funiter-accounts class="mb-5 mx-auto" style="max-width: 450px;" />
         </div>  
         <div>
           <funiter-currency class="mb-5 mx-auto" style="max-width: 350px;"/>
@@ -101,13 +101,6 @@ watch(() => funiterLib.currency,
     localStorage.setItem('state', JSON.stringify(funiterLib.getState()))
   }
 )
-
-const colors = [ 
-  '#DDDDDDDD', '#FE4365DD', '#F9CDADDD', 
-  '#83AF9BDD', '#A7226EDD', '#F26B38DD', 
-  '#F7DB4FDD', '#CAFDE0DD', '#FFB8EADD',
-  '#C3421ADD', '#4F6ABFDD'
-]
 
 const accounts = []
 

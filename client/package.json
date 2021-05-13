@@ -12,6 +12,7 @@
     "deflate-js": "^0.2.3",
     "file-saver": "^2.0.5",
     "mathjs": "^9.3.2",
+    "randomcolor": "^0.6.2",
     "vue": "^3.0.5"
   },
   "devDependencies": {

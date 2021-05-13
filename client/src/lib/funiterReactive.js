@@ -1,30 +1,35 @@
 import funiter from '../lib/funiter.js'
 import { evaluate } from 'mathjs/number'
 import { reactive } from 'vue'
+import { randomColor } from 'randomcolor'
 
 const funiterProxy = reactive({
     name: funiter.name,
     isPlaying: false,
     currency: {},
     accounts: [],
-    selectedAccounts: [funiter.name]
+    selectedAccounts: new Map()
 })
+
+funiterProxy.selectedAccounts.set(funiter.name, { color: '#CCCCCCDD' })
 
 const uValue = funiter.uValue
 
 
 funiterProxy.isSelected = (account) => {
-    return funiterProxy.selectedAccounts.indexOf(account.name) >= 0
+    const selectedAccount = funiterProxy.selectedAccounts.get(account.name)
+    return selectedAccount != null
 }
 
 funiterProxy.select = (account) => {
     if (account.role == 'bank')
         return
-    let index = funiterProxy.selectedAccounts.indexOf(account.name)
-    if (index < 0) {
-        funiterProxy.selectedAccounts.push(account.name)
+    let selectedAccount = funiterProxy.selectedAccounts.get(account.name)
+    if (!selectedAccount && funiter.getAccount(account.name)) {
+        selectedAccount = { color: randomColor() }
+        funiterProxy.selectedAccounts.set(account.name, selectedAccount)
     } else {
-        funiterProxy.selectedAccounts.splice(index, 1)
+        funiterProxy.selectedAccounts.delete(account.name)
     }
 }
 
@@ -132,13 +137,14 @@ funiterProxy.stop = () => {
 
 funiterProxy.getState = () => {
     const state = funiter.getState()
-    state.selectedAccounts = funiterProxy.selectedAccounts
+    state.selectedAccounts = Object.fromEntries(funiterProxy.selectedAccounts)
     return state
 }
 
 funiterProxy.restoreState = state => {
-    if (state.selectedAccounts)
-        funiterProxy.selectedAccounts = state.selectedAccounts
+    if (state.selectedAccounts && state.selectedAccounts[funiter.name]) {
+        funiterProxy.selectedAccounts = new Map(Object.entries(state.selectedAccounts))
+    }
     
     funiter.restoreState(state)
     funiterProxy.refresh()

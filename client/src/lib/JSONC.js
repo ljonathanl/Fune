@@ -446,7 +446,7 @@ function getArr(str) {
  */
 JSONC.unpack = function (gzipped, bDecompress) {
   var aArr = getArr(Base64.decode(gzipped)),
-    str = String.fromCharCode.apply(String, gzip.unzip(aArr,{level:9})),
+    str = gzip.unzip(aArr,{level:9}),//String.fromCharCode.apply(String, gzip.unzip(aArr,{level:9})),
     json = JSON.parse(str);
   return bDecompress ? JSONC.decompress(json) : json;
 };

@@ -6,7 +6,7 @@
         </h4>
         <trends
             :data="state.stats"
-            :colors="colors"
+            :colors="state.colors"
             :padding="10"
             :radius="8"
             :stroke-width="1"
@@ -64,53 +64,58 @@
 import { Trends } from './Trend.js'
 import { fr, en } from './Translate.js'
 import funiter from '../lib/funiterReactive.js'
-import { defineProps, watch, onMounted, reactive } from 'vue'
+import { watch, onMounted, reactive } from 'vue'
 
-const { colors } = defineProps({
-    colors: Array,
-})
 
 const state = reactive({
     referential: 'relative',
     statType: 'day',
     stats: [],
+    colors: []
 })
 
 const getStats = () => {
     let funeStat = funiter.getAccountStats(funiter.name, state.statType)
-    let stats = [[]]
-    for (let index = 1; index < funiter.selectedAccounts.length; index++) {
-        const account = funiter.selectedAccounts[index];
-        if (account) {
-            let stat = funiter.getAccountStats(account, state.statType)
-            if (state.referential == 'average') {
-                for (let j = 0; j < stat.length; j++) {
-                    stat[j] = funeStat[j].average == 0 ? 0 : (stat[j] / funeStat[j].average) * 100000;
+    let stat = null
+    let stats = []
+    let colors = []
+    funiter.selectedAccounts.forEach((account, name) => {
+        if (name != funiter.name) {
+            stat = funiter.getAccountStats(name, state.statType)
+            if (stat) {
+                if (state.referential == 'average') {
+                    for (let j = 0; j < stat.length; j++) {
+                        stat[j] = funeStat[j].average == 0 ? 0 : (stat[j] / funeStat[j].average) * 100000;
+                    }
+                } else if (state.referential == 'quantitative') {
+                    for (let j = 0; j < stat.length; j++) {
+                        stat[j] = stat[j] * funeStat[j].quantitative
+                    }
                 }
-            } else if (state.referential == 'quantitative') {
-                for (let j = 0; j < stat.length; j++) {
-                    stat[j] = stat[j] * funeStat[j].quantitative
-                }
+                stats.push(stat)
+                colors.push(account.color)
             }
-            stats.push(stat)
         }
-    }
+    })
 
     if (state.referential == 'average') {
-        stats[0] = new Array(funeStat.length).fill(100000)
+        stat = new Array(funeStat.length).fill(100000)
     } else if (state.referential == 'relative') {
-        stats[0] = funeStat.map(c => {
+        stat = funeStat.map(c => {
             return c.average
         })
     } else if (state.referential == 'quantitative') {
-        stats[0] = funeStat.map(c => {
+        stat = funeStat.map(c => {
             return c.average * c.quantitative
         })
     }
+    stats.push(stat)
+    colors.push(funiter.selectedAccounts.get(funiter.name).color)
     state.stats = stats
+    state.colors = colors
 }
 
-watch(() => funiter.selectedAccounts.length, getStats)
+watch(() => funiter.selectedAccounts, getStats, { deep: true })
 
 watch(() => funiter.currency, getStats, { deep: true })
 
@@ -118,11 +123,7 @@ watch(() => state.referential,  getStats)
 
 watch(() => state.statType,  getStats)
 
-
-
-onMounted(() => {
-    getStats()
-})
+onMounted(getStats)
 
 
 </script>
