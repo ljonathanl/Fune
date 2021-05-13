@@ -137,6 +137,7 @@ function zip(data, options) {
 		data = Array.prototype.map.call(data, function (char) {
 			return char.charCodeAt(0);
 		});
+		flags |= possibleFlags['FTEXT'];
 	}
 
 	// magic number marking this file as GZIP
@@ -223,6 +224,7 @@ function unzip(data) {
 			return true;
 		}
 	});
+
 
 	// just throw away the bytes for now
 	if (flags & possibleFlags['FEXTRA']) {

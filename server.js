@@ -1,7 +1,7 @@
 import express from 'express'
 import morgan from 'morgan'
 import storage from 'node-persist'
-import * as math from 'mathjs'
+import { evaluate } from 'mathjs'
 import funiter from './public/funiter.js'
 
 
@@ -126,7 +126,7 @@ async function start() {
     }
 
     const state = await storage.getItem('state')
-    funiter.start(math.evaluate, state)
+    funiter.start(evaluate, state)
     // funiter.play()
 }
 

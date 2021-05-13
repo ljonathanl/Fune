@@ -94,10 +94,6 @@ import { defineProps, reactive, ref, computed, onMounted, defineEmit } from 'vue
 
 
 
-const { colors } = defineProps({
-    colors: Array,
-})
-
 const state = reactive({
     onlySelected: false,
     sortKey: 'name',
@@ -150,9 +146,9 @@ const resetBalance = (account) => {
 
 
 const getColor = (account) => {
-    let index = funiter.selectedAccounts.indexOf(account.name)
-    if (index < 0)
+    const selectedAccount = funiter.selectedAccounts.get(account.name)
+    if (selectedAccount == null)
         return null
-    return colors[index % colors.length] 
+    return selectedAccount.color
 }
 </script>

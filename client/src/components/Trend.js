@@ -137,7 +137,7 @@ var Background = {
         y: boundary.minY - 2,
         fill: '#CCCCCC88',
         'font-size': '0.6em'
-      }, Math.floor(this.max / 1000)),
+      }, Math.round(this.max / 1000)),
       h('line', {
         x1: boundary.minX,
         y1: boundary.minY,
@@ -150,7 +150,7 @@ var Background = {
         y: boundary.maxY - 2,
         fill: '#CCCCCC88',
         'font-size': '0.6em'
-      }, Math.floor(this.min / 1000)),
+      }, Math.round(this.min / 1000)),
       h('line', {
         x1: boundary.minX,
         y1: boundary.maxY,
@@ -368,7 +368,7 @@ var Trends = {
       maxY: viewHeight - padding
     };
 
-    var max = 10;
+    var max = 1000;
     for (let i = 0; i < this.data.length; i++) {
       const element = this.data[i];
       if (element && element.length > 1) {
@@ -393,8 +393,8 @@ var Trends = {
             id: 'stats',
             ref: 'path' + index,
             color: this.colors[index],
-            width: index == 0 ? 1.3 : 1,
-            dash: index == 0 ? '2 2' : '0'
+            width: index == this.data.length - 1 ? 2 : 1,
+            dash: index == this.data.length - 1 ? '3 3' : '0'
           })
         )
       }
