@@ -95,12 +95,18 @@ funiterLib.restoreState(state)
 
 <script setup>
 
+const saveState = () => {
+  localStorage.setItem('state', JSON.stringify(funiterLib.getState()))
+}
+
 watch(() => funiterLib.currency,
   () => {
     window.location.hash = "#" + currencyToHash(funiterLib.currency)
-    localStorage.setItem('state', JSON.stringify(funiterLib.getState()))
+    saveState()
   }
 )
+
+watch(() => funiterLib.selectedAccounts, saveState, { deep: true })
 
 const accounts = []
 
