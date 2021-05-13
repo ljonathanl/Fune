@@ -89,7 +89,7 @@ const getStats = () => {
                     }
                 } else if (state.referential == 'quantitative') {
                     for (let j = 0; j < stat.length; j++) {
-                        stat[j] = stat[j] * funeStat[j].quantitative
+                        stat[j] = stat[j] * (funeStat[j].quantitative / funiter.currency.quantitative)
                     }
                 }
                 stats.push(stat)
@@ -106,7 +106,7 @@ const getStats = () => {
         })
     } else if (state.referential == 'quantitative') {
         stat = funeStat.map(c => {
-            return c.average * c.quantitative
+            return c.average * (c.quantitative / funiter.currency.quantitative)
         })
     }
     stats.push(stat)

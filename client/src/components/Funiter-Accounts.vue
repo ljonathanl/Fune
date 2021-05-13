@@ -54,7 +54,7 @@
                                 <fr>raz</fr>
                             </a>
                         </template>
-                        <a v-if="account.name != funiter.name" href="#" @click.stop.prevent="deleteAccount(account)">x</a>
+                        <a v-if="account.name != funiter.name" href="#" @click.stop.prevent="deleteAccount(account)"><i class="fa fa-trash"></i></a>
                     </td>
                 </tr>
             </tbody>
