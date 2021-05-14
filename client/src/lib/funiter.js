@@ -180,7 +180,7 @@ funiter.getState = () => {
 
 const defaultCurrency = {
     date: new Date().toISOString(),
-    stepTime: 10,
+    stepTime: 1,
     uPerDay: 1,
     elapsedTime: 0,
     revaluationTime: 1, 
@@ -190,7 +190,7 @@ const defaultCurrency = {
     lastMelt: 0,
     average: 0,
     quantitative: 1,
-    expression: '10/100'
+    expression: '0.1'
 }
 
 funiter.expressionParser = (expression, values) => {

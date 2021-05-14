@@ -49,7 +49,7 @@
                                 <en> tö </en>
                                 <fr> à </fr> 
                             </label>
-                            <select v-model="state.tx.to" id="txTo">
+                            <select v-model="state.tx.to" id="txTo" class="form-control">
                                 <option disabled value="">
                                     <en>someöne</en>
                                     <fr>qüi</fr>
