@@ -99,7 +99,7 @@
                             <div>
                                 <h5 v-if="transaction.from == state.account.name">
                                     <span style="width: 80px;" class="badge bg-light text-dark text-right">{{ funiter.currencyDecimal(transaction.value) }}<small> Ü</small></span>
-                                    <span style="width: 50px;" class="d-inline-block text-center">
+                                    <span style="width: 70px;" class="d-inline-block text-center">
                                         <en> to </en>
                                         <fr> à </fr> 
                                     </span>
@@ -111,7 +111,7 @@
                                 </h5>
                                 <h5 v-else>
                                     <span style="width: 80px;" class="badge bg-primary text-right">{{ funiter.currencyDecimal(transaction.value) }}<small> Ü</small></span>
-                                    <span style="width: 50px;" class="d-inline-block text-center">
+                                    <span style="width: 70px;" class="d-inline-block text-center">
                                         <en> from </en>
                                         <fr> de </fr>
                                     </span>
