@@ -3,6 +3,8 @@ import { evaluate } from 'mathjs/number'
 import { reactive } from 'vue'
 import { randomColor } from 'randomcolor'
 
+const defaultSelected = { color: '#FFFFFF' }
+
 const funiterProxy = reactive({
     name: funiter.name,
     isPlaying: false,
@@ -11,7 +13,7 @@ const funiterProxy = reactive({
     selectedAccounts: new Map()
 })
 
-funiterProxy.selectedAccounts.set(funiter.name, { color: '#CCCCCCDD' })
+funiterProxy.selectedAccounts.set(funiter.name, defaultSelected)
 
 const uValue = funiter.uValue
 
@@ -145,6 +147,7 @@ funiterProxy.restoreState = state => {
     if (state) {
         if (state.selectedAccounts && state.selectedAccounts[funiter.name]) {
             funiterProxy.selectedAccounts = new Map(Object.entries(state.selectedAccounts))
+            funiterProxy.selectedAccounts.set(funiter.name, defaultSelected)
         }
         
         funiter.restoreState(state)

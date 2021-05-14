@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar navbar-dark bg-dark w-100">
     <div class="text-right mx-auto" style="width: 400px">
-      <span @click="toTop()" class="pointer bg-primary px-1 display-6 position-absolute" style="font-family: monospace;left: 0.5em;">fї</span>
+      <span @click="toTop()" class="pointer bg-primary px-1 display-6 position-absolute" style="font-family: monospace;left: 0.5em;" :title="funiter.name">fї</span>
       <button class="btn btn-outline-primary" @click="funiter.play()" v-if="!funiter.isPlaying" style="width: 120px" >
         <i class="fa fa-play"></i>
         <en> play</en>

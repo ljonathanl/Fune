@@ -74,7 +74,7 @@
                 </button>
             </div>
 
-            <div class="input-group mb-1 mt-5">
+            <div class="input-group mb-1 mt-3">
                 <label class="input-group-text" for="currencyMass">
                     <en>monetary mass (M)</en>
                     <fr>masse monétaire (M)</fr>
