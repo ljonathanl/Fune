@@ -6,12 +6,12 @@
       <fr> charger</fr>
       <input type="file" hidden @change="readSingleFile">
     </label>
-    <button class="btn btn-light text-dark" @click="save()" :disabled="funiter.isPlaying">
+    <button class="btn btn-light text-dark ml-1" @click="save()" :disabled="funiter.isPlaying">
       <i class="fa fa-download"></i>
       <en> save</en>
       <fr> sauvegarder</fr>
     </button>
-    <button class="btn btn-sm btn-outline-danger ml-3" @click="funiter.reset()">
+    <button class="btn btn-secondary ml-3" @click="funiter.reset()">
       <i class="fa fa-undo"></i>
       <en> reset</en>
       <fr> RAZ</fr>

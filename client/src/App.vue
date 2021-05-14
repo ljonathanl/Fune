@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div class="container">
+    <div class="container mt-3">
       <h1 class="display-1 text-center mb-3">
-          <!-- <span class="bg-primary pl-1 pr-1 align-middle" style="font-family: monospace;">fї</span> -->
-          <img src="/favicon64x64.png"/>
+          <span class="bg-primary px-1 align-middle" style="font-family: monospace;">fї</span>
+          <!-- <img src="/favicon64x64.png"/> -->
           <span class="align-middle"> f<small>Ü</small>ne</span>
       </h1>
       <div class="text-center mb-3">
@@ -35,15 +35,15 @@
       <funiter-data class="mx-auto" style="max-width: 400px;" />
       <funiter-control class="mx-auto sticky-top" />
       <div class="d-flex align-items-start flex-wrap mt-3" style="justify-content: space-evenly;">
-          <div>
+          <div class="mx-auto">
             <funiter-currency class="mb-5 mx-auto" style="max-width: 350px;"/>
             <funiter-transaction class="mb-5 mx-auto" style="max-width: 450px;" />
           </div>
-          <div>
-            <funiter-stats class="mb-5" style="min-width: 33vw; max-width: 600px;" />
+          <div class="mx-auto">
+            <funiter-stats class="mb-5 mx-auto" style="min-width: 33vw; max-width: 600px;" />
             <funiter-accounts class="mb-5 mx-auto" style="max-width: 450px;" />
           </div>  
-        <funiter-account class="mb-5 mx-3" />
+        <funiter-account class="mb-5 mx-auto" />
       </div>
     </funiter>
   </div>
