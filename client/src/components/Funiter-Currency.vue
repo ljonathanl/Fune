@@ -102,8 +102,8 @@
             </div>
             <div class="input-group mb-3">
                 <label class="input-group-text" for="currencyQuantitative">
-                    <en>quantitative value</en>
-                    <fr>valeur quantitative</fr>
+                    <en>quantitative</en>
+                    <fr>quantitatif</fr>
                 </label>
                 <input id="currencyQuantitative" :value="funiter.currency.quantitative.toFixed(2)" type="text" class="form-control text-right" disabled>
                 <span class="input-group-text">
