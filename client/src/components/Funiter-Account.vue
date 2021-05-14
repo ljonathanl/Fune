@@ -42,7 +42,7 @@
                 </h4>
                 <form class="mb-4 justify-content-center" v-if="state.account.role == 'bank' || state.account.balance > 0">
                     <div>
-                        <div class="input-group mb-3">
+                        <div class="input-group mb-1">
                             <input v-model="state.tx.value" type="number" :max="Math.round(state.account.balance/100)" step="any" min="0" class="form-control text-right">
                             <small class="input-group-text">Ü</small>
                             <label class="input-group-text" for="txTo">

@@ -15,7 +15,7 @@
             auto-draw
             smooth>
         </trends>
-        <div class="input-group mx-auto" style="max-width: 400px">
+        <div class="input-group mx-auto mt-1" style="max-width: 400px">
             <label class="input-group-text px-1">
                 100
             </label>

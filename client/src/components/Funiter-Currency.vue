@@ -5,7 +5,7 @@
             <fr>monnaie</fr>
         </h4>
         <form>
-            <div class="input-group mb-3">
+            <div class="input-group mb-1">
                 <label class="input-group-text">
                     <en>Ü revaluation</en>
                     <fr>réévaluation de Ü</fr>
@@ -22,14 +22,14 @@
                     </option>
                 </select>
             </div>   
-            <div class="input-group mb-3">
+            <div class="input-group mb-1">
                 <span class="input-group-text" v-if="editedCurrency.mode == 'melt'">Ü(t-1) = ( 1 - </span>
                 <span class="input-group-text" v-else>Ü(t+1) = ( 1 + </span>
                 <input id="currencyExpression" v-model="editedCurrency.expression" type="text" class="form-control text-right"
                     :class="{'bg-primary': editedCurrency.expression != funiter.currency.expression}" :disabled="funiter.isPlaying">
                 <span class="input-group-text"> ) Ü(t)</span>    
             </div>
-            <div class="input-group mb-3">
+            <div class="input-group mb-1">
                 <label class="input-group-text" for="currencyUPerDay">
                     <en>Ü per day</en>
                     <fr>Ü par jour</fr>
@@ -38,7 +38,7 @@
                     :class="{'bg-primary': editedCurrency.uPerDay != funiter.currency.uPerDay}" :disabled="funiter.isPlaying">
                 <span class="input-group-text">Ü</span>
             </div>
-            <div class="input-group mb-3">
+            <div class="input-group mb-1">
                 <label class="input-group-text" for="currencyRevaluationTime">
                     <en>revaluation period</en>
                     <fr>réévaluation</fr>
@@ -50,7 +50,7 @@
                     <fr>jour<span v-if="editedCurrency.revaluationTime > 1">s</span></fr>
                 </span>
             </div>
-            <div class="input-group mb-3">
+            <div class="input-group mb-1">
                 <label class="input-group-text" for="currencyStepTime">
                     <en>day duration</en>
                     <fr>durée d'un jour</fr>
@@ -74,7 +74,7 @@
                 </button>
             </div>
 
-            <div class="input-group mb-3 mt-5">
+            <div class="input-group mb-1 mt-5">
                 <label class="input-group-text" for="currencyMass">
                     <en>monetary mass (M)</en>
                     <fr>masse monétaire (M)</fr>
@@ -82,14 +82,14 @@
                 <input id="currencyMass" :value="funiter.currencyWithoutDecimal(funiter.currency.monetaryMass)" type="text" class="form-control text-right" disabled>
                 <span class="input-group-text">Ü</span>
             </div>
-            <div class="input-group mb-3">
+            <div class="input-group mb-1">
                 <label class="input-group-text" for="currencyNbMembers">
                     <en>Üman accounts (N)</en>
                     <fr>comptes Ümains (N)</fr>
                 </label>
                 <input id="currencyNbMembers" :value="funiter.currency.nbMembers" type="text" class="form-control text-right" disabled>
             </div>
-            <div class="input-group mb-3">
+            <div class="input-group mb-1">
                 <label class="input-group-text" for="currencyAvg">
                     <en>average</en>
                     <fr>moyenne</fr>
@@ -100,7 +100,7 @@
                     <fr>Ü / Ümain</fr>
                 </span>
             </div>
-            <div class="input-group mb-3">
+            <div class="input-group mb-1">
                 <label class="input-group-text" for="currencyQuantitative">
                     <en>quantitative</en>
                     <fr>quantitatif</fr>
@@ -111,7 +111,7 @@
                     <fr>Ü / Ü(0)</fr>
                 </span>
             </div>
-            <div class="input-group mb-3">
+            <div class="input-group mb-1">
                 <label class="input-group-text" for="currencyLastGrew">
                     <en>last growth</en>
                     <fr>dernière croissance</fr>
@@ -119,7 +119,7 @@
                 <input id="currencyLastGrew" :value="lastGrew" type="text" class="form-control text-right" disabled>
                 <span class="input-group-text">%</span>
             </div>
-            <div class="input-group mb-3">
+            <div class="input-group mb-1">
                 <label class="input-group-text" for="currencyLastMelt">
                     <en>last melting</en>
                     <fr>dernière fonte</fr>
@@ -127,7 +127,7 @@
                 <input id="currencyLastMelt" :value="funiter.currency.lastMelt" type="text" class="form-control text-right" disabled>
                 <span class="input-group-text">%</span>
             </div>
-            <div class="input-group mb-3">
+            <div class="input-group mb-1">
                 <label class="input-group-text" for="currencyElapsedTime">
                     <en>elapsed time (T)</en>
                     <fr>temps écoulé (T)</fr>
