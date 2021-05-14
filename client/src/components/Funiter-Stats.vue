@@ -15,45 +15,43 @@
             auto-draw
             smooth>
         </trends>
-        <div class="d-flex justify-content-between">
-            <div class="input-group mx-auto w-auto">
-                <label class="input-group-text">
-                    100
-                </label>
-                <select v-model="state.statType" class="form-control">
-                    <option value="day">
-                        <en>days</en>
-                        <fr>jours</fr>
-                    </option>
-                    <option value="month">
-                        <en>months</en>
-                        <fr>mois</fr>
-                    </option>
-                    <option value="year">
-                        <en>years</en>
-                        <fr>années</fr>
-                    </option>
-                </select>
-                <label class="input-group-text">  
-                    <en>referential</en>
-                    <fr>référentiel</fr>
-                </label>
-                <select v-model="state.referential" class="form-control">
-                    <option value="relative">
-                        <en>relative</en>
-                        <fr>relatif</fr>
-                    </option>
-                    <option value="quantitative">
-                        <en>quantitative</en>
-                        <fr>quantitatif</fr>
-                    </option>
-                    <option value="average">
-                        <en>average</en>
-                        <fr>moyenne</fr>
-                    </option>
-                </select>
-                <label class="input-group-text p-1"></label> 
-            </div>
+        <div class="input-group mx-auto" style="max-width: 400px">
+            <label class="input-group-text px-1">
+                100
+            </label>
+            <select v-model="state.statType" class="form-control px-1">
+                <option value="day">
+                    <en>days</en>
+                    <fr>jours</fr>
+                </option>
+                <option value="month">
+                    <en>months</en>
+                    <fr>mois</fr>
+                </option>
+                <option value="year">
+                    <en>years</en>
+                    <fr>années</fr>
+                </option>
+            </select>
+            <label class="input-group-text px-1">  
+                <en>referential</en>
+                <fr>référentiel</fr>
+            </label>
+            <select v-model="state.referential" class="form-control px-1">
+                <option value="relative">
+                    <en>relative</en>
+                    <fr>relatif</fr>
+                </option>
+                <option value="quantitative">
+                    <en>quantitative</en>
+                    <fr>quantitatif</fr>
+                </option>
+                <option value="average">
+                    <en>average</en>
+                    <fr>moyenne</fr>
+                </option>
+            </select>
+            <label class="input-group-text p-1"></label> 
         </div>
     </div>
 </template>

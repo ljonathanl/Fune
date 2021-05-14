@@ -144,6 +144,8 @@ const state = reactive({
         return funiter.accounts.filter(a => a.role != 'bank')
     }),
     otherAccounts: computed(() => {
+        if (!state.account)
+            return null
         return funiter.accounts.filter(a => a.role != 'bank' && a.name != state.account.name)
     }),
     stats: [],
