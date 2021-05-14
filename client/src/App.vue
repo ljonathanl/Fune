@@ -2,7 +2,7 @@
   <div>
     <div class="container mt-3">
       <h1 class="display-1 text-center mb-3">
-          <span class="bg-primary px-1 align-middle" style="font-family: monospace;">fї</span>
+          <code class="bg-primary px-1 align-middle text-light">fї</code>
           <!-- <img src="/favicon64x64.png"/> -->
           <span class="align-middle"> f<small>Ü</small>ne</span>
       </h1>

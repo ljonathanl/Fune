@@ -33,15 +33,15 @@
                         {{ account.name }}
                     </td>
                     <td class="text-center">
-                        <button v-if="account.role == 'human'" class="btn btn-sm btn-primary" @click="switchAccountRole(account)">
+                        <button v-if="account.role == 'human'" class="btn btn-sm btn-primary fw-bold" @click="switchAccountRole(account)">
                             <en><small>Ü</small>man</en>
                             <fr><small>Ü</small>main</fr>
                         </button>
-                        <button v-else-if="account.role == 'wallet'" class="btn btn-sm btn-secondary" @click="switchAccountRole(account)">
+                        <button v-else-if="account.role == 'wallet'" class="btn btn-sm btn-secondary fw-bold" @click="switchAccountRole(account)">
                             <en>wället</en>
                             <fr>sïmple</fr>
                         </button>
-                        <button v-else class="btn btn-sm btn-danger" disabled>
+                        <button v-else class="btn btn-sm btn-danger fw-bold" disabled>
                             <en>bänk</en>
                             <fr>bänque</fr>
                         </button>
