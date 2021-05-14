@@ -36,14 +36,14 @@
       <funiter-control class="mx-auto sticky-top" />
       <div class="d-flex align-items-start flex-wrap p-2" style="justify-content: space-evenly;">
           <div class="mx-auto">
-            <funiter-currency class="mb-5 mx-auto" style="max-width: 450px;"/>
-            <funiter-transaction class="mb-5 mx-auto" style="max-width: 450px;" />
+            <funiter-currency class="mb-3 mx-auto" style="max-width: 450px;"/>
+            <funiter-transaction class="mb-3 mx-auto" style="max-width: 450px;" />
           </div>
           <div class="mx-auto">
-            <funiter-stats class="mb-5 mx-auto" style="min-width: 33vw; max-width: 600px;" />
-            <funiter-accounts class="mb-5 mx-auto" style="max-width: 450px;" />
+            <funiter-stats class="mb-3 mx-auto" style="min-width: 33vw; max-width: 600px;" />
+            <funiter-accounts class="mb-3 mx-auto" style="max-width: 450px;" />
           </div>  
-        <funiter-account class="mb-5 mx-auto" />
+        <funiter-account class="mb-3 mx-auto" />
       </div>
     </funiter>
   </div>

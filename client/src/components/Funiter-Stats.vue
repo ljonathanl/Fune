@@ -9,7 +9,7 @@
             :colors="state.colors"
             :padding="10"
             :radius="8"
-            :stroke-width="2"
+            :stroke-width="1.4"
             :stroke-linecap="'butt'"
             :min="0"
             auto-draw

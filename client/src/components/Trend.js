@@ -391,8 +391,7 @@ var Trends = {
             id: 'stats',
             ref: 'path' + index,
             color: this.colors[index],
-            width: index == this.data.length - 1 ? 2 : 1,
-            dash: index == this.data.length - 1 ? '3 3' : '0'
+            dash: index == this.data.length - 1 ? '2 2' : '0'
           })
         )
       }
