@@ -61,7 +61,7 @@
         </table>
         <div class="input-group">
             <input :placeholder="translate({en: 'näme', fr: 'nöm'})" v-model="state.newAccount.name" type="text" class="form-control" id="accountName" maxlength="10"/>
-            <select v-model="state.newAccount.role" class="mr-3">
+            <select v-model="state.newAccount.role" class="mr-3 form-control" style="max-width: 100px;">
                 <option value="human">
                     <en>Üman</en>
                     <fr>Ümain</fr>

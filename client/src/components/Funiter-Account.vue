@@ -7,7 +7,7 @@
 
         <div class="mt-3 mb-3">
             <h3 class="text-center mb-6">
-                <select v-model="state.account" class="text-center">
+                <select v-model="state.account" class="text-center form-control mx-auto" style="max-width: 300px; font-size: 1.3em">
                     <option disabled :value="null">
                         <en>whö</en>
                         <fr>qüi</fr>
@@ -49,7 +49,7 @@
                                 <en> tö </en>
                                 <fr> à </fr> 
                             </label>
-                            <select v-model="state.tx.to" id="txTo" class="form-control">
+                            <select v-model="state.tx.to" id="txTo">
                                 <option disabled value="">
                                     <en>someöne</en>
                                     <fr>qüi</fr>
@@ -78,10 +78,10 @@
                 <trend
                     :data="state.stats"
                     :gradientDirection="'top'"
-                    :gradient="['#df691a', '#a54f15', '#65300d']"
+                    :gradient="['#f560a2', '#e83283', '#bd125e']"
                     :padding="10"
                     :radius="8"
-                    :stroke-width="1"
+                    :stroke-width="1.5"
                     :stroke-linecap="'butt'"
                     :min="0"
                     :max="1000"

@@ -1,6 +1,6 @@
 <template>
   <nav class="navbar navbar-dark bg-dark">
-    <div class="text-center w-100 my-2">
+    <div class="text-center w-100">
       <button class="btn btn-primary" @click="funiter.play()" :disabled="funiter.isPlaying">
         <i class="fa fa-play"></i>
         <en> play</en>

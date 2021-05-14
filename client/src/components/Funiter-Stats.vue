@@ -9,18 +9,18 @@
             :colors="state.colors"
             :padding="10"
             :radius="8"
-            :stroke-width="1"
+            :stroke-width="2"
             :stroke-linecap="'butt'"
             :min="0"
             auto-draw
             smooth>
         </trends>
-        <div class="mx-3 d-flex justify-content-between">
-            <div class="input-group w-auto">
+        <div class="d-flex justify-content-between">
+            <div class="input-group mx-auto w-auto">
                 <label class="input-group-text">
                     100
                 </label>
-                <select v-model="state.statType">
+                <select v-model="state.statType" class="form-control">
                     <option value="day">
                         <en>days</en>
                         <fr>jours</fr>
@@ -33,14 +33,12 @@
                         <en>years</en>
                         <fr>années</fr>
                     </option>
-                </select> 
-            </div>
-            <div class="ms-auto w-auto input-group">
+                </select>
                 <label class="input-group-text">  
                     <en>referential</en>
                     <fr>référentiel</fr>
                 </label>
-                <select v-model="state.referential">
+                <select v-model="state.referential" class="form-control">
                     <option value="relative">
                         <en>relative</en>
                         <fr>relatif</fr>
@@ -53,7 +51,8 @@
                         <en>average</en>
                         <fr>moyenne</fr>
                     </option>
-                </select> 
+                </select>
+                <label class="input-group-text p-1"></label> 
             </div>
         </div>
     </div>
