@@ -36,7 +36,7 @@ funiterProxy.select = (account) => {
 
 
 funiterProxy.doTx = tx => {
-    const result = funiter.doTx({from: tx.from, to: tx.to, value: Math.floor(tx.value * uValue)})
+    const result = funiter.doTx({from: tx.from, to: tx.to, message: tx.message, value: Math.floor(tx.value * uValue)})
     if (result)
         funiterProxy.refresh()
     return result
