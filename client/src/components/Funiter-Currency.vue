@@ -3,7 +3,12 @@
         <h4 class="text-center mb-3">
             <en>currency</en>
             <fr>monnaie</fr>
+            <info-button class="position-absolute" info="info-currency" />
         </h4>
+        <info infoId="info-currency">
+            <en>EN_info-currency</en>
+            <fr>FR_info-currency</fr>
+        </info>
         <form>
             <div class="input-group mb-1">
                 <label class="input-group-text">
@@ -21,14 +26,27 @@
                         <fr>croissance</fr>
                     </option>
                 </select>
-            </div>   
+                <label class="input-group-text pr-1">
+                    <info-button class="px-0" info="info-currency-mode" />
+                </label>
+            </div>
+            <info infoId="info-currency-mode">
+                <en>EN_info-currency-mode</en>
+                <fr>FR_info-currency-mode</fr>
+            </info>  
             <div class="input-group mb-1">
                 <span class="input-group-text" v-if="editedCurrency.mode == 'melt'">Ü(t-1) = ( 1 - </span>
                 <span class="input-group-text" v-else>Ü(t+1) = ( 1 + </span>
                 <input id="currencyExpression" v-model="editedCurrency.expression" type="text" class="form-control text-right"
                     :class="{'bg-primary': editedCurrency.expression != funiter.currency.expression}" :disabled="funiter.isPlaying">
-                <span class="input-group-text"> ) Ü(t)</span>    
+                <span class="input-group-text pr-1"> ) Ü(t)
+                    <info-button class="px-0 ml-2" info="info-currency-expression" />    
+                </span>    
             </div>
+            <info infoId="info-currency-expression">
+                <en>EN_info-currency-expression</en>
+                <fr>FR_info-currency-expression</fr>
+            </info> 
             <div class="input-group mb-1">
                 <label class="input-group-text" for="currencyUPerDay">
                     <en>Ü per day</en>
@@ -36,8 +54,14 @@
                 </label>
                 <input id="currencyUPerDay" v-model="editedCurrency.uPerDay" type="number" min="0" max="1000" step="1" class="form-control text-right"
                     :class="{'bg-primary': editedCurrency.uPerDay != funiter.currency.uPerDay}" :disabled="funiter.isPlaying">
-                <span class="input-group-text">Ü</span>
+                <span class="input-group-text pr-1">Ü
+                   <info-button class="px-0 ml-2" info="info-currency-uPerDay" /> 
+                </span>
             </div>
+            <info infoId="info-currency-uPerDay">
+                <en>EN_info-currency-uPerDay</en>
+                <fr>FR_info-currency-uPerDay</fr>
+            </info> 
             <div class="input-group mb-1">
                 <label class="input-group-text" for="currencyRevaluationTime">
                     <en>revaluation period</en>
@@ -45,11 +69,16 @@
                 </label>
                 <input id="currencyRevaluationTime" v-model="editedCurrency.revaluationTime" type="number" min="1" max="400" step="1" class="form-control text-right" 
                     :class="{'bg-primary': editedCurrency.revaluationTime != funiter.currency.revaluationTime}" :disabled="funiter.isPlaying">
-                <span class="input-group-text">
+                <span class="input-group-text pr-1">
                     <en>day<span v-if="editedCurrency.revaluationTime > 1">s</span></en>
                     <fr>jour<span v-if="editedCurrency.revaluationTime > 1">s</span></fr>
+                    <info-button class="px-0 ml-2" info="info-currency-revaluationTime" />
                 </span>
             </div>
+            <info infoId="info-currency-revaluationTime">
+                <en>EN_info-currency-revaluationTime</en>
+                <fr>FR_info-currency-revaluationTime</fr>
+            </info>
             <div class="input-group mb-1">
                 <label class="input-group-text" for="currencyStepTime">
                     <en>day duration</en>
@@ -57,11 +86,16 @@
                 </label>
                 <input id="currencyStepTime" v-model="editedCurrency.stepTime" type="number" min="1" max="90000" step="1" class="form-control text-right"
                     :class="{'bg-primary': editedCurrency.stepTime != funiter.currency.stepTime}" :disabled="funiter.isPlaying">
-                <span class="input-group-text">
+                <span class="input-group-text pr-1">
                     <en>second<span v-if="editedCurrency.stepTime > 1">s</span></en>
                     <fr>seconde<span v-if="editedCurrency.stepTime > 1">s</span></fr>
+                    <info-button class="px-0 ml-2" info="info-currency-stepTime" />
                 </span>
             </div>
+            <info infoId="info-currency-stepTime">
+                <en>EN_info-currency-stepTime</en>
+                <fr>FR_info-currency-stepTime</fr>
+            </info>
 
             <div class="d-flex align-items-start flex-wrap" style="justify-content: space-evenly;" v-if="currencyChange">
                 <button type="button" class="btn btn-secondary mr-auto" @click="Object.assign(editedCurrency, funiter.currency)">
@@ -75,59 +109,6 @@
             </div>
 
             <div class="input-group mb-1 mt-3">
-                <label class="input-group-text" for="currencyMass">
-                    <en>monetary mass (M)</en>
-                    <fr>masse monétaire (M)</fr>
-                </label>
-                <input id="currencyMass" :value="funiter.currencyWithoutDecimal(funiter.currency.monetaryMass)" type="text" class="form-control text-right" disabled>
-                <span class="input-group-text">Ü</span>
-            </div>
-            <div class="input-group mb-1">
-                <label class="input-group-text" for="currencyNbMembers">
-                    <en>Üman accounts (N)</en>
-                    <fr>comptes Ümains (N)</fr>
-                </label>
-                <input id="currencyNbMembers" :value="funiter.currency.nbMembers" type="text" class="form-control text-right" disabled>
-            </div>
-            <div class="input-group mb-1">
-                <label class="input-group-text" for="currencyAvg">
-                    <en>average</en>
-                    <fr>moyenne</fr>
-                </label>
-                <input id="currencyAvg" :value="funiter.currencyWithoutDecimal(funiter.currency.average)" type="text" class="form-control text-right" disabled>
-                <span class="input-group-text">
-                    <en>Ü / Üman</en>
-                    <fr>Ü / Ümain</fr>
-                </span>
-            </div>
-            <div class="input-group mb-1">
-                <label class="input-group-text" for="currencyQuantitative">
-                    <en>quantitative</en>
-                    <fr>quantitatif</fr>
-                </label>
-                <input id="currencyQuantitative" :value="funiter.currency.quantitative.toFixed(2)" type="text" class="form-control text-right" disabled>
-                <span class="input-group-text">
-                    <en>Ü / Ü(0)</en>
-                    <fr>Ü / Ü(0)</fr>
-                </span>
-            </div>
-            <div class="input-group mb-1">
-                <label class="input-group-text" for="currencyLastGrew">
-                    <en>last growth</en>
-                    <fr>dernière croissance</fr>
-                </label>
-                <input id="currencyLastGrew" :value="lastGrew" type="text" class="form-control text-right" disabled>
-                <span class="input-group-text">%</span>
-            </div>
-            <div class="input-group mb-1">
-                <label class="input-group-text" for="currencyLastMelt">
-                    <en>last melting</en>
-                    <fr>dernière fonte</fr>
-                </label>
-                <input id="currencyLastMelt" :value="funiter.currency.lastMelt" type="text" class="form-control text-right" disabled>
-                <span class="input-group-text">%</span>
-            </div>
-            <div class="input-group mb-1">
                 <label class="input-group-text" for="currencyElapsedTime">
                     <en>elapsed time (T)</en>
                     <fr>temps écoulé (T)</fr>
@@ -138,14 +119,88 @@
                     <fr>jour<span v-if="funiter.currency.elapsedTime > 1">s</span></fr>
                 </span>
             </div>
-        </form>    
+
+            <div v-if="more">
+                <div class="input-group mb-1">
+                    <label class="input-group-text" for="currencyMass">
+                        <en>monetary mass (M)</en>
+                        <fr>masse monétaire (M)</fr>
+                    </label>
+                    <input id="currencyMass" :value="funiter.currencyWithoutDecimal(funiter.currency.monetaryMass)" type="text" class="form-control text-right" disabled>
+                    <span class="input-group-text">Ü</span>
+                </div>
+                <div class="input-group mb-1">
+                    <label class="input-group-text" for="currencyNbMembers">
+                        <en>Üman accounts (N)</en>
+                        <fr>comptes Ümains (N)</fr>
+                    </label>
+                    <input id="currencyNbMembers" :value="funiter.currency.nbMembers" type="text" class="form-control text-right" disabled>
+                </div>
+                <div class="input-group mb-1">
+                    <label class="input-group-text" for="currencyAvg">
+                        <en>average</en>
+                        <fr>moyenne</fr>
+                    </label>
+                    <input id="currencyAvg" :value="funiter.currencyWithoutDecimal(funiter.currency.average)" type="text" class="form-control text-right" disabled>
+                    <span class="input-group-text">
+                        <en>Ü / Üman</en>
+                        <fr>Ü / Ümain</fr>
+                    </span>
+                </div>
+                <div class="input-group mb-1">
+                    <label class="input-group-text" for="currencyQuantitative">
+                        <en>quantitative</en>
+                        <fr>quantitatif</fr>
+                    </label>
+                    <input id="currencyQuantitative" :value="funiter.currency.quantitative.toFixed(2)" type="text" class="form-control text-right" disabled>
+                    <span class="input-group-text">
+                        <en>Ü / Ü(0)</en>
+                        <fr>Ü / Ü(0)</fr>
+                    </span>
+                </div>
+                <div class="input-group mb-1">
+                    <label class="input-group-text" for="currencyLastGrew">
+                        <en>last growth</en>
+                        <fr>dernière croissance</fr>
+                    </label>
+                    <input id="currencyLastGrew" :value="lastGrew" type="text" class="form-control text-right" disabled>
+                    <span class="input-group-text">%</span>
+                </div>
+                <div class="input-group mb-1">
+                    <label class="input-group-text" for="currencyLastMelt">
+                        <en>last melting</en>
+                        <fr>dernière fonte</fr>
+                    </label>
+                    <input id="currencyLastMelt" :value="funiter.currency.lastMelt" type="text" class="form-control text-right" disabled>
+                    <span class="input-group-text">%</span>
+                </div>
+            </div>
+
+            <div class="input-group mb-1">
+                <button type="button" class="btn btn-secondary form-control text-left" @click="more = true" v-if="!more">
+                    <en>more data</en>
+                    <fr>plus de données</fr>
+                    <i class="fa fa-plus-square position-absolute end-0 mr-3 pt-1"></i>
+                </button>
+                <button type="button" class="btn btn-secondary form-control text-left" @click="more = false" v-else>
+                    <en>less data</en>
+                    <fr>moins de données</fr>
+                    <i class="fa fa-minus-square position-absolute end-0 mr-3 pt-1"></i>
+                </button>
+            </div>
+            
+        </form> 
     </div>
 </template>
 
 <script setup>
 import funiter from '../lib/funiterReactive.js'
 import { fr, en } from './Translate.js'
-import { reactive, computed, onMounted, watch } from 'vue'
+import info from './Info.vue'
+import infoButton from './Info-Button.vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
+
+const more = ref(false)
 
 const editedCurrency = reactive({
     expression: '',
