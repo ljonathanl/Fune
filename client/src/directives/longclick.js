@@ -10,7 +10,6 @@ export default {
     let pressInterval = null
 
     const start = (e) => {
-      console.log("start " + e.type)
       if (e.type === 'click' && e.button !== 0) {
         return
       }

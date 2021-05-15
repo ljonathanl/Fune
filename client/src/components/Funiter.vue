@@ -33,4 +33,8 @@ onMounted(() => {
   .pointer {
     cursor: pointer;
   }
+
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div style="width: 400px;">
+    <div>
         <h4 class="text-center mb-3">
             <en>account</en>
             <fr>compte</fr>
@@ -45,7 +45,7 @@
                     <en>transaction</en>
                     <fr>transaction</fr>
                 </h4>
-                <form class="mb-4 justify-content-center" v-if="state.account.role == 'bank' || state.account.balance > 0">
+                <form class="mb-4 justify-content-center mx-auto" style="max-width: 500px;" >
                     <div>
                         <div class="input-group mb-1">
                             <input v-model="state.tx.value" type="number" :max="Math.round(state.account.balance/100)" step="any" min="0" class="form-control text-right">
@@ -80,7 +80,9 @@
                     <fr>stats</fr>
                 </h4>
                 <trend
+                    class="p-2"
                     :data="state.stats"
+                    style="background-color: #00000088; border-radius: .5rem"
                     :gradientDirection="'top'"
                     :gradient="['#f560a2', '#e83283', '#bd125e']"
                     :padding="10"
@@ -97,12 +99,12 @@
                     <en>diary</en>
                     <fr>journal</fr>
                 </h4>
-                <ul class="list-group list-group-flush pointer" style="max-width: 440px;">
-                    <li v-for="transaction in state.transactions" :key="transaction.id" class="list-group-item list-group-item-action">
+                <ul class="list-group list-group-flush pointer mx-auto" style="max-width: 450px;">
+                    <li v-for="transaction in state.transactions" :key="transaction.id" class="list-group-item list-group-item-action p-2">
                         <div class="d-flex w-100 justify-content-between" @click="state.tx.to = transaction.from == state.account.name ? transaction.to : transaction.from">
                             <div>
                                 <h5 v-if="transaction.from == state.account.name">
-                                    <span style="width: 80px;" class="badge bg-light text-dark text-right">{{ funiter.currencyDecimal(transaction.value) }}<small> Ü</small></span>
+                                    <span style="width: 85px;" class="badge bg-light text-dark text-right">{{ funiter.currencyDecimal(transaction.value) }} Ü</span>
                                     <span style="width: 70px;" class="d-inline-block text-center">
                                         <en> to </en>
                                         <fr> à </fr> 
@@ -114,7 +116,7 @@
                                     </strong>
                                 </h5>
                                 <h5 v-else>
-                                    <span style="width: 80px;" class="badge bg-primary text-right">{{ funiter.currencyDecimal(transaction.value) }}<small> Ü</small></span>
+                                    <span style="width: 85px;" class="badge bg-primary text-right">{{ funiter.currencyDecimal(transaction.value) }} Ü</span>
                                     <span style="width: 70px;" class="d-inline-block text-center">
                                         <en> from </en>
                                         <fr> de </fr>
@@ -125,10 +127,10 @@
                                         </span>
                                     </strong>
                                 </h5>
-                                {{ translateTxMessage(transaction.message) }}
                             </div>
-                            <small> {{ formatDay(transaction.day) }}</small>
+                            <small class="text-right"> {{ formatDay(transaction.day) }}</small>
                         </div>
+                        <span class="fw-bold">{{ translateTxMessage(transaction.message) }}</span>
                     </li>
                 </ul>
             </div>
@@ -191,6 +193,9 @@ const digit = (value) => {
 }
 
 const translateTxMessage = (message) => {
+    if (!message)
+        return ''
+
     if (message == '!1Ucreation') {
         return translate({
             en: '> u crëate Ü!',

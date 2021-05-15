@@ -134,7 +134,7 @@ var Background = {
       h('text', {
         x: boundary.minX,
         y: boundary.minY - 2,
-        fill: '#CCCCCC88',
+        fill: '#EEEEEEBB',
         'font-size': '0.6em'
       }, Math.round(this.max / 1000)),
       h('line', {
@@ -142,12 +142,12 @@ var Background = {
         y1: boundary.minY,
         x2: boundary.maxX,
         y2: boundary.minY,
-        stroke: '#CCCCCC88'
+        stroke: '#EEEEEEBB'
       }),
       h('text', {
         x: boundary.minX,
         y: boundary.maxY - 2,
-        fill: '#CCCCCC88',
+        fill: '#EEEEEEBB',
         'font-size': '0.6em'
       }, Math.round(this.min / 1000)),
       h('line', {
@@ -155,7 +155,7 @@ var Background = {
         y1: boundary.maxY,
         x2: boundary.maxX,
         y2: boundary.maxY,
-        stroke: '#CCCCCC88'
+        stroke: '#EEEEEEBB'
       })
     ]
   }
@@ -408,12 +408,12 @@ var Trends = {
       viewBox: ("0 0 " + viewWidth + " " + viewHeight)
     },
       [
+        paths,
         h(Background, {
           boundary: boundary,
           max: max,
           min: this.min,
         }),
-        paths
       ]
     )
   }

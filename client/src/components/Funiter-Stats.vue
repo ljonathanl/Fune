@@ -10,6 +10,8 @@
             <fr>FR_info-stats</fr>
         </info>
         <trends
+            class="p-2"
+            style="background-color: #00000088; border-radius: .5rem"
             :data="state.stats"
             :colors="state.colors"
             :padding="10"
@@ -20,7 +22,7 @@
             auto-draw
             smooth>
         </trends>
-        <div class="input-group mx-auto mt-1 mb-1" style="max-width: 400px">
+        <div class="input-group mx-auto mt-2 mb-1" style="max-width: 400px">
             <label class="input-group-text px-1">
                 100
             </label>

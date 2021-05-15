@@ -97,7 +97,7 @@
                 <fr>FR_info-currency-stepTime</fr>
             </info>
 
-            <div class="d-flex align-items-start flex-wrap" style="justify-content: space-evenly;" v-if="currencyChange">
+            <div class="d-flex align-items-start flex-wrap mb-1" style="justify-content: space-evenly;" v-if="currencyChange">
                 <button type="button" class="btn btn-secondary mr-auto" @click="Object.assign(editedCurrency, funiter.currency)">
                     <en>ündo!</en>
                     <fr>annüler!</fr>
@@ -108,7 +108,7 @@
                 </button>
             </div>
 
-            <div class="input-group mb-1 mt-3">
+            <!-- <div class="input-group mb-1 mt-3">
                 <label class="input-group-text" for="currencyElapsedTime">
                     <en>elapsed time (T)</en>
                     <fr>temps écoulé (T)</fr>
@@ -118,6 +118,19 @@
                     <en>day<span v-if="funiter.currency.elapsedTime > 1">s</span></en>
                     <fr>jour<span v-if="funiter.currency.elapsedTime > 1">s</span></fr>
                 </span>
+            </div> -->
+
+            <div class="input-group mb-1 mt-3">
+                <button type="button" class="btn btn-secondary form-control text-left" @click="more = true" v-if="!more">
+                    <en>more data</en>
+                    <fr>plus de données</fr>
+                    <i class="fa fa-plus-square position-absolute end-0 mr-3 pt-1"></i>
+                </button>
+                <button type="button" class="btn btn-secondary form-control text-left" @click="more = false" v-else>
+                    <en>less data</en>
+                    <fr>moins de données</fr>
+                    <i class="fa fa-minus-square position-absolute end-0 mr-3 pt-1"></i>
+                </button>
             </div>
 
             <div v-if="more">
@@ -176,18 +189,7 @@
                 </div>
             </div>
 
-            <div class="input-group mb-1">
-                <button type="button" class="btn btn-secondary form-control text-left" @click="more = true" v-if="!more">
-                    <en>more data</en>
-                    <fr>plus de données</fr>
-                    <i class="fa fa-plus-square position-absolute end-0 mr-3 pt-1"></i>
-                </button>
-                <button type="button" class="btn btn-secondary form-control text-left" @click="more = false" v-else>
-                    <en>less data</en>
-                    <fr>moins de données</fr>
-                    <i class="fa fa-minus-square position-absolute end-0 mr-3 pt-1"></i>
-                </button>
-            </div>
+            
             
         </form> 
     </div>
