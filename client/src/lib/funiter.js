@@ -1,4 +1,4 @@
-const txLimit = 1000
+const txLimit = 100
 const statLimit = 100
 
 const roles = {
@@ -28,6 +28,7 @@ let timeOutId = 0
 
 let state = {}
 
+let beginStat = 0
 
 const funiter = {
     name: 'fÜne',
@@ -153,13 +154,19 @@ funiter.getAccountStats = (id, period = statTypes.day) => {
     if (!stat)
         return []
 
-    if (state.currency.elapsedTime < statPeriods[period])
-        return [stat[0], stat[0]]
+    let begin = 0
+    if (period == statTypes.day)
+        begin = beginStat
+
+    let index = (Math.floor(state.currency.elapsedTime / statPeriods[period])) % statLimit
+
+    if (begin == index)
+        return [stat[begin], stat[begin]]
+
+    if (index > begin) 
+        return stat.slice(begin, index + 1)
     
-    let index = (Math.floor(state.currency.elapsedTime / statPeriods[period]) + 1) % statLimit
-    if (index > 0 && state.currency.elapsedTime < statPeriods[period] * statLimit) 
-        return stat.slice(0, index)
-    return stat.slice(index).concat(stat.slice(0, index))
+    return stat.slice(begin).concat(stat.slice(0, index + 1))
 }
 
 
@@ -238,9 +245,9 @@ const saveCurrencyStat = (statInfo = null) => {
     let stat = state.stats[funiter.name]
     if (!stat) {
         stat = {}
-        stat[statTypes.day] = new Array(statLimit).fill(defaultCurrency)
-        stat[statTypes.month] = new Array(statLimit).fill(defaultCurrency)
-        stat[statTypes.year] = new Array(statLimit).fill(defaultCurrency)
+        stat[statTypes.day] = new Array(statLimit).fill({})
+        stat[statTypes.month] = new Array(statLimit).fill({})
+        stat[statTypes.year] = new Array(statLimit).fill({})
         state.stats[funiter.name] = stat
     }
     stat[statTypes.day][statInfo.statDayIndex] = value
@@ -278,6 +285,9 @@ const refreshCurrencyAndStats = () => {
 
 const play = (autoPlay = true) => {
     state.currency.elapsedTime++
+
+    if (state.currency.elapsedTime >= statLimit && state.currency.elapsedTime % statLimit == beginStat)
+        beginStat = (beginStat + 1) % statLimit 
     
     let meltValue = 0
     let meltPercent = 0
@@ -373,6 +383,7 @@ funiter.reset = () => {
     state.currency.elapsedTime = 0
     state.currency.lastMelt = 0
     state.currency.quantitative = 1
+    beginStat = 0
     refreshCurrencyAndStats()
 }
 
@@ -384,7 +395,26 @@ funiter.play = (autoPlay = true) => {
         }
         funiter.isPlaying = autoPlay
         play(autoPlay)
+        return true
     }
+}
+
+funiter.unplay = () => {
+    if (!funiter.isPlaying && state.currency.elapsedTime > 0) {
+        const dayBefore = (state.currency.elapsedTime - 1) % statLimit
+        const currency = state.stats[funiter.name][statTypes.day][dayBefore]
+        if (currency && currency.elapsedTime == state.currency.elapsedTime - 1) {
+            funiter.updateCurrency(currency)
+            Object.values(state.accounts).forEach(account => {
+                if (account.role != roles.bank) {
+                    account.balance = state.stats[account.name][statTypes.day][dayBefore]
+                }
+            })
+            refreshCurrencyAndStats()
+            return true
+        }
+    }
+    return false
 }
 
 

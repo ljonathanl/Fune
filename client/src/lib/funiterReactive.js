@@ -126,14 +126,19 @@ funiterProxy.reset = () => {
 }
 
 funiterProxy.play = (autoPlay) => {
-    funiter.play(autoPlay)
-    funiterProxy.refresh()
+    if(funiter.play(autoPlay))
+        funiterProxy.refresh()
+    funiterProxy.isPlaying = funiter.isPlaying
+}
+
+funiterProxy.unplay = () => {
+    if (funiter.unplay())
+        funiterProxy.refresh()
     funiterProxy.isPlaying = funiter.isPlaying
 }
 
 funiterProxy.stop = () => {
     funiter.stop()
-    funiterProxy.refresh()
     funiterProxy.isPlaying = funiter.isPlaying
 }
 

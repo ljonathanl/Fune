@@ -44,16 +44,14 @@
     <funiter :accounts="accounts" :selectedAccounts="accounts">
       <funiter-data class="mx-auto" style="max-width: 400px;" />
       <funiter-control class="mx-auto sticky-top" />
-      <div class="d-flex align-items-start flex-wrap p-2" style="justify-content: space-evenly;">
-          <div class="mx-auto">
-            <funiter-currency class="mb-3 mx-auto" style="max-width: 450px;"/>
-            <funiter-transaction class="mb-3 mx-auto" style="max-width: 450px;" />
-          </div>
-          <div class="mx-auto">
-            <funiter-stats class="mb-3 mx-auto" style="min-width: 33vw; max-width: 600px;" />
-            <funiter-accounts class="mb-3 mx-auto" style="max-width: 450px;" />
-          </div>  
-        <funiter-account class="mb-3 mx-auto" />
+      <div class="d-flex align-items-start flex-wrap p-2 mt-3" style="justify-content: space-evenly;">
+        <funiter-currency class="mb-3 mx-auto" style="max-width: 450px;min-width: 25vw;"/>
+        <div class="mx-auto">
+          <funiter-stats class="mb-3" style="min-width: 35vw; max-width: 600px;" />
+          <funiter-transaction class="mb-3 mx-auto" style="max-width: 450px;" />
+        </div>
+        <funiter-accounts class="mb-3 mx-auto" style="max-width: 450px;min-width: 25vw;" />
+        <funiter-account class="mb-3 mx-auto" style="min-width: 35vw; max-width: 600px;" />
       </div>
     </funiter>
   </div>
@@ -138,7 +136,15 @@ if (funiterLib.accounts.length <= 1) {
 // Check out https://github.com/vuejs/rfcs/blob/script-setup-2/active-rfcs/0000-script-setup.md
 </script>
 
-
+<style>
+body {
+/* background-color: #000000; */
+/* background-image: url("https://www.transparenttextures.com/patterns/asfalt-dark.png"); */
+/* background-image: url("https://www.transparenttextures.com/patterns/classy-fabric.png"); */
+background-image: url("./rebel.png");
+background-color: #4a5e86
+}
+</style>
 
 
 

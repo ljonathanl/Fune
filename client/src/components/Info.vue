@@ -1,5 +1,5 @@
 <template>
-    <div class="alert alert-info alert-dismissible" v-if="display">
+    <div class="alert alert-info alert-dismissible" v-if="false && display">
         <slot></slot>
         <button type="button" class="btn-close" @click="toggle()" aria-label="Close"></button>
     </div>
