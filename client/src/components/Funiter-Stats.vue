@@ -2,8 +2,13 @@
     <div>
         <h4 class="text-center mb-3">
             <en>stats</en>
-            <fr>stats</fr> 
+            <fr>stats</fr>
+            <info-button class="position-absolute" info="info-stats" /> 
         </h4>
+        <info infoId="info-stats">
+            <en>EN_info-stats</en>
+            <fr>FR_info-stats</fr>
+        </info>
         <trends
             :data="state.stats"
             :colors="state.colors"
@@ -15,7 +20,7 @@
             auto-draw
             smooth>
         </trends>
-        <div class="input-group mx-auto mt-1" style="max-width: 400px">
+        <div class="input-group mx-auto mt-1 mb-1" style="max-width: 400px">
             <label class="input-group-text px-1">
                 100
             </label>
@@ -51,8 +56,14 @@
                     <fr>moyenne</fr>
                 </option>
             </select>
-            <label class="input-group-text p-1"></label> 
+            <label class="input-group-text p-1">
+                <info-button class="px-0" info="info-stats-referential" />
+            </label>
         </div>
+        <info infoId="info-stats-referential">
+            <en>EN_info-stats-referential</en>
+            <fr>FR_info-stats-referential</fr>
+        </info>
     </div>
 </template>
 
@@ -61,6 +72,8 @@
 import { Trends } from './Trend.js'
 import { fr, en } from './Translate.js'
 import funiter from '../lib/funiterReactive.js'
+import info from './Info.vue'
+import infoButton from './Info-Button.vue'
 import { watch, onMounted, reactive } from 'vue'
 
 

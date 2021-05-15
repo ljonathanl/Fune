@@ -2,8 +2,13 @@
     <div>
         <h4 class="text-center mb-3">
             <en>accounts</en>
-            <fr>comptes</fr> 
+            <fr>comptes</fr>
+            <info-button class="position-absolute" info="info-accounts" />  
         </h4>
+        <info infoId="info-accounts">
+            <en>EN_info-accounts</en>
+            <fr>FR_info-accounts</fr>
+        </info>
 
         <table class="table table-hover">
             <thead>
@@ -34,8 +39,8 @@
                     </td>
                     <td class="text-center">
                         <button v-if="account.role == 'human'" class="btn btn-sm btn-primary fw-bold" @click="switchAccountRole(account)">
-                            <en><small>Ü</small>man</en>
-                            <fr><small>Ü</small>main</fr>
+                            <en>Üman</en>
+                            <fr>Ümain</fr>
                         </button>
                         <button v-else-if="account.role == 'wallet'" class="btn btn-sm btn-secondary fw-bold" @click="switchAccountRole(account)">
                             <en>wället</en>
@@ -91,6 +96,8 @@
 <script setup>
 import { fr, en, translate } from './Translate.js'
 import funiter from '../lib/funiterReactive.js'
+import info from './Info.vue'
+import infoButton from './Info-Button.vue'
 import { defineProps, reactive, ref, computed, onMounted, defineEmit } from 'vue'
 
 

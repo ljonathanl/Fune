@@ -2,8 +2,13 @@
     <div style="width: 400px;">
         <h4 class="text-center mb-3">
             <en>account</en>
-            <fr>compte</fr> 
+            <fr>compte</fr>
+            <info-button class="position-absolute" info="info-account" /> 
         </h4>
+        <info infoId="info-account">
+            <en>EN_info-account</en>
+            <fr>FR_info-account</fr>
+        </info>
 
         <div class="mt-3 mb-3">
             <h3 class="text-center mb-6">
@@ -45,11 +50,11 @@
                         <div class="input-group mb-1">
                             <input v-model="state.tx.value" type="number" :max="Math.round(state.account.balance/100)" step="any" min="0" class="form-control text-right">
                             <small class="input-group-text">Ü</small>
-                            <label class="input-group-text" for="txTo">
+                            <label class="input-group-text" for="accountTxTo">
                                 <en> tö </en>
                                 <fr> à </fr> 
                             </label>
-                            <select v-model="state.tx.to" id="txTo" class="form-control">
+                            <select v-model="state.tx.to" id="accountTxTo" class="form-control p-1">
                                 <option disabled value="">
                                     <en>someöne</en>
                                     <fr>qüi</fr>
@@ -67,7 +72,6 @@
                             </label>
                             <input v-model="state.tx.message" type="text" maxlength="32" class="form-control" id="txMessage">
                         </div>
-
                     </div>
                 </form>
 
@@ -93,9 +97,9 @@
                     <en>diary</en>
                     <fr>journal</fr>
                 </h4>
-                <ul class="list-group list-group-flush" style="max-width: 440px;">
+                <ul class="list-group list-group-flush pointer" style="max-width: 440px;">
                     <li v-for="transaction in state.transactions" :key="transaction.id" class="list-group-item list-group-item-action">
-                        <div class="d-flex w-100 justify-content-between">
+                        <div class="d-flex w-100 justify-content-between" @click="state.tx.to = transaction.from == state.account.name ? transaction.to : transaction.from">
                             <div>
                                 <h5 v-if="transaction.from == state.account.name">
                                     <span style="width: 80px;" class="badge bg-light text-dark text-right">{{ funiter.currencyDecimal(transaction.value) }}<small> Ü</small></span>
@@ -136,7 +140,9 @@
 import { Trend } from './Trend.js'
 import { fr, en, translate } from './Translate.js'
 import funiter from '../lib/funiterReactive.js'
-import { reactive, watch, computed } from 'vue'
+import info from './Info.vue'
+import infoButton from './Info-Button.vue'
+import { reactive, watch, computed, onMounted } from 'vue'
 
 const state = reactive({
     account: null,
@@ -169,7 +175,10 @@ watch(() => funiter.currency, refresh, { deep: true })
 const doTx = () => {
     state.tx.from = state.account.name
     console.log(state.tx)
-    funiter.doTx(state.tx)
+    const tx = funiter.doTx(state.tx)
+    if (tx) {
+        state.tx.message = ''
+    }
     refresh()
 }
 
@@ -217,5 +226,14 @@ const formatDay = (day) => {
         fr:  'il y a ' + (funiter.currency.elapsedTime - day) + ' jours'
     })
 }
+
+onMounted(() => {
+    if (!state.account) {
+        const accounts = state.accounts
+        if (accounts.length > 1) {
+            state.account = state.accounts[0]
+        }
+    }
+})
 
 </script>
