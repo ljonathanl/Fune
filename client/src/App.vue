@@ -140,7 +140,7 @@ if (funiterLib.accounts.length <= 1) {
 body {
 /* background-color: #000000; */
 /* background-image: url("https://www.transparenttextures.com/patterns/asfalt-dark.png"); */
-background-image: url("./padded.png");
+background-image: url("/padded.png");
 /* background-image: url("./rebel.png"); */
 background-color: #4a5e86
 }
