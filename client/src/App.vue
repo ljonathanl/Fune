@@ -1,12 +1,12 @@
 <template>
   <div>
     <div class="container mt-3 mb-3">
-      <h1 class="display-1 text-center mb-3">
+      <h1 class="display-1 text-center mb-3" ref="title">
           <code class="bg-primary px-1 align-middle text-light">fї</code>
           <!-- <img src="/favicon64x64.png"/> -->
           <span class="align-middle"> f<small>Ü</small>ne</span>
       </h1>
-      <div class="justify-content-center mb-3 input-group mx-auto w-auto">
+      <div class="justify-content-center mb-3 input-group mx-auto fit-content">
         <button class="btn btn-sm text-light" :class="{ 'btn-outline-secondary': language != 'fr', 'btn-primary': language == 'fr'}" @click="setLanguage('fr')">FR</button>
         <button class="btn btn-sm text-light" :class="{ 'btn-outline-secondary': language != 'en', 'btn-primary': language == 'en'}"  @click="setLanguage('en')">EN</button>
       </div>
@@ -26,12 +26,12 @@
 
       <p class="lead text-center">
         <en>
-            a <small>Ü</small>man account create some new Ü (the Ünit of the f<small>Ü</small>ne currency) each day<br>
-            <small>old created <strong>Ünits</strong> melt by a given percentage each <strong>revaluation period</strong></small>
+            a <strong>Üman</strong> account create some new Ü (the Ünit of the f<small>Ü</small>ne money) at each creation period<br>
+            the old created Ünits melt according to a <strong>mathematical</strong>s formula at each <strong>revaluation period</strong>
         </en>
         <fr>
-            un compte Ümain crée de nouvelles <small>Ü</small> (l'Ünité de la monnaie f<small>Ü</small>ne) chaque jour<br>
-            <small>les anciennes <strong>Ünités</strong> fondent d'un certain pourcentage à chaque <strong>période de réévaluation</strong></small>
+            un compte <strong>Ümain</strong> crée de nouvelles <small>Ü</small> (l'Ünité de la monnaie f<small>Ü</small>ne) à chaque <strong>période de création</strong><br>
+            les anciennes Ünités fondent suivant une <strong>formule</strong> mathématique à chaque <strong>période de réévaluation</strong>
         </fr>
       </p>
       
@@ -45,12 +45,16 @@
       <funiter-data class="mx-auto" style="max-width: 400px;" />
       <funiter-control class="mx-auto sticky-top" />
       <div class="d-flex align-items-start flex-wrap p-2 mt-3" style="justify-content: space-evenly;">
-        <funiter-currency class="mb-3 mx-auto" style="max-width: 450px;min-width: 25vw;"/>
-        <div class="mx-auto">
-          <funiter-stats class="mb-3" style="min-width: 35vw; max-width: 600px;" />
+        <div style="min-width: 30vw;">
+          <funiter-currency class="mb-3 mx-auto" style="width: 380px;"/>
+        </div>
+        <div class="mx-auto" style="min-width: 35vw; max-width: 600px;">
+          <funiter-stats class="mb-3" />
           <funiter-transaction class="mb-3 mx-auto" style="max-width: 450px;" />
         </div>
-        <funiter-accounts class="mb-3 mx-auto" style="max-width: 450px;min-width: 25vw;" />
+        <div style="min-width: 30vw;">
+          <funiter-accounts class="mb-3 mx-auto" style="max-width: 450px;" />
+        </div>
         <funiter-account class="mb-3 mx-auto" style="min-width: 35vw; max-width: 600px;" />
       </div>
     </funiter>
@@ -58,7 +62,7 @@
 </template>
 
 <script>
-import { watch, ref } from 'vue'
+import { watch, ref, onMounted } from 'vue'
 import funiterLib from './lib/funiterReactive.js'
 import funiter from './components/Funiter.vue'
 import { fr, en, language, setLanguage } from './components/Translate.js'
@@ -73,37 +77,18 @@ import funiterStats from './components/Funiter-Stats.vue'
 import info from './components/Info.vue'
 import infoButton from './components/Info-Button.vue'
 
-const currencyToHash = (currency) => {
-  const params = new URLSearchParams()
-  params.append('e', currency.expression)
-  params.append('m', currency.mode)
-  params.append('upd', currency.uPerDay)
-  params.append('rt', currency.revaluationTime)
-  params.append('st', currency.stepTime)
-  return params.toString()   
-}
-
-const hashToCurrency= (hash) => {
-  const params = new URLSearchParams(hash)
-  const currency = {
-    mode: params.get('m') == 'grew' ? 'grew' : 'melt',
-    expression: params.get('e'),
-    uPerDay: parseInt(params.get('upd')),
-    revaluationTime: parseInt(params.get('rt')),
-    stepTime: parseInt(params.get('st')),
-  }
-  return currency
-}
-
-
 let state = JSON.parse(localStorage.getItem('state'))
-if(window.location.hash) {
-  if (!state) 
-    state = {currency: {}}
-  Object.assign(state.currency, hashToCurrency(window.location.hash.substring(1)))
-}
-
 funiterLib.restoreState(state)
+
+const observer = new IntersectionObserver( 
+  ([e]) => {
+    document.body.classList.toggle('titleIsHide', e.intersectionRatio < 1)
+  },
+  {
+    rootMargin: '100px 0px 0px 0px',
+    threshold: [1],
+  }
+)
 
 </script>
 
@@ -115,21 +100,26 @@ const saveState = () => {
   localStorage.setItem('state', JSON.stringify(funiterLib.getState()))
 }
 
-watch(() => funiterLib.currency,
-  () => {
-    window.location.hash = "#" + currencyToHash(funiterLib.currency)
-    saveState()
-  }
-)
+const title = ref(null)
+
+onMounted(() => {
+  observer.observe(title.value)
+})
+
+watch(() => funiterLib.currency, saveState, { deep: true })
 
 watch(() => funiterLib.selectedAccounts, saveState, { deep: true })
 
 const accounts = []
 
 if (funiterLib.accounts.length <= 1) {
-  accounts.push({name: 'Alice', balance: 10000, role: 'human'})
-  accounts.push({name: 'Bob', balance: 20000, role: 'human'})
-  accounts.push({name: 'Carole', balance: 0, role: 'human'})
+  const alice = {name: 'Alice', balance: 10000, role: 'human'}
+  const bob = {name: 'Bob', balance: 20000, role: 'human'}
+  const carole = {name: 'Carole', balance: 0, role: 'human'}
+  funiterLib.addAccounts([alice, bob, carole])
+  funiterLib.select(alice)
+  funiterLib.select(bob)
+  funiterLib.select(carole)
 }
 
 // This starter template is using Vue 3 experimental <script setup> SFCs
@@ -138,12 +128,49 @@ if (funiterLib.accounts.length <= 1) {
 
 <style>
 body {
-/* background-color: #000000; */
-/* background-image: url("https://www.transparenttextures.com/patterns/asfalt-dark.png"); */
-background-image: url("/padded.png");
+background-image: url("/padded.png"), linear-gradient(180deg, #4a5e86 20%, #1f283a);
 /* background-image: url("./rebel.png"); */
-background-color: #4a5e86
+background-color: #4a5e86;
 }
+
+.select-text-center {
+  text-align-last: center;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.stats {
+  background: #2d323e;
+  box-shadow: inset 6px 6px 7px #00000044,
+    inset -6px -6px 7px #FFFFFF11,
+    3px 3px 5px #00000066,
+    -3px -3px 5px #FFFFFF22;
+  border-radius: 1rem;
+}
+
+.control {
+  box-shadow: 0px -3px 10px #FFFFFF33, 0px 3px 10px #FFFFFF33;
+}
+
+.input-group, .list-group {
+  box-shadow: 0px 5px 20px #00000033;
+}
+
+.form-control {
+  box-shadow: inset 0px 3px 2px 0px #00000033;
+}
+
+.fit-content {
+  width: max-content!important;
+}
+
+
 </style>
 
 

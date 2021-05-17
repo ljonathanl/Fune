@@ -15,14 +15,14 @@
                     <en> fröm </en>
                     <fr> de </fr> 
                 </label>
-                <select v-model="tx.from" id="txFrom" class="form-control">
+                <select v-model="tx.from" id="txFrom" class="form-control select-text-center">
                     <option v-for="account in fromAccounts" :value="account.name" :key="account.name">{{ account.name }}</option>
                 </select>
                 <label class="input-group-text" for="txTo">
                     <en> tö </en>
                     <fr> à </fr> 
                 </label>
-                <select v-model="tx.to" id="txTo" class="form-control">
+                <select v-model="tx.to" id="txTo" class="form-control select-text-center">
                     <en><option disabled value="">select öne</option></en>
                     <fr><option disabled value="">qüi</option></fr>
                     <option v-for="account in toAccounts" :value="account.name" :key="account.name">{{ account.name }}</option>

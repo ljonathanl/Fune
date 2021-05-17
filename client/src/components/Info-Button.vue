@@ -1,5 +1,5 @@
 <template>
-    <button class="btn btn-sm text-info" @click="toggle(info)" v-if="false">
+    <button class="btn btn-sm text-info" type="button" @click="toggle(info)">
         <i class="fa fa-info-circle"></i>
     </button>
 </template>

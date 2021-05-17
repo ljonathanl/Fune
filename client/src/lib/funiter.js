@@ -1,6 +1,3 @@
-const txLimit = 100
-const statLimit = 100
-
 const roles = {
     human: 'human',
     wallet: 'wallet',
@@ -12,33 +9,26 @@ const modes = {
     melt: 'melt'
 }
 
-const statTypes = {
-    day: 'day',
-    month: 'month',
-    year: 'year'
-}
-
-const statPeriods = {
-    day: 1,
-    month: 60,
-    year: 360
-}
-
 let timeOutId = 0
-
-let state = {}
-
-let beginStat = 0
 
 const funiter = {
     name: 'fÜne',
     logo: 'fї',
     uValue: 1000,
     isPlaying: false,
+    txLimit: 100,
+    statLimit: 200,
+    symbol: 'Ü',
+    version: '0.5.0'
+}
+
+const state = {
+    version: 1,
+    beginStat: 0
 }
 
 funiter.doTx = (simpleTx, refresh = true) => {
-    let tx = Object.assign({from: '', to: '', message: '', value: 0, date: new Date().toISOString(), day: state.currency.elapsedTime}, simpleTx)
+    let tx = Object.assign({from: '', to: '', message: '', value: 0, date: new Date().toISOString(), time: state.currency.elapsedTime}, simpleTx)
     var accountFrom = state.accounts[tx.from]
     var accountTo = state.accounts[tx.to]
     if (tx.value <= 0 
@@ -58,8 +48,8 @@ funiter.doTx = (simpleTx, refresh = true) => {
     tx.balanceFrom = accountFrom.balance
     tx.balanceTo = accountTo.balance
     state.transactions.push(tx)
-    if (state.transactions.length > txLimit) 
-        state.transactions = state.transactions.slice(state.transactions.length - txLimit)
+    if (state.transactions.length > funiter.txLimit) 
+        state.transactions = state.transactions.slice(state.transactions.length - funiter.txLimit)
     if (refresh)
         refreshCurrencyAndStats()
     return tx
@@ -102,7 +92,7 @@ funiter.createAccount = newAccount => {
     if (!newAccount.name || state.accounts[newAccount.name]) 
         return null
 
-    let account = state.accounts[newAccount.name] = Object.assign({name: '', balance: 0, role: 'wallet', date: new Date().toISOString(), creationDay: state.currency.elapsedTime}, newAccount)
+    let account = state.accounts[newAccount.name] = Object.assign({name: '', balance: 0, role: 'wallet', date: new Date().toISOString(), time: state.currency.elapsedTime}, newAccount)
     refreshCurrencyAndStats()
     return account
 }
@@ -138,35 +128,23 @@ funiter.getAccountTx = (id, limit) => {
     return tx
 }
 
-funiter.getAccountStats = (id, period = statTypes.day) => {
-    period = statTypes[period]
-    if (!period)
-        period = statTypes.day
-
+funiter.getAccountStats = (id) => {
     if (!state.accounts[id]) 
         return null
 
-    const statAccount = state.stats[id]
-    if (!statAccount) 
+    const stat = state.stats[id]
+    if (!stat) 
         return []
 
-    const stat = statAccount[period]
-    if (!stat)
-        return []
+    let index = state.currency.elapsedTime % funiter.statLimit
 
-    let begin = 0
-    if (period == statTypes.day)
-        begin = beginStat
+    if (state.beginStat == index)
+        return [stat[state.beginStat], stat[state.beginStat]]
 
-    let index = (Math.floor(state.currency.elapsedTime / statPeriods[period])) % statLimit
-
-    if (begin == index)
-        return [stat[begin], stat[begin]]
-
-    if (index > begin) 
-        return stat.slice(begin, index + 1)
+    if (index > state.beginStat) 
+        return stat.slice(state.beginStat, index + 1)
     
-    return stat.slice(begin).concat(stat.slice(0, index + 1))
+    return stat.slice(state.beginStat).concat(stat.slice(0, index + 1))
 }
 
 
@@ -175,20 +153,9 @@ funiter.getAccountStats = (id, period = statTypes.day) => {
  * DB
  */
 
-funiter.getState = () => {
-    const result = {
-        currency: state.currency,
-        accounts: state.accounts,
-        transactions: state.transactions,
-        stats: state.stats,
-    }
-    return result
-}
-
 const defaultCurrency = {
-    date: new Date().toISOString(),
     stepTime: 1,
-    uPerDay: 1,
+    uPerTime: 1,
     elapsedTime: 0,
     revaluationTime: 1, 
     nbMembers: 0,
@@ -208,60 +175,22 @@ funiter.expressionParser = (expression, values) => {
 const cheatRegex = /!x(\d+)/
 const uValue = funiter.uValue
 const revaluationMessage = '!revaluation%'
-const creationMessage = '!1Ucreation'
+const creationMessage = '!Ucreation'
 
-const getStatInfo = () => {
-    return {
-        isStatMonth: state.currency.elapsedTime % statPeriods.month == 0,
-        isStatYear: state.currency.elapsedTime % statPeriods.year == 0,
-        statDayIndex: state.currency.elapsedTime % statLimit,
-        statMonthIndex: (state.currency.elapsedTime / statPeriods.month) % statLimit,
-        statYearIndex: (state.currency.elapsedTime / statPeriods.year) % statLimit,
-    }
-}
-
-const saveStat = (account, value, statInfo = null) => {
-    if (!statInfo)
-        statInfo = getStatInfo()
-    let stat = state.stats[account.name]
+const saveStat = (name, value) => {
+    const index = state.currency.elapsedTime % funiter.statLimit
+    let stat = state.stats[name]
     if (!stat) {
-        stat = {}
-        stat[statTypes.day] = new Array(statLimit).fill(0)
-        stat[statTypes.month] = new Array(statLimit).fill(0)
-        stat[statTypes.year] = new Array(statLimit).fill(0)
-        state.stats[account.name] = stat
+        stat = new Array(funiter.statLimit)
+        state.stats[name] = stat
     }
-    stat[statTypes.day][statInfo.statDayIndex] = value
-    if (statInfo.isStatMonth) 
-        stat[statTypes.month][statInfo.statMonthIndex] = value
-    if (statInfo.isStatYear) 
-        stat[statTypes.year][statInfo.statYearIndex] = value    
-}
-
-const saveCurrencyStat = (statInfo = null) => {
-    if (!statInfo)
-        statInfo = getStatInfo()
-    let value = Object.assign({}, state.currency)
-    let stat = state.stats[funiter.name]
-    if (!stat) {
-        stat = {}
-        stat[statTypes.day] = new Array(statLimit).fill({})
-        stat[statTypes.month] = new Array(statLimit).fill({})
-        stat[statTypes.year] = new Array(statLimit).fill({})
-        state.stats[funiter.name] = stat
-    }
-    stat[statTypes.day][statInfo.statDayIndex] = value
-    if (statInfo.isStatMonth) 
-        stat[statTypes.month][statInfo.statMonthIndex] = value
-    if (statInfo.isStatYear) 
-        stat[statTypes.year][statInfo.statYearIndex] = value    
+    stat[index] = value
 }
 
 const refreshCurrencyAndStats = () => {
     let monetaryMass = 0
     let nbMembers = 0
 
-    const statInfo = getStatInfo()
     Object.values(state.accounts).forEach(account => {
         const cheat = account.name.match(cheatRegex)
         let weight = 1
@@ -273,27 +202,29 @@ const refreshCurrencyAndStats = () => {
             
         if (account.role != roles.bank) {
             monetaryMass += account.balance * weight
-            saveStat(account, account.balance, statInfo)
+            saveStat(account.name, account.balance)
         }
     })
 
     state.currency.nbMembers = nbMembers
     state.currency.monetaryMass = monetaryMass
     state.currency.average = nbMembers > 0 ? Math.floor(monetaryMass / nbMembers) : 0
-    saveCurrencyStat(statInfo)
+    saveStat(funiter.name, Object.assign({}, state.currency))
 }
 
 const play = (autoPlay = true) => {
+    if (state.currency.elapsedTime >= 999)
+        funiter.stop()
     state.currency.elapsedTime++
 
-    if (state.currency.elapsedTime >= statLimit && state.currency.elapsedTime % statLimit == beginStat)
-        beginStat = (beginStat + 1) % statLimit 
+    if (state.currency.elapsedTime >= funiter.statLimit && state.currency.elapsedTime % funiter.statLimit == state.beginStat)
+        state.beginStat = (state.beginStat + 1) % funiter.statLimit 
     
     let meltValue = 0
     let meltPercent = 0
     
-    const uPerDay = state.currency.uPerDay >= 0 ? Math.floor(state.currency.uPerDay) : 0
-    const uGained = uValue * state.currency.revaluationTime * uPerDay
+    const uPerTime = state.currency.uPerTime >= 0 ? Math.floor(state.currency.uPerTime) : 0
+    const uGained = uValue * state.currency.revaluationTime * uPerTime
     const funiterAccount = state.accounts[funiter.name]
     
     const isRevaluation = state.currency.elapsedTime % state.currency.revaluationTime == 0
@@ -314,8 +245,8 @@ const play = (autoPlay = true) => {
                 melting = 10
             funiter.doTx({from: account.name, to: funiterAccount.name, message: revaluationMessage + meltPercent, value: melting}, false)
         }    
-        if (account.role == roles.human && uPerDay > 0) {
-            funiter.doTx({from: funiterAccount.name, to: account.name, message: creationMessage, value: uValue * uPerDay}, false)
+        if (account.role == roles.human && uPerTime > 0) {
+            funiter.doTx({from: funiterAccount.name, to: account.name, message: creationMessage, value: uValue * uPerTime}, false)
         }
     })
 
@@ -330,12 +261,16 @@ const play = (autoPlay = true) => {
     if (autoPlay)
         timeOutId = setTimeout(play, state.currency.stepTime * 1000, true)
 
-    funiter.onDayChange(state.currency.elapsedTime)
+    funiter.onTimeChange(state.currency.elapsedTime)
+}
+
+funiter.getState = () => {
+    return Object.assign({}, state)
 }
 
 funiter.restoreState = savedState => {
-    if (!savedState)
-        return
+    if (!savedState || !savedState.version || savedState.version != 1)
+        return false
     
     if (savedState.currency) 
         state.currency = Object.assign(defaultCurrency, savedState.currency)
@@ -345,6 +280,10 @@ funiter.restoreState = savedState => {
         state.transactions = savedState.transactions
     if (savedState.stats) 
         state.stats = savedState.stats
+    if (savedState.beginStat)
+        state.beginStat = savedState.beginStat
+
+    return true
 }
 
 
@@ -359,7 +298,7 @@ funiter.start = (expressionParser, initialState) => {
     if (!state.accounts) 
         state.accounts = {}
 
-    state.accounts[funiter.name] = {name: funiter.name, balance: 0, role: roles.bank, date: new Date().toISOString(), creationDay: 0}
+    state.accounts[funiter.name] = {name: funiter.name, balance: 0, role: roles.bank, date: new Date().toISOString(), time: 0}
 
     if (!state.transactions)
         state.transactions = []
@@ -369,7 +308,7 @@ funiter.start = (expressionParser, initialState) => {
 }
 
 
-funiter.onDayChange = () => {
+funiter.onTimeChange = () => {
     // nothing
 }
 
@@ -383,7 +322,7 @@ funiter.reset = () => {
     state.currency.elapsedTime = 0
     state.currency.lastMelt = 0
     state.currency.quantitative = 1
-    beginStat = 0
+    state.beginStat = 0
     refreshCurrencyAndStats()
 }
 
@@ -401,16 +340,17 @@ funiter.play = (autoPlay = true) => {
 
 funiter.unplay = () => {
     if (!funiter.isPlaying && state.currency.elapsedTime > 0) {
-        const dayBefore = (state.currency.elapsedTime - 1) % statLimit
-        const currency = state.stats[funiter.name][statTypes.day][dayBefore]
+        const timeBefore = (state.currency.elapsedTime - 1) % funiter.statLimit
+        const currency = state.stats[funiter.name][timeBefore]
         if (currency && currency.elapsedTime == state.currency.elapsedTime - 1) {
             funiter.updateCurrency(currency)
             Object.values(state.accounts).forEach(account => {
                 if (account.role != roles.bank) {
-                    account.balance = state.stats[account.name][statTypes.day][dayBefore]
+                    account.balance = state.stats[account.name][timeBefore]
                 }
             })
             refreshCurrencyAndStats()
+            state.transactions = state.transactions.filter(tx => tx.time <= timeBefore)
             return true
         }
     }
