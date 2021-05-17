@@ -18,6 +18,8 @@
             :stroke-width="1.4"
             :stroke-linecap="'butt'"
             :min="0"
+            :xUnit="state.xUnit"
+            :yUnit="state.yUnit"
             auto-draw
             smooth>
         </trends>
@@ -54,7 +56,7 @@
 
 <script setup>
 import { Trends } from './Trend.js'
-import { fr, en } from './Translate.js'
+import { fr, en, translateTime } from './Translate.js'
 import funiter from '../lib/funiterReactive.js'
 import info from './Info.vue'
 import infoButton from './Info-Button.vue'
@@ -64,10 +66,13 @@ import { watch, onMounted, reactive } from 'vue'
 const state = reactive({
     referential: 'relative',
     stats: [],
-    colors: []
+    colors: [],
+    xUnit: '',
+    yUnit: 'Ü'
 })
 
 const getStats = () => {
+    state.xUnit = funiter.currency.elapsedTime + ' ' + translateTime(funiter.creationPeriod, funiter.currency.elapsedTime)
     let funeStat = funiter.getAccountStats(funiter.name)
     let stat = null
     let stats = []
@@ -92,12 +97,15 @@ const getStats = () => {
     })
 
     if (state.referential == 'average') {
+        state.yUnit = '% M/N'
         stat = new Array(funeStat.length).fill(100000)
     } else if (state.referential == 'relative') {
+        state.yUnit = 'Ü'
         stat = funeStat.map(c => {
             return c.average
         })
     } else if (state.referential == 'quantitative') {
+        state.yUnit = 'Ü(0) / Ü'
         stat = funeStat.map(c => {
             return c.average * (c.quantitative / funiter.currency.quantitative)
         })
@@ -112,7 +120,7 @@ watch(() => funiter.selectedAccounts, getStats, { deep: true })
 
 watch(() => funiter.currency, getStats, { deep: true })
 
-watch(() => state.referential,  getStats)
+watch(() => [state.referential, funiter.creationPeriod],  getStats)
 
 onMounted(getStats)
 

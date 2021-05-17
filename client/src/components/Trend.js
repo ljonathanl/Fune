@@ -44,7 +44,7 @@ function genPoints(data, ref, ref$1) {
   var max = ref$1.max;
   var min = ref$1.min;
 
-  var arr = data.map(function (item) { return (typeof item === 'number' ? item : item.value); });
+  var arr = data.map(function (item) { return (!isNaN(item) ? item : 0); });
   var minValue = Math.min.apply(Math, arr.concat([min])) - 0.001;
   var gridX = (maxX - minX) / (arr.length - 1);
   var gridY = (maxY - minY) / (Math.max.apply(Math, arr.concat([max])) + 0.001 - minValue);
@@ -125,7 +125,7 @@ var Path = {
 };
 
 var Background = {
-  props: ['boundary', 'max', 'min'],
+  props: ['boundary', 'max', 'min', 'xUnit', 'yUnit'],
 
   render: function render() {
     var boundary = this.boundary;
@@ -133,10 +133,24 @@ var Background = {
     return [
       h('text', {
         x: boundary.minX,
-        y: boundary.minY - 2,
+        y: boundary.minY - 3,
         fill: '#EEEEEEBB',
         'font-size': '0.6em'
-      }, Math.round(this.max / 1000)),
+      }, Math.round(this.max / 1000) + ' ' + this.yUnit),
+      h('text', {
+        x: boundary.minX,
+        y: boundary.maxY - 2,
+        fill: '#EEEEEEBB',
+        'font-size': '0.6em'
+      }, Math.round(this.min / 1000)),
+      h('text', {
+        x: boundary.maxX,
+        y: boundary.maxY - 2,
+        width: 100,
+        fill: '#EEEEEEBB',
+        style: {'text-anchor': 'end'},
+        'font-size': '0.6em'
+      }, this.xUnit),
       h('line', {
         x1: boundary.minX,
         y1: boundary.minY,
@@ -144,12 +158,6 @@ var Background = {
         y2: boundary.minY,
         stroke: '#EEEEEEBB'
       }),
-      h('text', {
-        x: boundary.minX,
-        y: boundary.maxY - 2,
-        fill: '#EEEEEEBB',
-        'font-size': '0.6em'
-      }, Math.round(this.min / 1000)),
       h('line', {
         x1: boundary.minX,
         y1: boundary.maxY,
@@ -245,7 +253,15 @@ var Trend = {
       type: Number,
       default: 10
     },
-    smooth: Boolean
+    smooth: Boolean,
+    xUnit: {
+      type: String,
+      default: ''
+    },
+    yUnit: {
+      type: String,
+      default: ''
+    }
   },
 
   watch: {
@@ -306,6 +322,8 @@ var Trend = {
           boundary: boundary,
           max: Math.max.apply(Math, this.data.concat([this.max])),
           min: Math.min.apply(Math, this.data.concat([this.min])),
+          xUnit: this.xUnit,
+          yUnit: this.yUnit
         }),
         h(Path, {
           smooth: this.smooth,
@@ -349,7 +367,15 @@ var Trends = {
       type: Number,
       default: 10
     },
-    smooth: Boolean
+    smooth: Boolean,
+    xUnit: {
+      type: String,
+      default: ''
+    },
+    yUnit: {
+      type: String,
+      default: ''
+    }
   },
 
   render: function render() {
@@ -413,6 +439,8 @@ var Trends = {
           boundary: boundary,
           max: max,
           min: this.min,
+          xUnit: this.xUnit,
+          yUnit: this.yUnit
         }),
       ]
     )
