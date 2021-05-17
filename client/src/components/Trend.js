@@ -135,21 +135,21 @@ var Background = {
         x: boundary.minX,
         y: boundary.minY - 3,
         fill: '#EEEEEEBB',
-        'font-size': '0.6em'
+        'font-size': '0.5em'
       }, Math.round(this.max / 1000) + ' ' + this.yUnit),
       h('text', {
         x: boundary.minX,
-        y: boundary.maxY - 2,
+        y: boundary.maxY - 3,
         fill: '#EEEEEEBB',
-        'font-size': '0.6em'
+        'font-size': '0.5em'
       }, Math.round(this.min / 1000)),
       h('text', {
         x: boundary.maxX,
-        y: boundary.maxY - 2,
+        y: boundary.maxY - 3,
         width: 100,
         fill: '#EEEEEEBB',
         style: {'text-anchor': 'end'},
-        'font-size': '0.6em'
+        'font-size': '0.5em'
       }, this.xUnit),
       h('line', {
         x1: boundary.minX,
