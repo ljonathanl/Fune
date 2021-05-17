@@ -19,7 +19,8 @@ const funiter = {
     txLimit: 100,
     statLimit: 200,
     symbol: 'Ü',
-    version: '0.5.0'
+    version: '0.5.0',
+    stepTime: 1,
 }
 
 const state = {
@@ -154,7 +155,6 @@ funiter.getAccountStats = (id) => {
  */
 
 const defaultCurrency = {
-    stepTime: 1,
     uPerTime: 1,
     elapsedTime: 0,
     revaluationTime: 1, 
@@ -213,8 +213,11 @@ const refreshCurrencyAndStats = () => {
 }
 
 const play = (autoPlay = true) => {
-    if (state.currency.elapsedTime >= 999)
+    if (state.currency.elapsedTime >= funiter.statLimit) {
         funiter.stop()
+        return
+    }
+
     state.currency.elapsedTime++
 
     if (state.currency.elapsedTime >= funiter.statLimit && state.currency.elapsedTime % funiter.statLimit == state.beginStat)
@@ -259,7 +262,7 @@ const play = (autoPlay = true) => {
     refreshCurrencyAndStats()
 
     if (autoPlay)
-        timeOutId = setTimeout(play, state.currency.stepTime * 1000, true)
+        timeOutId = setTimeout(play, funiter.stepTime * 1000, true)
 
     funiter.onTimeChange(state.currency.elapsedTime)
 }

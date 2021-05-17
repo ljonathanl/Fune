@@ -21,7 +21,7 @@
             auto-draw
             smooth>
         </trends>
-        <div class="input-group mx-auto mt-3 mb-1" style="max-width: 220px">
+        <div class="input-group mx-auto mt-3 mb-1" style="max-width: 250px">
             <label class="input-group-text px-1">  
                 <en>referential</en>
                 <fr>référentiel</fr>

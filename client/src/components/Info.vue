@@ -9,7 +9,7 @@
 import { computed, reactive, defineProps } from 'vue'
 
 const infoState = reactive({
-    'info-home-funiter': true
+    // 'info-home-funiter': true
 })
 
 const toggleInfo = (id) => {

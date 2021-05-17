@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div class="container mt-3 mb-3">
-      <h1 class="display-1 text-center mb-3" ref="title">
-          <code class="bg-primary px-1 align-middle text-light">fї</code>
-          <!-- <img src="/favicon64x64.png"/> -->
+    <div class="container mt-3 mb-5">
+      <h1 class="display-1 text-center mb-3">
+          <!-- <code class="bg-primary px-1 align-middle text-light">fї</code> -->
+          <img src="/favicon90x90.png" class="icon"/>
           <span class="align-middle"> f<small>Ü</small>ne</span>
       </h1>
       <div class="justify-content-center mb-3 input-group mx-auto fit-content">
@@ -26,11 +26,23 @@
 
       <p class="lead text-center">
         <en>
-            a <strong>Üman</strong> account create some new Ü (the Ünit of the f<small>Ü</small>ne money) at each creation period<br>
+            a <strong>Üman</strong> account create some new Ü (the Ünit of the f<small>Ü</small>ne money) every
+        </en>
+        <fr>
+            un compte <strong>Ümain</strong> crée de nouvelles <small>Ü</small> (l'Ünité de la monnaie f<small>Ü</small>ne) chaque
+        </fr>
+        <select class="form-control select-text-center d-inline fit-content" v-model="funiterLib.creationPeriod">
+          <option value="day">{{ translateTime('day') }}</option>
+          <option value="month">{{ translateTime('month') }}</option>
+          <option value="year">{{ translateTime('year') }}</option>
+        </select>
+      </p>
+
+      <p class="lead text-center">
+        <en>
             the old created Ünits melt according to a <strong>mathematical</strong>s formula at each <strong>revaluation period</strong>
         </en>
         <fr>
-            un compte <strong>Ümain</strong> crée de nouvelles <small>Ü</small> (l'Ünité de la monnaie f<small>Ü</small>ne) à chaque <strong>période de création</strong><br>
             les anciennes Ünités fondent suivant une <strong>formule</strong> mathématique à chaque <strong>période de réévaluation</strong>
         </fr>
       </p>
@@ -41,7 +53,7 @@
       </info>
     </div>
 
-    <funiter :accounts="accounts" :selectedAccounts="accounts">
+    <funiter :accounts="accounts" :selectedAccounts="accounts" class="mt-3">
       <funiter-data class="mx-auto" style="max-width: 400px;" />
       <funiter-control class="mx-auto sticky-top" />
       <div class="d-flex align-items-start flex-wrap p-2 mt-3" style="justify-content: space-evenly;">
@@ -65,7 +77,7 @@
 import { watch, ref, onMounted } from 'vue'
 import funiterLib from './lib/funiterReactive.js'
 import funiter from './components/Funiter.vue'
-import { fr, en, language, setLanguage } from './components/Translate.js'
+import { fr, en, language, setLanguage, translateTime } from './components/Translate.js'
 import funiterData from './components/Funiter-Data.vue'
 import funiterControl from './components/Funiter-Control.vue'
 import funiterCurrency from './components/Funiter-Currency.vue'
@@ -80,16 +92,6 @@ import infoButton from './components/Info-Button.vue'
 let state = JSON.parse(localStorage.getItem('state'))
 funiterLib.restoreState(state)
 
-const observer = new IntersectionObserver( 
-  ([e]) => {
-    document.body.classList.toggle('titleIsHide', e.intersectionRatio < 1)
-  },
-  {
-    rootMargin: '100px 0px 0px 0px',
-    threshold: [1],
-  }
-)
-
 </script>
 
 <script setup>
@@ -99,12 +101,6 @@ const test = ref('info')
 const saveState = () => {
   localStorage.setItem('state', JSON.stringify(funiterLib.getState()))
 }
-
-const title = ref(null)
-
-onMounted(() => {
-  observer.observe(title.value)
-})
 
 watch(() => funiterLib.currency, saveState, { deep: true })
 
@@ -154,8 +150,21 @@ input[type=number] {
   border-radius: 1rem;
 }
 
+.icon {
+  box-shadow: inset 6px 6px 7px #00000044,
+    inset -6px -6px 7px #FFFFFF11,
+    3px 3px 5px #00000066,
+    -3px -3px 5px #FFFFFF22;
+  border-radius: 1rem;
+}
+
+.emboss {
+  box-shadow: 3px 3px 5px #00000066,
+    -3px -3px 5px #FFFFFF22;
+}
+
 .control {
-  box-shadow: 0px -3px 10px #FFFFFF33, 0px 3px 10px #FFFFFF33;
+  box-shadow: 0px -1px 5px #FFFFFF33, 0px 3px 10px #FFFFFF33;
 }
 
 .input-group, .list-group {
@@ -170,6 +179,9 @@ input[type=number] {
   width: max-content!important;
 }
 
+.role {
+  height: 2em;
+}
 
 </style>
 

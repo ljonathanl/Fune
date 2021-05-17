@@ -38,15 +38,15 @@
                         {{ account.name }}
                     </td>
                     <td class="text-center">
-                        <button v-if="account.role == 'human'" class="btn btn-sm btn-primary fw-bold" @click="switchAccountRole(account)">
+                        <button v-if="account.role == 'human'" class="btn btn-sm btn-primary fw-bold role" @click="switchAccountRole(account)">
                             <en>Üman</en>
                             <fr>Ümain</fr>
                         </button>
-                        <button v-else-if="account.role == 'wallet'" class="btn btn-sm btn-secondary fw-bold" @click="switchAccountRole(account)">
+                        <button v-else-if="account.role == 'wallet'" class="btn btn-sm btn-secondary fw-bold role" @click="switchAccountRole(account)">
                             <en>wället</en>
                             <fr>sïmple</fr>
                         </button>
-                        <button v-else class="btn btn-sm btn-danger fw-bold" disabled>
+                        <button v-else class="btn btn-sm btn-danger fw-bold role" disabled>
                             <en>bänk</en>
                             <fr>bänque</fr>
                         </button>
@@ -59,7 +59,7 @@
                                 <fr>raz</fr>
                             </a>
                         </template>
-                        <a v-if="account.name != funiter.name" href="#" @click.stop.prevent="deleteAccount(account)"><i class="fa fa-trash"></i></a>
+                        <a v-if="account.name != funiter.name" href="#" @click.stop.prevent="deleteAccount(account)" class="text-warning"><i class="fa fa-trash"></i></a>
                     </td>
                 </tr>
             </tbody>

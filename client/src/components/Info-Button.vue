@@ -1,7 +1,7 @@
 <template>
-    <button class="btn btn-sm text-info" type="button" @click="toggle(info)">
+    <span class="text-info pl-1 pointer" @click="toggle(info)">
         <i class="fa fa-info-circle"></i>
-    </button>
+    </span>
 </template>
 
 <script setup>
