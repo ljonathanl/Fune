@@ -10,12 +10,12 @@
             <fr>FR_info-currency</fr>
         </info>
         <form>
-            <div class="input-group mb-1">
+            <!-- <div class="input-group mb-1">
                 <label class="input-group-text">
                     <en>Ü revaluation</en>
                     <fr>réévaluation de Ü</fr>
                 </label>
-                <select v-model="editedCurrency.mode" id="currencyMode" class="form-control"
+                <select v-model="editedCurrency.mode" id="currencyMode" class="form-control select-text-center"
                     :class="{'bg-primary': editedCurrency.mode != funiter.currency.mode}" :disabled="funiter.isPlaying">
                     <option value="melt">
                         <en>melting</en>
@@ -33,39 +33,27 @@
             <info infoId="info-currency-mode">
                 <en>EN_info-currency-mode</en>
                 <fr>FR_info-currency-mode</fr>
-            </info>  
+            </info>   -->
+            
             <div class="input-group mb-1">
-                <span class="input-group-text" v-if="editedCurrency.mode == 'melt'">Ü(t-1) = ( 1 - </span>
-                <span class="input-group-text" v-else>Ü(t+1) = ( 1 + </span>
-                <input id="currencyExpression" v-model="editedCurrency.expression" type="text" class="form-control text-right"
-                    :class="{'bg-primary': editedCurrency.expression != funiter.currency.expression}" :disabled="funiter.isPlaying">
-                <span class="input-group-text pr-1"> ) Ü(t)
-                    <info-button class="px-0 ml-2" info="info-currency-expression" />    
-                </span>    
-            </div>
-            <info infoId="info-currency-expression">
-                <en>EN_info-currency-expression</en>
-                <fr>FR_info-currency-expression</fr>
-            </info> 
-            <div class="input-group mb-1">
-                <label class="input-group-text" for="currencyUPerDay">
+                <label class="input-group-text" for="currencyUPerTime">
                     <en>Ü per day</en>
                     <fr>Ü par jour</fr>
                 </label>
-                <input id="currencyUPerDay" v-model="editedCurrency.uPerDay" type="number" min="0" max="1000" step="1" class="form-control text-right"
-                    :class="{'bg-primary': editedCurrency.uPerDay != funiter.currency.uPerDay}" :disabled="funiter.isPlaying">
+                <input id="currencyUPerTime" v-model="editedCurrency.uPerTime" type="number" min="0" max="1000" step="1" class="form-control text-right"
+                    :class="{'bg-primary': editedCurrency.uPerTime != funiter.currency.uPerTime}" :disabled="funiter.isPlaying">
                 <span class="input-group-text pr-1">Ü
-                   <info-button class="px-0 ml-2" info="info-currency-uPerDay" /> 
+                   <info-button class="px-0 ml-2" info="info-currency-uPerTime" /> 
                 </span>
             </div>
-            <info infoId="info-currency-uPerDay">
-                <en>EN_info-currency-uPerDay</en>
-                <fr>FR_info-currency-uPerDay</fr>
+            <info infoId="info-currency-uPerTime">
+                <en>EN_info-currency-uPerTime</en>
+                <fr>FR_info-currency-uPerTime</fr>
             </info> 
             <div class="input-group mb-1">
                 <label class="input-group-text" for="currencyRevaluationTime">
-                    <en>revaluation period</en>
-                    <fr>réévaluation</fr>
+                    <en>revaluation (r)</en>
+                    <fr>réévaluation (r)</fr>
                 </label>
                 <input id="currencyRevaluationTime" v-model="editedCurrency.revaluationTime" type="number" min="1" max="400" step="1" class="form-control text-right" 
                     :class="{'bg-primary': editedCurrency.revaluationTime != funiter.currency.revaluationTime}" :disabled="funiter.isPlaying">
@@ -79,7 +67,31 @@
                 <en>EN_info-currency-revaluationTime</en>
                 <fr>FR_info-currency-revaluationTime</fr>
             </info>
+
             <div class="input-group mb-1">
+                <select v-model="editedCurrency.mode" id="currencyMode" class="form-control select-text-center"
+                    :class="{'bg-primary': editedCurrency.mode != funiter.currency.mode}" :disabled="funiter.isPlaying">
+                    <option value="melt">
+                        Ü(t-r) = ( 1 - 
+                    </option>
+                    <option value="grew">
+                        Ü(t+r) = ( 1 + 
+                    </option>
+                </select>
+                <!-- <span class="input-group-text" v-if="editedCurrency.mode == 'melt'">Ü(t-1) = ( 1 - </span>
+                <span class="input-group-text" v-else>Ü(t+1) = ( 1 + </span> -->
+                <input id="currencyExpression" v-model="editedCurrency.expression" type="text" class="form-control text-right"
+                    :class="{'bg-primary': editedCurrency.expression != funiter.currency.expression}" :disabled="funiter.isPlaying">
+                <span class="form-control px-1" style="flex-grow: 0.61;">
+                     ) Ü(t)
+                    <info-button class="px-0 ml-2" info="info-currency-expression" />    
+                </span>    
+            </div>
+            <info infoId="info-currency-expression">
+                <en>EN_info-currency-expression</en>
+                <fr>FR_info-currency-expression</fr>
+            </info> 
+            <!-- <div class="input-group mb-1">
                 <label class="input-group-text" for="currencyStepTime">
                     <en>day duration</en>
                     <fr>durée d'un jour</fr>
@@ -95,7 +107,7 @@
             <info infoId="info-currency-stepTime">
                 <en>EN_info-currency-stepTime</en>
                 <fr>FR_info-currency-stepTime</fr>
-            </info>
+            </info> -->
 
             <div class="d-flex align-items-start flex-wrap mb-1" style="justify-content: space-evenly;" v-if="currencyChange">
                 <button type="button" class="btn btn-secondary mr-auto" @click="Object.assign(editedCurrency, funiter.currency)">
@@ -154,7 +166,7 @@
                         <en>average</en>
                         <fr>moyenne</fr>
                     </label>
-                    <input id="currencyAvg" :value="funiter.currencyWithoutDecimal(funiter.currency.average)" type="text" class="form-control text-right" disabled>
+                    <input id="currencyAvg" :value="funiter.currencyDecimal(funiter.currency.average)" type="text" class="form-control text-right" disabled>
                     <span class="input-group-text">
                         <en>Ü / Üman</en>
                         <fr>Ü / Ümain</fr>
@@ -165,7 +177,7 @@
                         <en>quantitative</en>
                         <fr>quantitatif</fr>
                     </label>
-                    <input id="currencyQuantitative" :value="funiter.currency.quantitative.toFixed(2)" type="text" class="form-control text-right" disabled>
+                    <input id="currencyQuantitative" :value="displayQuantitative(funiter.currency.quantitative)" type="text" class="form-control text-right" disabled>
                     <span class="input-group-text">
                         <en>Ü / Ü(0)</en>
                         <fr>Ü / Ü(0)</fr>
@@ -207,7 +219,7 @@ const more = ref(false)
 const editedCurrency = reactive({
     expression: '',
     mode: 'melt',
-    uPerDay: 1,
+    uPerTime: 1,
     stepTime: 0,
     revaluationTime: 0,
 })
@@ -223,20 +235,28 @@ const currencyChange = computed(() => {
         return false
     return funiter.currency.expression != editedCurrency.expression
         || funiter.currency.mode != editedCurrency.mode
-        || funiter.currency.uPerDay != editedCurrency.uPerDay
+        || funiter.currency.uPerTime != editedCurrency.uPerTime
         || funiter.currency.revaluationTime != editedCurrency.revaluationTime
         || funiter.currency.stepTime != editedCurrency.stepTime;
 })
 
 const updateCurrency = () => {
-    const { expression, mode, uPerDay, revaluationTime, stepTime } = editedCurrency
-    funiter.updateCurrency({ expression, mode, uPerDay, revaluationTime, stepTime })
+    const { expression, mode, uPerTime, revaluationTime, stepTime } = editedCurrency
+    funiter.updateCurrency({ expression, mode, uPerTime, revaluationTime, stepTime })
+}
+
+const displayQuantitative = (value) => {
+    if (value < 1000000) {
+        return value.toFixed(2)
+    }
+
+    return value.toExponential(3)
 }
 
 watch(() => [
     funiter.currency.expression,
     funiter.currency.mode,
-    funiter.currency.uPerDay,
+    funiter.currency.uPerTime,
     funiter.currency.revaluationTime,
     funiter.currency.stepTime
 ], () => {

@@ -18,12 +18,12 @@
                         <fr>stats</fr> 
                     </th>
                     <th @click="sortBy('name')" class="pointer">
-                        <en>name</en>
-                        <fr>nom</fr> 
+                        <en>näme</en>
+                        <fr>nöm</fr> 
                     </th>
                     <th @click="sortBy('role')" class="text-center pointer">
-                        <en>role</en>
-                        <fr>rôle</fr>
+                        <en>röle</en>
+                        <fr>röle</fr>
                     </th>
                     <th @click="sortBy('balance')" class="text-right pointer">
                         <en>balance</en>

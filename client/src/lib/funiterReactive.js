@@ -8,6 +8,10 @@ const defaultSelected = { color: '#FFFFFF' }
 const funiterProxy = reactive({
     name: funiter.name,
     isPlaying: false,
+    uValue: funiter.uValue,
+    uSymbol: 'Ü',
+    creationPeriod: 'day',
+    stepTime: 1,
     currency: {},
     accounts: [],
     selectedAccounts: new Map()
@@ -105,11 +109,11 @@ funiterProxy.getAccountTx = (id, limit) => {
     return funiter.getAccountTx(id, limit)
 }
 
-funiterProxy.getAccountStats = (id, period = statTypes.day) => {
-    return funiter.getAccountStats(id, period)
+funiterProxy.getAccountStats = (id) => {
+    return funiter.getAccountStats(id)
 }
 
-funiterProxy.onDayChange = () => {
+funiterProxy.onTimeChange = () => {
     funiterProxy.refresh()
 }
 
@@ -169,7 +173,7 @@ funiterProxy.currencyDecimal = (value) => {
     return (value/uValue).toFixed(2)
 }
 
-funiter.onDayChange = funiterProxy.onDayChange
+funiter.onTimeChange = funiterProxy.onTimeChange
 funiter.start(evaluate, {})
 funiterProxy.refresh()
 

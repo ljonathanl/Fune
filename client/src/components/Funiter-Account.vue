@@ -12,15 +12,17 @@
 
         <div class="mt-3 mb-3">
             <h3 class="text-center mb-6">
-                <select v-model="state.account" class="text-center form-control mx-auto" style="max-width: 300px; font-size: 1.3em; text-align-last: center;">
-                    <option disabled :value="null">
-                        <en>whö</en>
-                        <fr>qüi</fr>
-                    </option>
-                    <option v-for="selectedAccount in state.accounts" :value="selectedAccount" :key="selectedAccount.name">
-                        <strong>{{ selectedAccount.name }}</strong>
-                    </option>
-                </select>
+                <div class="mx-auto input-group" style="max-width: 300px">
+                    <select v-model="state.account" class="text-center mx-auto form-control select-text-center" style="font-size: 1.3em;">
+                        <option disabled :value="null">
+                            <en>whö</en>
+                            <fr>qüi</fr>
+                        </option>
+                        <option v-for="selectedAccount in state.accounts" :value="selectedAccount" :key="selectedAccount.name">
+                            <strong>{{ selectedAccount.name }}</strong>
+                        </option>
+                    </select>
+                </div>
             </h3>
             <div v-if="state.account">
                 <div class="display-3 text-center">
@@ -54,7 +56,7 @@
                                 <en> tö </en>
                                 <fr> à </fr> 
                             </label>
-                            <select v-model="state.tx.to" id="accountTxTo" class="form-control p-1">
+                            <select v-model="state.tx.to" id="accountTxTo" class="form-control p-1 select-text-center">
                                 <option disabled value="">
                                     <en>someöne</en>
                                     <fr>qüi</fr>
@@ -80,9 +82,8 @@
                     <fr>stats</fr>
                 </h4>
                 <trend
-                    class="p-2"
+                    class="p-2 stats"
                     :data="state.stats"
-                    style="background-color: #00000088; border-radius: .5rem"
                     :gradientDirection="'top'"
                     :gradient="['#f560a2', '#e83283', '#bd125e']"
                     :padding="10"
@@ -128,7 +129,7 @@
                                     </strong>
                                 </h5>
                             </div>
-                            <small class="text-right"> {{ formatDay(transaction.day) }}</small>
+                            <small class="text-right"> {{ formatDay(transaction.time) }}</small>
                         </div>
                         <span class="fw-bold">{{ translateTxMessage(transaction.message) }}</span>
                     </li>
@@ -196,7 +197,7 @@ const translateTxMessage = (message) => {
     if (!message)
         return ''
 
-    if (message == '!1Ucreation') {
+    if (message == '!Ucreation') {
         return translate({
             en: '> u crëate Ü!',
             fr:  '> crëation de Ü !'

@@ -10,8 +10,7 @@
             <fr>FR_info-stats</fr>
         </info>
         <trends
-            class="p-2"
-            style="background-color: #00000088; border-radius: .5rem"
+            class="p-2 stats"
             :data="state.stats"
             :colors="state.colors"
             :padding="10"
@@ -22,29 +21,12 @@
             auto-draw
             smooth>
         </trends>
-        <div class="input-group mx-auto mt-2 mb-1" style="max-width: 400px">
-            <label class="input-group-text px-1">
-                100
-            </label>
-            <select v-model="state.statType" class="form-control px-1">
-                <option value="day">
-                    <en>days</en>
-                    <fr>jours</fr>
-                </option>
-                <option value="month">
-                    <en>months</en>
-                    <fr>mois</fr>
-                </option>
-                <option value="year">
-                    <en>years</en>
-                    <fr>années</fr>
-                </option>
-            </select>
+        <div class="input-group mx-auto mt-3 mb-1" style="max-width: 220px">
             <label class="input-group-text px-1">  
                 <en>referential</en>
                 <fr>référentiel</fr>
             </label>
-            <select v-model="state.referential" class="form-control px-1">
+            <select v-model="state.referential" class="form-control px-1 select-text-center">
                 <option value="relative">
                     <en>relative</en>
                     <fr>relatif</fr>
@@ -81,19 +63,18 @@ import { watch, onMounted, reactive } from 'vue'
 
 const state = reactive({
     referential: 'relative',
-    statType: 'day',
     stats: [],
     colors: []
 })
 
 const getStats = () => {
-    let funeStat = funiter.getAccountStats(funiter.name, state.statType)
+    let funeStat = funiter.getAccountStats(funiter.name)
     let stat = null
     let stats = []
     let colors = []
     funiter.selectedAccounts.forEach((account, name) => {
         if (name != funiter.name) {
-            stat = funiter.getAccountStats(name, state.statType)
+            stat = funiter.getAccountStats(name)
             if (stat) {
                 if (state.referential == 'average') {
                     for (let j = 0; j < stat.length; j++) {
@@ -132,8 +113,6 @@ watch(() => funiter.selectedAccounts, getStats, { deep: true })
 watch(() => funiter.currency, getStats, { deep: true })
 
 watch(() => state.referential,  getStats)
-
-watch(() => state.statType,  getStats)
 
 onMounted(getStats)
 
