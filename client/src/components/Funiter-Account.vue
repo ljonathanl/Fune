@@ -92,6 +92,8 @@
                     :stroke-linecap="'butt'"
                     :min="0"
                     :max="1000"
+                    :xUnit="funiter.currency.elapsedTime + ' ' + translateTime(funiter.creationPeriod, funiter.currency.elapsedTime)"
+                    yUnit="Ü"
                     auto-draw
                     smooth>
                 </trend>
