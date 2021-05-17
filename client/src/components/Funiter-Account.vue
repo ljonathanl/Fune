@@ -129,7 +129,7 @@
                                     </strong>
                                 </h5>
                             </div>
-                            <small class="text-right"> {{ formatDay(transaction.time) }}</small>
+                            <small class="text-right"> {{ formatTime(transaction.time) }}</small>
                         </div>
                         <span class="fw-bold">{{ translateTxMessage(transaction.message) }}</span>
                     </li>
@@ -141,7 +141,7 @@
 
 <script setup>
 import { Trend } from './Trend.js'
-import { fr, en, translate } from './Translate.js'
+import { fr, en, translate, translateTime } from './Translate.js'
 import funiter from '../lib/funiterReactive.js'
 import info from './Info.vue'
 import infoButton from './Info-Button.vue'
@@ -177,7 +177,6 @@ watch(() => funiter.currency, refresh, { deep: true })
 
 const doTx = () => {
     state.tx.from = state.account.name
-    console.log(state.tx)
     const tx = funiter.doTx(state.tx)
     if (tx) {
         state.tx.message = ''
@@ -215,21 +214,29 @@ const translateTxMessage = (message) => {
     return message ? '> ' + message : ''
 }
 
-const formatDay = (day) => {
-    if (day >= funiter.currency.elapsedTime) {
-        return translate({
-            en: 'today',
-            fr:  'aujourd\'hui'
-        })
-    } else if (day == funiter.currency.elapsedTime - 1) {
-        return translate({
-            en: 'yesterday',
-            fr:  'hier'
-        })
-    }
+const formatTime = (time) => {
+    if (time >= funiter.currency.elapsedTime) {
+        switch (funiter.creationPeriod) {
+            case 'day': return translate({
+                en: 'today',
+                fr:  'aujourd\'hui'
+            })
+            case 'month': return translate({
+                en: 'this month',
+                fr:  'ce mois-ci'
+            })
+            case 'year': return translate({
+                en: 'this year',
+                fr:  'cette année'
+            })
+        }
+        
+    } 
+    const diff = funiter.currency.elapsedTime - time
+    const translatedTime = translateTime(funiter.creationPeriod, diff)
     return translate({
-        en: (funiter.currency.elapsedTime - day) + ' days ago',
-        fr:  'il y a ' + (funiter.currency.elapsedTime - day) + ' jours'
+        en: diff + ' ' + translatedTime + ' ago',
+        fr:  'il y a ' + diff + ' ' + translatedTime
     })
 }
 

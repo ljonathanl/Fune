@@ -37,8 +37,9 @@
             
             <div class="input-group mb-1">
                 <label class="input-group-text" for="currencyUPerTime">
-                    <en>Ü per day</en>
-                    <fr>Ü par jour</fr>
+                    <en>Ü per </en>
+                    <fr>Ü par </fr>
+                    {{ translateTime(funiter.creationPeriod) }}
                 </label>
                 <input id="currencyUPerTime" v-model="editedCurrency.uPerTime" type="number" min="0" max="1000" step="1" class="form-control text-right"
                     :class="{'bg-primary': editedCurrency.uPerTime != funiter.currency.uPerTime}" :disabled="funiter.isPlaying">
@@ -58,8 +59,7 @@
                 <input id="currencyRevaluationTime" v-model="editedCurrency.revaluationTime" type="number" min="1" max="400" step="1" class="form-control text-right" 
                     :class="{'bg-primary': editedCurrency.revaluationTime != funiter.currency.revaluationTime}" :disabled="funiter.isPlaying">
                 <span class="input-group-text pr-1">
-                    <en>day<span v-if="editedCurrency.revaluationTime > 1">s</span></en>
-                    <fr>jour<span v-if="editedCurrency.revaluationTime > 1">s</span></fr>
+                    {{ translateTime(funiter.creationPeriod, editedCurrency.revaluationTime) }}
                     <info-button class="px-0 ml-2" info="info-currency-revaluationTime" />
                 </span>
             </div>
@@ -82,7 +82,7 @@
                 <span class="input-group-text" v-else>Ü(t+1) = ( 1 + </span> -->
                 <input id="currencyExpression" v-model="editedCurrency.expression" type="text" class="form-control text-right"
                     :class="{'bg-primary': editedCurrency.expression != funiter.currency.expression}" :disabled="funiter.isPlaying">
-                <span class="form-control px-1" style="flex-grow: 0.61;">
+                <span class="form-control px-1 text-left" style="flex-grow: 0.71;">
                      ) Ü(t)
                     <info-button class="px-0 ml-2" info="info-currency-expression" />    
                 </span>    
@@ -209,7 +209,7 @@
 
 <script setup>
 import funiter from '../lib/funiterReactive.js'
-import { fr, en } from './Translate.js'
+import { fr, en, translateTime } from './Translate.js'
 import info from './Info.vue'
 import infoButton from './Info-Button.vue'
 import { ref, reactive, computed, onMounted, watch } from 'vue'
@@ -220,7 +220,6 @@ const editedCurrency = reactive({
     expression: '',
     mode: 'melt',
     uPerTime: 1,
-    stepTime: 0,
     revaluationTime: 0,
 })
 
@@ -236,13 +235,12 @@ const currencyChange = computed(() => {
     return funiter.currency.expression != editedCurrency.expression
         || funiter.currency.mode != editedCurrency.mode
         || funiter.currency.uPerTime != editedCurrency.uPerTime
-        || funiter.currency.revaluationTime != editedCurrency.revaluationTime
-        || funiter.currency.stepTime != editedCurrency.stepTime;
+        || funiter.currency.revaluationTime != editedCurrency.revaluationTime;
 })
 
 const updateCurrency = () => {
-    const { expression, mode, uPerTime, revaluationTime, stepTime } = editedCurrency
-    funiter.updateCurrency({ expression, mode, uPerTime, revaluationTime, stepTime })
+    const { expression, mode, uPerTime, revaluationTime } = editedCurrency
+    funiter.updateCurrency({ expression, mode, uPerTime, revaluationTime })
 }
 
 const displayQuantitative = (value) => {
@@ -257,8 +255,7 @@ watch(() => [
     funiter.currency.expression,
     funiter.currency.mode,
     funiter.currency.uPerTime,
-    funiter.currency.revaluationTime,
-    funiter.currency.stepTime
+    funiter.currency.revaluationTime
 ], () => {
     Object.assign(editedCurrency, funiter.currency)
 })

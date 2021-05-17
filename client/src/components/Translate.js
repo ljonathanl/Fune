@@ -29,10 +29,23 @@ setLanguage((
 const fr = createTranslateComponent('fr')
 const en = createTranslateComponent('en')
 
+const translateTime = (time, number = 0) => {
+    switch (time) {
+        case 'day':
+            return translate({en: 'day', fr: 'jour'}) + (number > 1 ? 's' : '')
+        case 'month':
+            return translate({en: 'month', fr: 'mois'}) + (number > 1 && language.value != 'fr' ? 's' : '')
+        case 'year':
+            return translate({en: 'year', fr: 'an'}) + (number > 1 ? 's' : '')
+    }
+    return time
+}
+
 export {
     fr,
     en,
     language,
     translate,
-    setLanguage
+    setLanguage,
+    translateTime
 }

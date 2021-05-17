@@ -10,7 +10,7 @@ const funiterProxy = reactive({
     isPlaying: false,
     uValue: funiter.uValue,
     uSymbol: 'Ü',
-    creationPeriod: 'day',
+    creationPeriod: 'month',
     stepTime: 1,
     currency: {},
     accounts: [],
@@ -130,6 +130,7 @@ funiterProxy.reset = () => {
 }
 
 funiterProxy.play = (autoPlay) => {
+    funiter.stepTime = funiterProxy.stepTime
     if(funiter.play(autoPlay))
         funiterProxy.refresh()
     funiterProxy.isPlaying = funiter.isPlaying
@@ -149,6 +150,7 @@ funiterProxy.stop = () => {
 funiterProxy.getState = () => {
     const state = funiter.getState()
     state.selectedAccounts = Object.fromEntries(funiterProxy.selectedAccounts)
+    state.creationPeriod = funiterProxy.creationPeriod
     return state
 }
 
@@ -157,6 +159,10 @@ funiterProxy.restoreState = state => {
         if (state.selectedAccounts && state.selectedAccounts[funiter.name]) {
             funiterProxy.selectedAccounts = new Map(Object.entries(state.selectedAccounts))
             funiterProxy.selectedAccounts.set(funiter.name, defaultSelected)
+        }
+
+        if (state.creationPeriod) {
+            funiterProxy.creationPeriod = state.creationPeriod
         }
         
         funiter.restoreState(state)

@@ -56,7 +56,6 @@ const load = (content) => {
   try {
     // const state = jsonc.unpack(content, true)
     const state = JSON.parse(content)
-    // console.log(state)
     funiter.stop()
     funiter.restoreState(state)
   } catch (e) {
