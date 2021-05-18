@@ -6,7 +6,7 @@
       <span>
         {{ translateTime(funiter.creationPeriod) }}
       </span>
-      
+
       <span class="ml-1 display-5 font-monospace mr-2">{{ (1000 >= funiter.currency.elapsedTime) ? ('000' + funiter.currency.elapsedTime).slice(-3) : funiter.currency.elapsedTime }} </span>
       
       <div class="input-group d-inline ml-1 mr-3 w-auto">

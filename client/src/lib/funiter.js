@@ -181,7 +181,7 @@ const saveStat = (name, value) => {
     const index = state.currency.elapsedTime % funiter.statLimit
     let stat = state.stats[name]
     if (!stat) {
-        stat = new Array(funiter.statLimit)
+        stat = new Array(funiter.statLimit).fill(0)
         state.stats[name] = stat
     }
     stat[index] = value
