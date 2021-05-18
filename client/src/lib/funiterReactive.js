@@ -10,7 +10,7 @@ const funiterProxy = reactive({
     isPlaying: false,
     uValue: funiter.uValue,
     uSymbol: 'Ü',
-    creationPeriod: 'month',
+    creationPeriod: 'year',
     stepTime: 1,
     currency: {},
     accounts: [],
