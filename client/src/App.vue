@@ -24,19 +24,21 @@
         <fr>FR_info-home-libreCurrency</fr>
       </info>
 
-      <p class="lead text-center">
+      <div class="lead text-center">
         <en>
             a <strong>Üman</strong> account create some new Ü (the Ünit of the f<small>Ü</small>ne money) every
         </en>
         <fr>
             un compte <strong>Ümain</strong> crée de nouvelles <small>Ü</small> (l'Ünité de la monnaie f<small>Ü</small>ne) chaque
         </fr>
-        <select class="form-control select-text-center d-inline fit-content" v-model="funiterLib.creationPeriod">
-          <option value="day">{{ translateTime('day') }}</option>
-          <option value="month">{{ translateTime('month') }}</option>
-          <option value="year">{{ translateTime('year') }}</option>
-        </select>
-      </p>
+        <div class="input-group fit-content d-inline-block">
+          <select class="form-control select-text-center fit-content p-1" v-model="funiterLib.creationPeriod">
+            <option value="day">{{ translateTime('day') }}</option>
+            <option value="month">{{ translateTime('month') }}</option>
+            <option value="year">{{ translateTime('year') }}</option>
+          </select>
+        </div>
+      </div>
 
       <p class="lead text-center">
         <en>

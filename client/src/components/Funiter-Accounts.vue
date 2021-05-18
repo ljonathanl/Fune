@@ -29,24 +29,28 @@
                         <en>balance</en>
                         <fr>solde</fr>
                     </th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
                 <tr v-for="account in sortedAccounts" :key="account.name">
-                    <td :style="{'background-color': getColor(account)}" @click="funiter.select(account)" class="pointer"></td>
+                    <td @click="funiter.select(account)" class="pointer">
+                        <div :style="{'background-color': getColor(account) }" style="width:25px;height:25px" class="icon">
+                        </div>
+                    </td>
                     <td @click="funiter.select(account)" class="pointer">
                         {{ account.name }}
                     </td>
                     <td class="text-center">
-                        <button v-if="account.role == 'human'" class="btn btn-sm btn-primary fw-bold role" @click="switchAccountRole(account)">
+                        <button v-if="account.role == 'human'" class="btn btn-sm btn-primary fw-bold emboss role" @click="switchAccountRole(account)">
                             <en>Üman</en>
                             <fr>Ümain</fr>
                         </button>
-                        <button v-else-if="account.role == 'wallet'" class="btn btn-sm btn-secondary fw-bold role" @click="switchAccountRole(account)">
+                        <button v-else-if="account.role == 'wallet'" class="btn btn-sm btn-secondary fw-bold emboss role" @click="switchAccountRole(account)">
                             <en>wället</en>
                             <fr>sïmple</fr>
                         </button>
-                        <button v-else class="btn btn-sm btn-danger fw-bold role" disabled>
+                        <button v-else class="btn btn-sm btn-danger fw-bold emboss role" disabled>
                             <en>bänk</en>
                             <fr>bänque</fr>
                         </button>
@@ -54,7 +58,17 @@
                     <td class="text-right">
                         <template v-if="account.role != 'bank'">
                             <strong>{{ funiter.currencyDecimal(account.balance) }}<small> Ü </small></strong>
-                            <a href="#" @click.stop.prevent="resetBalance(account)" class="mx-2">
+                            <!-- <a href="#" @click.stop.prevent="resetBalance(account)" class="mx-2">
+                                <en>reset</en>
+                                <fr>raz</fr>
+                            </a> -->
+                        </template>
+                        <!-- <a v-if="account.name != funiter.name" href="#" @click.stop.prevent="deleteAccount(account)" class="text-warning"><i class="fa fa-trash"></i></a> -->
+                    </td>
+                    <td class="text-right">
+                        <template v-if="account.role != 'bank'">
+                            <!-- <strong>{{ funiter.currencyDecimal(account.balance) }}<small> Ü </small></strong> -->
+                            <a href="#" @click.stop.prevent="resetBalance(account)" class="mr-2">
                                 <en>reset</en>
                                 <fr>raz</fr>
                             </a>
@@ -156,7 +170,7 @@ const resetBalance = (account) => {
 const getColor = (account) => {
     const selectedAccount = funiter.selectedAccounts.get(account.name)
     if (selectedAccount == null)
-        return null
+        return '#444444'
     return selectedAccount.color
 }
 </script>

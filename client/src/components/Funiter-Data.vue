@@ -1,19 +1,19 @@
 <template>
   <div class="mb-3 text-center">
     <div class="input-group d-inline">
-      <label class="btn btn-dark mb-0" :class="{ disabled: funiter.isPlaying }">
+      <label class="btn btn-dark mb-0 emboss" :class="{ disabled: funiter.isPlaying }">
         <i class="fa fa-upload"></i>
         <en> load</en>
         <fr> charger</fr>
         <input type="file" hidden @change="readSingleFile">
       </label>
-      <button class="btn btn-light text-dark" @click="save()" :disabled="funiter.isPlaying">
+      <button class="btn btn-light text-dark emboss" @click="save()" :disabled="funiter.isPlaying">
         <i class="fa fa-download"></i>
         <en> save</en>
         <fr> sauvegarder</fr>
       </button>
     </div>
-    <button class="btn btn-secondary ml-3" @click="funiter.reset()">
+    <button class="btn btn-secondary ml-3 emboss" @click="funiter.reset()">
       <i class="fa fa-undo"></i>
       <en> reset</en>
       <fr> RAZ</fr>

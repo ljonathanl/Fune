@@ -44,7 +44,7 @@ function genPoints(data, ref, ref$1) {
   var max = ref$1.max;
   var min = ref$1.min;
 
-  var arr = data.map(function (item) { return (!isNaN(item) ? item : 0); });
+  var arr = data.map(function (item) { return (item && !isNaN(item) ? item : 0); });
   var minValue = Math.min.apply(Math, arr.concat([min])) - 0.001;
   var gridX = (maxX - minX) / (arr.length - 1);
   var gridY = (maxY - minY) / (Math.max.apply(Math, arr.concat([max])) + 0.001 - minValue);
