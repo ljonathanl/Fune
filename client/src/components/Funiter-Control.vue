@@ -1,15 +1,12 @@
 <template>
   <nav class="navbar navbar-dark bg-dark w-100 control">
-    <div class="d-flex mx-auto align-items-center justify-content-end text-right pointer" style="width: 400px">
+    <div class="d-flex mx-auto align-items-center" style="width: 400px">
       <img src="/favicon64x64.png" class="icon mr-auto ml-1 pointer" @click="toTop()"/>
 
-      <span>
-        {{ translateTime(funiter.creationPeriod) }}
-      </span>
+      <span class="ml-auto">{{ translateTime(funiter.creationPeriod) }}</span>
+      <span class="ml-1 display-5 font-monospace mr-auto">{{ (1000 >= funiter.currency.elapsedTime) ? ('000' + funiter.currency.elapsedTime).slice(-3) : funiter.currency.elapsedTime }} </span>
 
-      <span class="ml-1 display-5 font-monospace mr-2">{{ (1000 >= funiter.currency.elapsedTime) ? ('000' + funiter.currency.elapsedTime).slice(-3) : funiter.currency.elapsedTime }} </span>
-      
-      <div class="input-group d-inline ml-1 mr-3 w-auto">
+      <div class="input-group d-inline mx-auto fit-content">
         <button class="btn btn-outline-light bg-light text-dark btn-sm pr-1 pl-2 emboss" v-longclick="stepBackward" :disabled="funiter.isPlaying">
           <i class="fa fa-step-backward"></i>
         </button>
@@ -18,10 +15,10 @@
         </button>
       </div>
 
-      <button class="btn btn-primary mr-2 emboss" @click="funiter.play()" v-if="!funiter.isPlaying" style="width: 63px" >
+      <button class="btn btn-primary mr-2 emboss ml-auto" @click="funiter.play()" v-if="!funiter.isPlaying" style="width: 63px" >
         <i class="fa fa-play"></i>
       </button>
-      <button class="btn btn-light mr-2 emboss" @click="funiter.stop()" v-if="funiter.isPlaying" style="width: 63px" >
+      <button class="btn btn-light mr-2 emboss ml-auto" @click="funiter.stop()" v-if="funiter.isPlaying" style="width: 63px" >
         <i class="fa fa-pause"></i>
       </button>
       
