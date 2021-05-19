@@ -19,7 +19,7 @@ const funiter = {
     txLimit: 100,
     statLimit: 200,
     symbol: 'Ü',
-    version: '0.5.0',
+    version: '0.1.0',
     stepTime: 1,
 }
 
@@ -205,6 +205,7 @@ const refreshCurrencyAndStats = () => {
             saveStat(account.name, account.balance)
         }
     })
+
 
     state.currency.nbMembers = nbMembers
     state.currency.monetaryMass = monetaryMass

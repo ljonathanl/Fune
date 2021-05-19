@@ -20,6 +20,7 @@
             :min="0"
             :xUnit="state.xUnit"
             :yUnit="state.yUnit"
+            @click="log"
             auto-draw
             smooth>
         </trends>
@@ -61,6 +62,10 @@ import funiter from '../lib/funiterReactive.js'
 import info from './Info.vue'
 import infoButton from './Info-Button.vue'
 import { watch, onMounted, reactive } from 'vue'
+
+const log = (event) => {
+    console.log(event)
+}
 
 
 const state = reactive({
