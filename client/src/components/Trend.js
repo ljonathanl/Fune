@@ -377,15 +377,54 @@ var Trends = {
       default: ''
     }
   },
+  data: () => {
+    return {
+      pt: null,
+      boundary: null,
+      maxX: 0,
+      maxY: 0,
+    }
+  },
+  methods: {
+    getCoordinates(x, y) {
+      this.pt.x = x
+      this.pt.y = y
+      const r = {
+        x: 0,
+        y: 0
+      } 
+      if (this.maxX <= 0) 
+        return r
+      const svgpt =  this.pt.matrixTransform(this.$el.getScreenCTM().inverse());
+      if (svgpt.x < this.boundary.minX) {
+        r.x = 0
+      } else if (svgpt.x > this.boundary.maxX + this.boundary.minX) {
+        r.x = this.maxX
+      } else {
+        r.x = Math.round(this.maxX * (svgpt.x - this.boundary.minX) / this.boundary.maxX)
+      }
 
+      if (svgpt.y < this.boundary.minY) {
+        r.y = this.maxY
+      } else if (svgpt.y > this.boundary.maxY) {
+        r.y = 0
+      } else {
+        r.y = Math.round(this.maxY * ((this.boundary.maxY + this.boundary.minY) - svgpt.y) / this.boundary.maxY)
+      }
+      return r
+    }
+  },
+  mounted() {
+    this.pt = this.$el.createSVGPoint()
+  },
   render: function render() {
-    if (!this.data) { return }
+    // if (!this.data) { return }
     var width = this.width;
     var height = this.height;
     var padding = this.padding;
     var viewWidth = width || 300;
     var viewHeight = height || 200;
-    var boundary = {
+    this.boundary = {
       minX: padding,
       minY: padding,
       maxX: viewWidth - padding,
@@ -401,6 +440,12 @@ var Trends = {
         }
       }
     }
+    this.maxY = max
+    if (this.data.length >= 1) {
+      this.maxX = this.data[0].length - 1
+    } else {
+      this.maxX = 0
+    }
 
     var paths = [];
     for (let index = 0; index < this.data.length; index++) {
@@ -410,7 +455,7 @@ var Trends = {
           h(Path, {
             smooth: this.smooth,
             data: element,
-            boundary: boundary,
+            boundary: this.boundary,
             radius: this.radius,
             max: max,
             min: this.min,
@@ -423,9 +468,9 @@ var Trends = {
       }
     }
 
-    if (paths.length == 0) {
-      return
-    }
+    // if (paths.length == 0) {
+    //   return
+    // }
 
     return h(
       'svg', {
@@ -436,7 +481,7 @@ var Trends = {
       [
         paths,
         h(Background, {
-          boundary: boundary,
+          boundary: this.boundary,
           max: max,
           min: this.min,
           xUnit: this.xUnit,

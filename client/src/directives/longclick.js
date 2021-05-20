@@ -1,6 +1,6 @@
 export default {
   mounted: (el, binding) => {
-    const delay = 200
+    const delay = 300
     const interval = 50
     if (typeof binding.value !== 'function') {
       return

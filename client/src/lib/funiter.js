@@ -70,6 +70,7 @@ funiter.updateCurrency = newCurrency => {
     if (isPlaying)
         funiter.stop()
     Object.assign(state.currency, newCurrency)
+    refreshCurrencyAndStats()
     if (isPlaying)
         funiter.play()
     return Object.assign({}, state.currency)
@@ -347,7 +348,7 @@ funiter.unplay = () => {
         const timeBefore = (state.currency.elapsedTime - 1) % funiter.statLimit
         const currency = state.stats[funiter.name][timeBefore]
         if (currency && currency.elapsedTime == state.currency.elapsedTime - 1) {
-            funiter.updateCurrency(currency)
+            state.currency = currency
             Object.values(state.accounts).forEach(account => {
                 if (account.role != roles.bank) {
                     account.balance = state.stats[account.name][timeBefore]
