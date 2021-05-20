@@ -185,6 +185,10 @@ input[type=number] {
   height: 2em;
 }
 
+text {
+  user-select: none;
+}
+
 </style>
 
 

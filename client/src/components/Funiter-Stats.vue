@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="position-relative">
         <h4 class="text-center mb-3">
             <en>stats</en>
             <fr>stats</fr>
@@ -9,21 +9,25 @@
             <en>EN_info-stats</en>
             <fr>FR_info-stats</fr>
         </info>
-        <trends
-            class="p-2 stats"
-            :data="state.stats"
-            :colors="state.colors"
-            :padding="10"
-            :radius="8"
-            :stroke-width="1.4"
-            :stroke-linecap="'butt'"
-            :min="0"
-            :xUnit="state.xUnit"
-            :yUnit="state.yUnit"
-            @click="log"
-            auto-draw
-            smooth>
-        </trends>
+        <div :title="title">
+            <trends
+                
+                class="p-2 stats"
+                :data="state.stats"
+                :colors="state.colors"
+                :padding="10"
+                :radius="8"
+                :stroke-width="1.4"
+                :stroke-linecap="'butt'"
+                :min="0"
+                :xUnit="state.xUnit"
+                :yUnit="state.yUnit"
+                @mousemove="refreshTitle"
+                ref="stats"
+                auto-draw
+                smooth>
+            </trends>
+        </div>
         <div class="input-group mx-auto mt-3 mb-1" style="max-width: 250px">
             <label class="input-group-text px-1">  
                 <en>referential</en>
@@ -61,10 +65,18 @@ import { fr, en, translateTime } from './Translate.js'
 import funiter from '../lib/funiterReactive.js'
 import info from './Info.vue'
 import infoButton from './Info-Button.vue'
-import { watch, onMounted, reactive } from 'vue'
+import { ref, watch, onMounted, reactive } from 'vue'
 
-const log = (event) => {
-    console.log(event)
+const stats = ref(null)
+
+const title = ref('-------------')
+
+const refreshTitle = (event) => {
+    const pt = stats.value.getCoordinates(event.clientX, event.clientY)
+    if (!pt) {
+        return
+    }
+    title.value = funiter.currencyDecimal(pt.y) + ' Ü  / ' + pt.x  + ' ' + translateTime(funiter.creationPeriod, pt.x) 
 }
 
 
@@ -127,7 +139,9 @@ watch(() => funiter.currency, getStats, { deep: true })
 
 watch(() => [state.referential, funiter.creationPeriod],  getStats)
 
-onMounted(getStats)
+onMounted(() => {
+    getStats()
+})
 
 
 </script>
