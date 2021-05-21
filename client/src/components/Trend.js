@@ -398,10 +398,10 @@ var Trends = {
       const svgpt =  this.pt.matrixTransform(this.$el.getScreenCTM().inverse());
       if (svgpt.x < this.boundary.minX) {
         r.x = 0
-      } else if (svgpt.x > this.boundary.maxX + this.boundary.minX) {
+      } else if (svgpt.x > this.boundary.maxX) {
         r.x = this.maxX
       } else {
-        r.x = Math.round(this.maxX * (svgpt.x - this.boundary.minX) / this.boundary.maxX)
+        r.x = Math.round(this.maxX * (svgpt.x - this.boundary.minX) / (this.boundary.maxX - this.boundary.minX))
       }
 
       if (svgpt.y < this.boundary.minY) {
@@ -409,7 +409,7 @@ var Trends = {
       } else if (svgpt.y > this.boundary.maxY) {
         r.y = 0
       } else {
-        r.y = Math.round(this.maxY * ((this.boundary.maxY + this.boundary.minY) - svgpt.y) / this.boundary.maxY)
+        r.y = Math.round(this.maxY * (this.boundary.maxY - svgpt.y) / (this.boundary.maxY - this.boundary.minY))
       }
       return r
     }
