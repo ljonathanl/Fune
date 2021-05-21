@@ -17,9 +17,9 @@ const funiter = {
     uValue: 1000,
     isPlaying: false,
     txLimit: 100,
-    statLimit: 200,
+    statLimit: 100,
     symbol: 'Ü',
-    version: '0.1.0',
+    version: '0.1.1',
     stepTime: 1,
 }
 
@@ -173,7 +173,7 @@ funiter.expressionParser = (expression, values) => {
 }
 
 
-const cheatRegex = /!x(\d+)/
+const cheatRegex = /^!(.*)/
 const uValue = funiter.uValue
 const revaluationMessage = '!revaluation%'
 const creationMessage = '!Ucreation'
@@ -188,25 +188,33 @@ const saveStat = (name, value) => {
     stat[index] = value
 }
 
+const getAccountWeight = (account) => {
+    const cheat = account.name.match(cheatRegex)
+    let weight = 1
+    if (cheat) {
+        try {
+            weight = Math.round(funiter.expressionParser(cheat[1], {M: state.currency.monetaryMass, N: state.currency.nbMembers, T: state.currency.elapsedTime})) 
+        } catch (e) {}
+        if (weight < 1) 
+            weight = 1
+    }
+    return weight
+}
+
 const refreshCurrencyAndStats = () => {
     let monetaryMass = 0
     let nbMembers = 0
 
     Object.values(state.accounts).forEach(account => {
-        const cheat = account.name.match(cheatRegex)
-        let weight = 1
-        if (cheat)
-            weight = parseInt(cheat[1]) 
-
-        if (account.role == roles.human) 
-            nbMembers += weight
-            
         if (account.role != roles.bank) {
-            monetaryMass += account.balance * weight
-            saveStat(account.name, account.balance)
+            const weight = getAccountWeight(account) 
+            if (account.role == roles.human) 
+                nbMembers += weight
+                
+            monetaryMass += account.balance
+            saveStat(account.name, Math.floor(account.balance / weight))
         }
     })
-
 
     state.currency.nbMembers = nbMembers
     state.currency.monetaryMass = monetaryMass
@@ -215,7 +223,7 @@ const refreshCurrencyAndStats = () => {
 }
 
 const play = (autoPlay = true) => {
-    if (state.currency.elapsedTime >= funiter.statLimit) {
+    if (state.currency.elapsedTime >= 999) {
         funiter.stop()
         return
     }
@@ -243,15 +251,18 @@ const play = (autoPlay = true) => {
     }
 
     Object.values(state.accounts).forEach(account => {
-        if (isRevaluation && meltValue > 0 && account.balance > 9) {
-            let melting = account.balance * meltValue
-            melting = Math.min(melting > uGained ? Math.ceil(melting) : Math.floor(melting), account.balance)
-            if (melting < 10)
-                melting = 10
-            funiter.doTx({from: account.name, to: funiterAccount.name, message: revaluationMessage + meltPercent, value: melting}, false)
-        }    
-        if (account.role == roles.human && uPerTime > 0) {
-            funiter.doTx({from: funiterAccount.name, to: account.name, message: creationMessage, value: uValue * uPerTime}, false)
+        if (account.role != roles.bank) {
+            const weight = getAccountWeight(account)
+            if (isRevaluation && meltValue > 0 && account.balance > 9) {
+                let melting = account.balance * meltValue
+                melting = Math.min(melting > uGained ? Math.ceil(melting) : Math.floor(melting), account.balance)
+                if (melting < 10)
+                    melting = 10
+                funiter.doTx({from: account.name, to: funiterAccount.name, message: revaluationMessage + meltPercent, value: melting}, false)
+            }    
+            if (account.role == roles.human && uPerTime > 0) {
+                funiter.doTx({from: funiterAccount.name, to: account.name, message: creationMessage, value: weight * uValue * uPerTime}, false)
+            }
         }
     })
 
@@ -321,6 +332,13 @@ funiter.reset = () => {
     funiter.stop()
     Object.values(state.accounts).forEach(account => {
         account.balance = 0
+        if (state.beginStat != 0)
+            return
+        const balance = state.stats[account.name][0]
+        if (balance <= 0) 
+            return 
+        account.balance = getAccountWeight(account) * balance
+         
     })
     state.transactions = []
     state.stats = {}
@@ -351,7 +369,8 @@ funiter.unplay = () => {
             state.currency = currency
             Object.values(state.accounts).forEach(account => {
                 if (account.role != roles.bank) {
-                    account.balance = state.stats[account.name][timeBefore]
+                    const weight = getAccountWeight(account)
+                    account.balance = state.stats[account.name][timeBefore] * weight
                 }
             })
             refreshCurrencyAndStats()
@@ -374,4 +393,5 @@ funiter.stop = () => {
     }
 }
 
+console.log(funiter.name + ' v' + funiter.version)
 export default funiter

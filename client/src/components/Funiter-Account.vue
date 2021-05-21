@@ -107,7 +107,7 @@
                         <div class="d-flex w-100 justify-content-between" @click="state.tx.to = transaction.from == state.account.name ? transaction.to : transaction.from">
                             <div>
                                 <h5 v-if="transaction.from == state.account.name">
-                                    <span style="width: 85px;" class="badge bg-light text-dark text-right">{{ funiter.currencyDecimal(transaction.value) }} Ü</span>
+                                    <span style="min-width: 85px;" class="badge bg-light text-dark text-right">{{ funiter.currencyDecimal(transaction.value) }} Ü</span>
                                     <span style="width: 70px;" class="d-inline-block text-center">
                                         <en> to </en>
                                         <fr> à </fr> 
@@ -119,7 +119,7 @@
                                     </strong>
                                 </h5>
                                 <h5 v-else>
-                                    <span style="width: 85px;" class="badge bg-primary text-right">{{ funiter.currencyDecimal(transaction.value) }} Ü</span>
+                                    <span style="min-width: 85px;" class="badge bg-primary text-right">{{ funiter.currencyDecimal(transaction.value) }} Ü</span>
                                     <span style="width: 70px;" class="d-inline-block text-center">
                                         <en> from </en>
                                         <fr> de </fr>

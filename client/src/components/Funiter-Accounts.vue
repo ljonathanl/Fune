@@ -58,16 +58,10 @@
                     <td class="text-right">
                         <template v-if="account.role != 'bank'">
                             <strong>{{ funiter.currencyDecimal(account.balance) }}<small> Ü </small></strong>
-                            <!-- <a href="#" @click.stop.prevent="resetBalance(account)" class="mx-2">
-                                <en>reset</en>
-                                <fr>raz</fr>
-                            </a> -->
                         </template>
-                        <!-- <a v-if="account.name != funiter.name" href="#" @click.stop.prevent="deleteAccount(account)" class="text-warning"><i class="fa fa-trash"></i></a> -->
                     </td>
                     <td class="text-right">
                         <template v-if="account.role != 'bank'">
-                            <!-- <strong>{{ funiter.currencyDecimal(account.balance) }}<small> Ü </small></strong> -->
                             <a href="#" @click.stop.prevent="resetBalance(account)" class="mr-2">
                                 <en>reset</en>
                                 <fr>raz</fr>
@@ -80,7 +74,7 @@
         </table>
 
         <div class="input-group">
-            <input :placeholder="translate({en: 'näme', fr: 'nöm'})" v-model="state.newAccount.name" type="text" class="form-control" id="accountName" maxlength="10"/>
+            <input :placeholder="translate({en: 'näme', fr: 'nöm'})" v-model="state.newAccount.name" type="text" class="form-control" id="accountName" maxlength="16"/>
             <select v-model="state.newAccount.role" class="form-control" style="max-width: 100px;">
                 <option value="human">
                     <en>Üman</en>

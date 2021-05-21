@@ -11,7 +11,6 @@
         </info>
         <div :title="title">
             <trends
-                
                 class="p-2 stats"
                 :data="state.stats"
                 :colors="state.colors"
@@ -76,7 +75,7 @@ const refreshTitle = (event) => {
     if (!pt) {
         return
     }
-    title.value = funiter.currencyDecimal(pt.y) + ' Ü  / ' + pt.x  + ' ' + translateTime(funiter.creationPeriod, pt.x) 
+    title.value = funiter.currencyDecimal(pt.y) + ' ' + state.yUnit + ' | ' + pt.x  + ' ' + translateTime(funiter.creationPeriod, pt.x) 
 }
 
 
