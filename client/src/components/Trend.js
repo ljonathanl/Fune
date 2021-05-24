@@ -139,13 +139,13 @@ var Background = {
       }, Math.round(this.max / 1000) + ' ' + this.yUnit),
       h('text', {
         x: boundary.minX,
-        y: boundary.maxY - 3,
+        y: boundary.maxY + 10,
         fill: '#EEEEEEBB',
         'font-size': '0.5em'
-      }, Math.round(this.min / 1000)),
+      }, this.min),
       h('text', {
         x: boundary.maxX,
-        y: boundary.maxY - 3,
+        y: boundary.maxY + 10,
         width: 100,
         fill: '#EEEEEEBB',
         style: {'text-anchor': 'end'},
@@ -239,9 +239,13 @@ var Trend = {
       type: Number,
       default: -Infinity
     },
-    min: {
+    minY: {
       type: Number,
       default: Infinity
+    },
+    minX: {
+      type: Number,
+      default: 0
     },
     height: Number,
     width: Number,
@@ -321,7 +325,7 @@ var Trend = {
         h(Background, {
           boundary: boundary,
           max: Math.max.apply(Math, this.data.concat([this.max])),
-          min: Math.min.apply(Math, this.data.concat([this.min])),
+          min: this.minX,
           xUnit: this.xUnit,
           yUnit: this.yUnit
         }),
@@ -331,7 +335,7 @@ var Trend = {
           boundary: boundary,
           radius: this.radius,
           max: this.max,
-          min: this.min,
+          min: this.minY,
           id: 'stats',
           ref: 'path',
           dash: '0'
@@ -353,9 +357,13 @@ var Trends = {
       type: Array,
       required: true
     },
-    min: {
+    minY: {
       type: Number,
       default: Infinity
+    },
+    minX: {
+      type: Number,
+      default: 0
     },
     height: Number,
     width: Number,
@@ -401,7 +409,7 @@ var Trends = {
       } else if (svgpt.x > this.boundary.maxX) {
         r.x = this.maxX
       } else {
-        r.x = Math.round(this.maxX * (svgpt.x - this.boundary.minX) / (this.boundary.maxX - this.boundary.minX))
+        r.x = Math.round((this.maxX - this.minX) * (svgpt.x - this.boundary.minX) / (this.boundary.maxX - this.boundary.minX))
       }
 
       if (svgpt.y < this.boundary.minY) {
@@ -409,7 +417,7 @@ var Trends = {
       } else if (svgpt.y > this.boundary.maxY) {
         r.y = 0
       } else {
-        r.y = Math.round(this.maxY * (this.boundary.maxY - svgpt.y) / (this.boundary.maxY - this.boundary.minY))
+        r.y = Math.round((this.maxY - this.minY) * (this.boundary.maxY - svgpt.y) / (this.boundary.maxY - this.boundary.minY))
       }
       return r
     }
@@ -458,7 +466,7 @@ var Trends = {
             boundary: this.boundary,
             radius: this.radius,
             max: max,
-            min: this.min,
+            min: this.minY,
             id: 'stats',
             ref: 'path' + index,
             color: this.colors[index],
@@ -483,7 +491,7 @@ var Trends = {
         h(Background, {
           boundary: this.boundary,
           max: max,
-          min: this.min,
+          min: this.minX,
           xUnit: this.xUnit,
           yUnit: this.yUnit
         }),

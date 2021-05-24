@@ -10,31 +10,6 @@
             <fr>FR_info-currency</fr>
         </info>
         <form>
-            <!-- <div class="input-group mb-1">
-                <label class="input-group-text">
-                    <en>Ü revaluation</en>
-                    <fr>réévaluation de Ü</fr>
-                </label>
-                <select v-model="editedCurrency.mode" id="currencyMode" class="form-control select-text-center"
-                    :class="{'bg-primary': editedCurrency.mode != funiter.currency.mode}" :disabled="funiter.isPlaying">
-                    <option value="melt">
-                        <en>melting</en>
-                        <fr>fonte</fr>
-                    </option>
-                    <option value="grew">
-                        <en>growth</en>
-                        <fr>croissance</fr>
-                    </option>
-                </select>
-                <label class="input-group-text pr-1">
-                    <info-button class="px-0" info="info-currency-mode" />
-                </label>
-            </div>
-            <info infoId="info-currency-mode">
-                <en>EN_info-currency-mode</en>
-                <fr>FR_info-currency-mode</fr>
-            </info>   -->
-            
             <div class="input-group mb-1">
                 <label class="input-group-text" for="currencyUPerTime">
                     <en>Ü per </en>
@@ -78,8 +53,6 @@
                         Ü(t+r) = ( 1 + 
                     </option>
                 </select>
-                <!-- <span class="input-group-text" v-if="editedCurrency.mode == 'melt'">Ü(t-1) = ( 1 - </span>
-                <span class="input-group-text" v-else>Ü(t+1) = ( 1 + </span> -->
                 <input id="currencyExpression" v-model="editedCurrency.expression" type="text" class="form-control text-right"
                     :class="{'bg-primary': editedCurrency.expression != funiter.currency.expression}" :disabled="funiter.isPlaying">
                 <span class="form-control px-1 text-left" style="flex-grow: 0.71;">
@@ -88,27 +61,10 @@
                 </span>    
             </div>
             <info infoId="info-currency-expression">
-                <en>EN_info-currency-expression</en>
-                <fr>FR_info-currency-expression</fr>
+                <a href="#" class="info-link fa-play-circle" @click.prevent="editedCurrency.expression = '0.1';editedCurrency.mode = 'grew'">Fb(Ü): Ü(t+r) = ( 1 + 0.1) Ü(t)</a><br>                
+                <a href="#" class="info-link fa-play-circle" @click.prevent="editedCurrency.expression = '0.1^2 * M/N';editedCurrency.mode = 'grew'">Fg(Ü): Ü(t+r) = ( 1 + 0.1^2 * M/N) Ü(t)</a><br>
+                <a href="#" class="info-link fa-play-circle" @click.prevent="editedCurrency.expression = '0.1';editedCurrency.mode = 'melt'">Ff(Ü): Ü(t-r) = ( 1 - 0.1) Ü(t)</a><br>
             </info> 
-            <!-- <div class="input-group mb-1">
-                <label class="input-group-text" for="currencyStepTime">
-                    <en>day duration</en>
-                    <fr>durée d'un jour</fr>
-                </label>
-                <input id="currencyStepTime" v-model="editedCurrency.stepTime" type="number" min="1" max="90000" step="1" class="form-control text-right"
-                    :class="{'bg-primary': editedCurrency.stepTime != funiter.currency.stepTime}" :disabled="funiter.isPlaying">
-                <span class="input-group-text pr-1">
-                    <en>second<span v-if="editedCurrency.stepTime > 1">s</span></en>
-                    <fr>seconde<span v-if="editedCurrency.stepTime > 1">s</span></fr>
-                    <info-button class="px-0 ml-2" info="info-currency-stepTime" />
-                </span>
-            </div>
-            <info infoId="info-currency-stepTime">
-                <en>EN_info-currency-stepTime</en>
-                <fr>FR_info-currency-stepTime</fr>
-            </info> -->
-
             <div class="d-flex align-items-start flex-wrap mb-1" style="justify-content: space-evenly;" v-if="currencyChange">
                 <button type="button" class="btn btn-secondary mr-auto" @click="Object.assign(editedCurrency, funiter.currency)">
                     <en>ündo!</en>
@@ -119,19 +75,6 @@
                     <fr>valïder!</fr>
                 </button>
             </div>
-
-            <!-- <div class="input-group mb-1 mt-3">
-                <label class="input-group-text" for="currencyElapsedTime">
-                    <en>elapsed time (T)</en>
-                    <fr>temps écoulé (T)</fr>
-                </label>
-                <input id="currencyElapsedTime" v-model="funiter.currency.elapsedTime" type="text" class="form-control text-right" disabled>
-                <span class="input-group-text">
-                    <en>day<span v-if="funiter.currency.elapsedTime > 1">s</span></en>
-                    <fr>jour<span v-if="funiter.currency.elapsedTime > 1">s</span></fr>
-                </span>
-            </div> -->
-
             <div class="input-group mb-1 mt-3">
                 <button type="button" class="btn btn-secondary form-control text-left" @click="more = true" v-if="!more">
                     <en>more data</en>
@@ -193,16 +136,13 @@
                 </div>
                 <div class="input-group mb-1">
                     <label class="input-group-text" for="currencyLastMelt">
-                        <en>last melting</en>
-                        <fr>dernière fonte</fr>
+                        <en>distribution (D)</en>
+                        <fr>distribution (D)</fr>
                     </label>
                     <input id="currencyLastMelt" :value="funiter.currency.lastMelt" type="text" class="form-control text-right" disabled>
                     <span class="input-group-text">%</span>
                 </div>
             </div>
-
-            
-            
         </form> 
     </div>
 </template>

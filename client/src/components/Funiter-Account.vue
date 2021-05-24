@@ -90,7 +90,8 @@
                     :radius="8"
                     :stroke-width="1.5"
                     :stroke-linecap="'butt'"
-                    :min="0"
+                    :minX="state.beginStat"
+                    :minY="0"
                     :max="1000"
                     :xUnit="funiter.currency.elapsedTime + ' ' + translateTime(funiter.creationPeriod, funiter.currency.elapsedTime)"
                     yUnit="Ü"
@@ -160,6 +161,7 @@ const state = reactive({
         return funiter.accounts.filter(a => a.role != 'bank' && a.name != state.account.name)
     }),
     stats: [],
+    beginStat: 0,
     transactions: [],
     tx: {from: '', to: '', message: '', value: 1},
 })
@@ -167,7 +169,8 @@ const state = reactive({
 const refresh = () => {
     if (state.account) {
         state.transactions = funiter.getAccountTx(state.account.name, 10).reverse()
-        state.stats = funiter.getAccountStats(state.account.name, 'day')
+        state.stats = funiter.getAccountStats(state.account.name)
+        state.beginStat = funiter.currency.elapsedTime == 0 ? 0 : funiter.currency.elapsedTime - (state.stats.length - 1)
     }
 }
 
