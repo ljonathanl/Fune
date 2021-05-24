@@ -42,10 +42,10 @@
 
       <p class="lead text-center">
         <en>
-            the old created Ünits melt according to a <strong>mathematical</strong>s formula at each <strong>revaluation period</strong>
+            a percentage of the old Ünits is redistributed according to a <strong>mathematical</strong> formula at each <strong>revaluation period</strong>
         </en>
         <fr>
-            les anciennes Ünités fondent suivant une <strong>formule</strong> mathématique à chaque <strong>période de réévaluation</strong>
+            un pourcentage des anciennes Ünités est redistribué suivant une <strong>formule</strong> mathématique à chaque <strong>période de réévaluation</strong>
         </fr>
       </p>
       
@@ -187,6 +187,21 @@ input[type=number] {
 
 text {
   user-select: none;
+}
+
+.info-link {
+  text-decoration: none;
+}
+
+.info-link:before {
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transform: translate(0, 0);
+  padding-right: 0.5rem;
 }
 
 </style>

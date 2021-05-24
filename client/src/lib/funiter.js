@@ -253,6 +253,9 @@ const play = (autoPlay = true) => {
     Object.values(state.accounts).forEach(account => {
         if (account.role != roles.bank) {
             const weight = getAccountWeight(account)
+            if (account.role == roles.human && uPerTime > 0) {
+                funiter.doTx({from: funiterAccount.name, to: account.name, message: creationMessage, value: weight * uValue * uPerTime}, false)
+            }
             if (isRevaluation && meltValue > 0 && account.balance > 9) {
                 let melting = account.balance * meltValue
                 melting = Math.min(melting > uGained ? Math.ceil(melting) : Math.floor(melting), account.balance)
@@ -260,9 +263,6 @@ const play = (autoPlay = true) => {
                     melting = 10
                 funiter.doTx({from: account.name, to: funiterAccount.name, message: revaluationMessage + meltPercent, value: melting}, false)
             }    
-            if (account.role == roles.human && uPerTime > 0) {
-                funiter.doTx({from: funiterAccount.name, to: account.name, message: creationMessage, value: weight * uValue * uPerTime}, false)
-            }
         }
     })
 

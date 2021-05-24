@@ -18,7 +18,8 @@
                 :radius="8"
                 :stroke-width="1.4"
                 :stroke-linecap="'butt'"
-                :min="0"
+                :minX="state.beginStat"
+                :minY="0"
                 :xUnit="state.xUnit"
                 :yUnit="state.yUnit"
                 @mousemove="refreshTitle"
@@ -63,6 +64,7 @@ import { Trends } from './Trend.js'
 import { fr, en, translateTime } from './Translate.js'
 import funiter from '../lib/funiterReactive.js'
 import info from './Info.vue'
+import lodash from 'lodash'
 import infoButton from './Info-Button.vue'
 import { ref, watch, onMounted, reactive } from 'vue'
 
@@ -70,12 +72,19 @@ const stats = ref(null)
 
 const title = ref('-------------')
 
+let time = lodash.now()
+
 const refreshTitle = (event) => {
     const pt = stats.value.getCoordinates(event.clientX, event.clientY)
-    if (!pt) {
+    const now = lodash.now()
+    if (!pt || now - time < 100) {
         return
     }
-    title.value = funiter.currencyDecimal(pt.y) + ' ' + state.yUnit + ' | ' + pt.x  + ' ' + translateTime(funiter.creationPeriod, pt.x) 
+    time = now
+    const T = (pt.x + state.beginStat)
+    title.value = funiter.currencyDecimal(pt.y) + ' ' + state.yUnit + '\n' + 
+        'T: ' + T  + ' ' + translateTime(funiter.creationPeriod, T) + '\n' +
+        translateCurrency(state.funeStat[pt.x])
 }
 
 
@@ -84,8 +93,18 @@ const state = reactive({
     stats: [],
     colors: [],
     xUnit: '',
-    yUnit: 'Ü'
+    yUnit: 'Ü',
+    beginStat: 0,
+    funeStat: [null]
 })
+
+const translateCurrency = (currency) => {
+    if (!currency) return ''
+    return 'M: ' + funiter.currencyDecimal(currency.monetaryMass) + ' Ü' + '\n' +
+        'N: ' + currency.nbMembers + ' Üm.' + '\n' +
+        'M/N: ' + funiter.currencyDecimal(currency.average) + ' Ü' + '\n' +
+        'D: ' + currency.lastMelt + ' %' + '\n' 
+}
 
 const getStats = () => {
     state.xUnit = funiter.currency.elapsedTime + ' ' + translateTime(funiter.creationPeriod, funiter.currency.elapsedTime)
@@ -130,6 +149,8 @@ const getStats = () => {
     colors.push(funiter.selectedAccounts.get(funiter.name).color)
     state.stats = stats
     state.colors = colors
+    state.funeStat = funeStat
+    state.beginStat = funeStat[0].elapsedTime
 }
 
 watch(() => funiter.selectedAccounts, getStats, { deep: true })
