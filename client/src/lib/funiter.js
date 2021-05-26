@@ -247,7 +247,7 @@ const play = (autoPlay = true) => {
         if (state.currency.mode == modes.grew) 
             meltValue = 1 - 1 / (1 + meltValue)
         meltValue = Math.max(0, Math.min(1, meltValue))
-        meltPercent = (meltValue * 100).toFixed(2)
+        meltPercent = Math.floor(meltValue * 10000)/100 
     }
 
     Object.values(state.accounts).forEach(account => {
