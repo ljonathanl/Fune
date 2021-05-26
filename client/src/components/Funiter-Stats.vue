@@ -28,7 +28,7 @@
                 smooth>
             </trends>
         </div>
-        <div class="input-group mx-auto mt-3 mb-1" style="max-width: 250px">
+        <div class="input-group mx-auto mt-3 mb-1" style="max-width: 350px">
             <label class="input-group-text px-1">  
                 <en>referential</en>
                 <fr>référentiel</fr>
@@ -47,14 +47,12 @@
                     <fr>moyenne</fr>
                 </option>
             </select>
-            <label class="input-group-text p-1">
-                <info-button class="px-0" info="info-stats-referential" />
-            </label>
+            <button type="button" class="btn btn-secondary" @click="exportAsCSV()">
+                <i class="fa fa-table"></i>
+                <en> export</en>
+                <fr> exporter</fr>
+            </button>
         </div>
-        <info infoId="info-stats-referential">
-            <en>EN_info-stats-referential</en>
-            <fr>FR_info-stats-referential</fr>
-        </info>
     </div>
 </template>
 
@@ -67,6 +65,7 @@ import info from './Info.vue'
 import lodash from 'lodash'
 import infoButton from './Info-Button.vue'
 import { ref, watch, onMounted, reactive } from 'vue'
+import { saveAs } from 'file-saver'
 
 const stats = ref(null)
 
@@ -91,6 +90,7 @@ const refreshTitle = (event) => {
 const state = reactive({
     referential: 'relative',
     stats: [],
+    accounts: [],
     colors: [],
     xUnit: '',
     yUnit: 'Ü',
@@ -112,13 +112,14 @@ const getStats = () => {
     let stat = null
     let stats = []
     let colors = []
+    let accounts = []
     funiter.selectedAccounts.forEach((account, name) => {
         if (name != funiter.name) {
             stat = funiter.getAccountStats(name)
             if (stat) {
                 if (state.referential == 'average') {
                     for (let j = 0; j < stat.length; j++) {
-                        stat[j] = funeStat[j].average == 0 ? 0 : (stat[j] / funeStat[j].average) * 100000;
+                        stat[j] = funeStat[j].average == 0 ? 0 : (stat[j] / funeStat[j].average) * 100000
                     }
                 } else if (state.referential == 'quantitative') {
                     for (let j = 0; j < stat.length; j++) {
@@ -126,6 +127,7 @@ const getStats = () => {
                     }
                 }
                 stats.push(stat)
+                accounts.push(name)
                 colors.push(account.color)
             }
         }
@@ -133,6 +135,14 @@ const getStats = () => {
 
     if (state.referential == 'average') {
         state.yUnit = '% M/N'
+
+        // Ü / (M/N)
+        stat = funeStat.map(c => {
+            return c.average == 0 ? 0 : ((c.uPerTime * c.revaluationTime *  1000)  / c.average) * 100000
+        })
+        stats.push(stat)
+        colors.push("#99999955")
+
         stat = new Array(funeStat.length).fill(100000)
     } else if (state.referential == 'relative') {
         state.yUnit = 'Ü'
@@ -151,7 +161,49 @@ const getStats = () => {
     state.colors = colors
     state.funeStat = funeStat
     state.beginStat = funeStat[0].elapsedTime
+    state.accounts = accounts
 }
+
+const getGrew = (melt) => {
+    if (melt == 0)
+        return (0).toFixed(2)
+    return ((1 / (1 / (melt / 100) - 1)) * 100).toFixed(2)
+}
+
+const exportAsCSV = () => {
+    let csv = 'currency;' + 
+        '"U per time: ' + funiter.currency.uPerTime + '";' + 
+        '"revaluation period: ' + funiter.currency.revaluationTime + '";' +
+        '"expression: ' + (funiter.currency.mode == 'melt' ? 'U(t-r) = ( 1 - ' : 'U(t+r) = ( 1 + ') + funiter.currency.expression + ' ) U(t)";' + '\n' +
+        'referential;' + state.referential + ';\n'
+        '\n;;\n;;'
+    
+    csv += 'time;M;N;C;D;M/N;'
+
+    for (let index = 0; index < state.accounts.length; index++) {
+        csv += '"' + state.accounts[index] + '";';
+    }
+
+    csv += '\n'
+
+    for (let i = 0; i < state.funeStat.length; i++) {
+        let currency = state.funeStat[i]
+        csv += currency.elapsedTime + ';' + 
+            funiter.currencyDecimal(currency.monetaryMass) + ';' +
+            currency.nbMembers + ';' +
+            getGrew(currency.lastMelt) + ';' +
+            currency.lastMelt.toFixed(2) + ';' +
+            funiter.currencyDecimal(currency.average) + ';'
+
+        for (let j = 0; j < state.accounts.length; j++) {
+            csv += funiter.currencyDecimal(state.stats[j][i]) + ';'
+        }
+        csv += '\n'
+    }
+
+    var blob = new Blob([csv], {type: "text/csv;charset=utf-8"})
+    saveAs(blob, "fune_" + new Date().toISOString().substring(0,16) + ".csv")
+} 
 
 watch(() => funiter.selectedAccounts, getStats, { deep: true })
 

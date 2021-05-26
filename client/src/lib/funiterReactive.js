@@ -79,6 +79,7 @@ funiterProxy.createAccount = newAccount => {
     let account = funiter.createAccount(newAccount)
     if (account) {
         funiterProxy.accounts.push(account)
+        funiterProxy.select(account)
         funiterProxy.refresh()
     }
     return account

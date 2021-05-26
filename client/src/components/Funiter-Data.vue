@@ -31,7 +31,7 @@ const save = () => {
   const state = funiter.getState()
   const json = JSON.stringify(state)
   // var lzwString = jsonc.pack( state, true )
-  var blob = new Blob([json], {type: "text/plain;charset=utf-8"})
+  var blob = new Blob([json], {type: "application/json;charset=utf-8"})
   saveAs(blob, "fune_" + new Date().toISOString().substring(0,16) + ".fun")
 }
 

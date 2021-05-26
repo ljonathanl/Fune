@@ -211,8 +211,8 @@ const translateTxMessage = (message) => {
     if (message.indexOf('!revaluation%') == 0) {
         let c = message.split('%')[1]
         return translate({
-            en: '> all the Ü melt by ' + c + '%!',
-            fr:  '> tous les Ü fondent de ' + c + '% !'
+            en: '> ' + c + '% of Ü are redistributed',
+            fr: '> ' + c + '% des Ü sont redistribués'
         })
     }
 
