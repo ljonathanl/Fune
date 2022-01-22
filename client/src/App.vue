@@ -126,7 +126,7 @@ if (funiterLib.accounts.length <= 1) {
 
 <style>
 body {
-background-image: url("./padded.png"), linear-gradient(180deg, #4a5e86 20%, #1f283a);
+background-image: url("/padded.png"), linear-gradient(180deg, #4a5e86 20%, #1f283a);
 /* background-image: url("./rebel.png"); */
 background-color: #4a5e86;
 }
