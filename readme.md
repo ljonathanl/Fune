@@ -1,4 +1,4 @@
-![icon](./public/favicon90x90.png "icon")
+![icon](./client/public/favicon90x90.png "icon")
 
 
 # **``fї`` ~ fÜne**
@@ -9,5 +9,8 @@ a crëator account create a new one Ü (the Ünit of the fÜne currency) by day
 
 old created **Ünits** melt a given percentage per **revaluation period**
 
+
+
+[DEMO](https://ljonathanl.github.io/Fune/client/dist/)
 
 
